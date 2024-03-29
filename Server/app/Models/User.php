@@ -24,7 +24,8 @@ class User extends Authenticatable
         'roll_no',
         'student_id',
         'admitted_year',
-        'div'
+        'div',
+        'role'
     ];
 
     /**

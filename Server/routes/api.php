@@ -14,6 +14,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
+Route::middleware(['auth:sanctum'])->get('/profile', function (Request $request) {
     return $request->user();
 });
+
+
+
+Route::middleware(['auth:sanctum', 'ability:token-student'])->group(function () {
+    Route::get('/test', function (Request $request) {
+        return $request->user();
+    });
+});
+
+
+require __DIR__.'/auth.php';
