@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentAchivementsController;
+use App\Http\Controllers\StudentExtraCuController;
 use App\Http\Controllers\StudentInternshipController;
 use App\Models\StudentAchivements;
 use Illuminate\Http\Request;
@@ -31,6 +32,10 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(f
     Route::post("/student/add/achievement",[StudentAchivementsController::class,'store']);
     Route::get("/student/fetch/achievements",[StudentAchivementsController::class,'fetch']);
     Route::post("/student/update/achievement",[StudentAchivementsController::class,'update']);
+
+    Route::post("/student/add/extra-curricular-activities",[StudentExtraCuController::class,'store']);
+    Route::get("/student/fetch/extra-curricular-activities",[StudentExtraCuController::class,'fetch']);
+    Route::post("/student/update/extra-curricular-activities",[StudentExtraCuController::class,'update']);
 
 });
 

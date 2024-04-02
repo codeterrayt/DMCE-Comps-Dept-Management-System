@@ -65,4 +65,9 @@ class User extends Authenticatable
         return $this->hasMany(StudentAchivements::class)->get();
     }
 
+    public function fetch_extra_curr()
+    {
+        return $this->hasMany(StudentExtraCu::class)->get();
+    }
+
 }
