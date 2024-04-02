@@ -3,8 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentAchivementsController;
 use App\Http\Controllers\StudentExtraCuController;
+use App\Http\Controllers\StudentHackathonsController;
 use App\Http\Controllers\StudentInternshipController;
-use App\Models\StudentAchivements;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +36,10 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(f
     Route::post("/student/add/extra-curricular-activities",[StudentExtraCuController::class,'store']);
     Route::get("/student/fetch/extra-curricular-activities",[StudentExtraCuController::class,'fetch']);
     Route::post("/student/update/extra-curricular-activities",[StudentExtraCuController::class,'update']);
+
+    Route::post("/student/add/hackathon",[StudentHackathonsController::class,'store']);
+    Route::get("/student/fetch/hackathon",[StudentHackathonsController::class,'fetch']);
+    Route::post("/student/update/hackathon",[StudentHackathonsController::class,'update']);
 
 });
 

@@ -67,7 +67,7 @@ class StudentAchivementsController extends Controller
          $request->validate([
             'id' => [
                 'required',
-                Rule::exists('student_internships')->where(function ($query) {
+                Rule::exists('student_achievements')->where(function ($query) {
                     return $query->where('id', request()->id)
                                  ->where('user_id', auth()->id());
                 }),
