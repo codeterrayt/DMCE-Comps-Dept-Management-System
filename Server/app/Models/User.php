@@ -75,4 +75,8 @@ class User extends Authenticatable
         return $this->hasMany(StudentHackathons::class)->get();
     }
 
+    public function fetch_higher_studies(){
+        return $this->hasMany(StudentHigherStudies::class)->get();
+    }
+
 }
