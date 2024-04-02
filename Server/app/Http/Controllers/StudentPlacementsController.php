@@ -107,4 +107,27 @@ class StudentPlacementsController extends Controller
          return response()->json(["placements" => $placements]);
     }
 
+    public function destroy(Request $request)
+    {
+
+        $request->validate([
+            'id' => [
+                'required',
+                Rule::exists('student_placements')->where(function ($query) {
+                    return $query->where('id', request()->id)
+                                 ->where('user_id', auth()->id());
+                }),
+            ],
+        ]);
+
+        // Find the job placement by ID
+        $jobPlacement = StudentPlacements::findOrFail($request->id);
+
+        // Delete the job placement
+        $jobPlacement->delete();
+
+        // Return a response
+        return response()->json(['message' => 'Job placement deleted successfully']);
+    }
+
 }

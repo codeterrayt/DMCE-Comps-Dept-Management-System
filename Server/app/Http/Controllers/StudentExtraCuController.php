@@ -105,4 +105,29 @@ class StudentExtraCuController extends Controller
       // Return a response
       return response()->json(['message' => 'Internship updated successfully', 'ecc' => $ecc]);
   }
+
+  public function destroy(Request $request)
+  {
+
+      $request->validate([
+          'id' => [
+              'required',
+              Rule::exists('student_extra_cus')->where(function ($query) {
+                  return $query->where('id', request()->id)
+                               ->where('user_id', auth()->id());
+              }),
+          ],
+      ]);
+
+      // Find the job placement by ID
+      $jobPlacement = StudentExtraCu::findOrFail($request->id);
+
+      // Delete the job placement
+      $jobPlacement->delete();
+
+      // Return a response
+      return response()->json(['message' => 'Student Extra Cur deleted successfully']);
+  }
+
+
 }

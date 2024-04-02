@@ -102,4 +102,27 @@ class StudentHigherStudiesController extends Controller
         return response()->json(['higher_studies' => $fetch_higher_studies]);
     }
 
+    public function destroy(Request $request)
+    {
+
+        $request->validate([
+            'id' => [
+                'required',
+                Rule::exists('student_higher_studies')->where(function ($query) {
+                    return $query->where('id', request()->id)
+                                 ->where('user_id', auth()->id());
+                }),
+            ],
+        ]);
+
+        // Find the job placement by ID
+        $jobPlacement = StudentHigherStudies::findOrFail($request->id);
+
+        // Delete the job placement
+        $jobPlacement->delete();
+
+        // Return a response
+        return response()->json(['message' => 'Higher Studies deleted successfully']);
+    }
+
 }

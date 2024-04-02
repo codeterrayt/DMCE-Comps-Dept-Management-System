@@ -150,4 +150,28 @@ class StudentInternshipController extends Controller
         // Return the internships as a JSON response
         return response()->json(["internships" => $internships]);
     }
+
+    public function destroy(Request $request)
+    {
+
+        $request->validate([
+            'id' => [
+                'required',
+                Rule::exists('student_internships')->where(function ($query) {
+                    return $query->where('id', request()->id)
+                                 ->where('user_id', auth()->id());
+                }),
+            ],
+        ]);
+
+        // Find the job placement by ID
+        $jobPlacement = StudentInternship::findOrFail($request->id);
+
+        // Delete the job placement
+        $jobPlacement->delete();
+
+        // Return a response
+        return response()->json(['message' => 'Internship deleted successfully']);
+    }
+
 }

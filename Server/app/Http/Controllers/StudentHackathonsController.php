@@ -108,4 +108,28 @@ class StudentHackathonsController extends Controller
         // Return a response
         return response()->json(['message' => 'Hackathon participation updated successfully', 'hackathon_participation' => $StudentHackathons]);
     }
+
+    public function destroy(Request $request)
+    {
+
+        $request->validate([
+            'id' => [
+                'required',
+                Rule::exists('student_hackathons')->where(function ($query) {
+                    return $query->where('id', request()->id)
+                                 ->where('user_id', auth()->id());
+                }),
+            ],
+        ]);
+
+        // Find the job placement by ID
+        $jobPlacement = StudentHackathons::findOrFail($request->id);
+
+        // Delete the job placement
+        $jobPlacement->delete();
+
+        // Return a response
+        return response()->json(['message' => 'Hackathon deleted successfully']);
+    }
+
 }
