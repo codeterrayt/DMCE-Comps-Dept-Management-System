@@ -70,4 +70,9 @@ class User extends Authenticatable
         return $this->hasMany(StudentExtraCu::class)->get();
     }
 
+    public function fetch_hackathons()
+    {
+        return $this->hasMany(StudentHackathons::class)->get();
+    }
+
 }
