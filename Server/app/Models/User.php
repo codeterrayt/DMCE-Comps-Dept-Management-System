@@ -55,4 +55,14 @@ class User extends Authenticatable
         $this->notify(new \App\Notifications\UserVerifyNotification(Auth::user()));  //pass the currently logged in user to the notification class
     }
 
+    public function fetch_internships()
+    {
+        return $this->hasMany(StudentInternship::class)->get();
+    }
+
+    public function fetch_achievements()
+    {
+        return $this->hasMany(StudentAchivements::class)->get();
+    }
+
 }
