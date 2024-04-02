@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
@@ -50,26 +53,77 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
 
-        $rules = [
-            'name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255|unique:users,email,' . auth()->id(),
-            'password' => 'nullable|string|min:8',
-            'roll_no' => 'nullable|string|max:255',
-            'student_id' => 'nullable|string|max:255|unique:users,student_id,' . auth()->id(),
-            'admitted_year' => 'nullable|numeric|min:1900|max:' . date('Y'),
-            'div' => 'nullable|string|max:2',
-            // 'role' => [
-            //     'required',
-            //     Rule::in(['admin', 'student']), // assuming role can only be one of these values
-            // ],
-        ];
+        $rules = [];
 
-        $request->validate($rules);
+        if(Auth::user()->role  == 'admin'){
+
+            $rules = [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
+                // 'password' => 'nullable|string|min:8',
+                // 'roll_no' => 'required|string|max:255',
+                // 'student_id' => 'required|string|max:255|unique:users,student_id,' . auth()->id(),
+                // 'admitted_year' => 'required|numeric|min:1900|max:' . date('Y'),
+                // 'div' => 'required|string|max:2',
+                // 'role' => [
+                //     'required',
+                //     Rule::in(['admin', 'student']), // assuming role can only be one of these values
+                // ],
+            ];
+
+        }else{
+            $rules = [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
+                // 'password' => 'nullable|string|min:8',
+                'roll_no' => 'required|string|max:255',
+                'student_id' => 'required|string|max:255|unique:users,student_id,' . auth()->id(),
+                'admitted_year' => 'required|numeric|min:1900|max:' . date('Y'),
+                'div' => 'required|string|max:2',
+                // 'role' => [
+                //     'required',
+                //     Rule::in(['admin', 'student']), // assuming role can only be one of these values
+                // ],
+            ];
+        }
 
 
+
+
+
+        // Get only the fields specified in the rules
+        $data = $request->only(array_keys($rules));
+
+        // Remove the "role" field if it exists in the request data
+        if (array_key_exists('role', $data)) {
+            unset($data['role']);
+        }
+
+
+        // Validate the data
+        $validator = Validator::make($data, $rules);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            // Handle validation errors
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            // Handle validation errors
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Validation passed, update the user
+        $user = User::findOrFail(auth()->id());
+        $user->update($data);
+
+        // Return success response
+        return response()->json(['message' => 'User updated successfully']);
 
 
     }
