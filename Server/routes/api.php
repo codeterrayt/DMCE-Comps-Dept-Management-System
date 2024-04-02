@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,16 +15,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum'])->get('/profile', function (Request $request) {
+Route::middleware(['auth:sanctum'])->get('/fetch/profile', function (Request $request) {
     return $request->user();
 });
 
 
-
-Route::middleware(['auth:sanctum', 'ability:token-student'])->group(function () {
+Route::middleware(['auth:sanctum','verified', 'ability:token-admin'])->group(function () {
     Route::get('/test', function (Request $request) {
         return $request->user();
     });
+});
+
+
+Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(function () {
+    Route::post('/update/profile',[ProfileController::class,'update']);
 });
 
 
