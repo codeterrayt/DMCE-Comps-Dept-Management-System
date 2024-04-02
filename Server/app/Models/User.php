@@ -79,4 +79,8 @@ class User extends Authenticatable
         return $this->hasMany(StudentHigherStudies::class)->get();
     }
 
+    public function fetch_placements(){
+        return $this->hasMany(StudentPlacements::class)->get();
+    }
+
 }
