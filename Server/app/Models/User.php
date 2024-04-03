@@ -60,9 +60,19 @@ class User extends Authenticatable
         return $this->hasMany(StudentInternship::class)->get();
     }
 
+    public function studentInternship()
+    {
+        return $this->hasMany(StudentInternship::class);
+    }
+
     public function fetch_achievements()
     {
         return $this->hasMany(StudentAchivements::class)->get();
+    }
+
+    public function studentAchievements()
+    {
+        return $this->hasMany(StudentAchivements::class);
     }
 
     public function fetch_extra_curr()
@@ -70,17 +80,37 @@ class User extends Authenticatable
         return $this->hasMany(StudentExtraCu::class)->get();
     }
 
+    public function StudentExtraCurr()
+    {
+        return $this->hasMany(StudentExtraCu::class);
+    }
+
     public function fetch_hackathons()
     {
         return $this->hasMany(StudentHackathons::class)->get();
+    }
+
+
+    public function StudentHackathons()
+    {
+        return $this->hasMany(StudentHackathons::class);
     }
 
     public function fetch_higher_studies(){
         return $this->hasMany(StudentHigherStudies::class)->get();
     }
 
+    public function studentHigherStudies()
+    {
+        return $this->hasMany(StudentHigherStudies::class);
+    }
+
     public function fetch_placements(){
         return $this->hasMany(StudentPlacements::class)->get();
+    }
+
+    public function StudentPlacements(){
+        return $this->hasMany(StudentPlacements::class);
     }
 
 }

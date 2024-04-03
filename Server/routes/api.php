@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentAchivementsController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentExtraCuController;
 use App\Http\Controllers\StudentHackathonsController;
 use App\Http\Controllers\StudentHigherStudiesController;
@@ -21,9 +22,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum'])->get('/fetch/profile', function (Request $request) {
-    return $request->user();
-});
 
 
 Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(function () {
@@ -60,9 +58,17 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(f
 
 });
 
+Route::middleware(['auth:sanctum','verified', 'ability:token-admin'])->group(function () {
+    Route::post('/update/profile',[ProfileController::class,'update']);
+    Route::get("/admin/fetch/students",[StudentController::class,"index"]);
+
+});
 
 Route::middleware(['auth:sanctum','verified', 'ability:token-student,token-admin'])->group(function () {
     Route::post('/update/profile',[ProfileController::class,'update']);
+    Route::get('/fetch/profile', function (Request $request) {
+        return $request->user();
+    });
 });
 
 
