@@ -115,7 +115,8 @@ class StudentController extends Controller
         return response()->json($users);
     }
 
-    public function fetch_internship_by_student_id(Request $request){
+    public function fetch_internship_by_student_id(Request $request)
+    {
         // Validate the incoming request data
         $request->validate([
             'student_id' => 'required|exists:users,id',
@@ -125,15 +126,16 @@ class StudentController extends Controller
         $studentId = $request->input('student_id');
 
         // Query the StudentInternship model to fetch internships by student ID
-        $internships = User::where("id",$studentId)->with("studentInternship")->get();
+        $internships = User::where("id", $studentId)->with("studentInternship")->get();
 
         // Return the fetched internships as a JSON response
         return response()->json(['internships' => $internships]);
     }
 
-    public function fetch_ecc_by_student_id(Request $request){
-          // Validate the incoming request data
-          $request->validate([
+    public function fetch_ecc_by_student_id(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
             'student_id' => 'required|exists:users,id',
         ]);
 
@@ -141,11 +143,44 @@ class StudentController extends Controller
         $studentId = $request->input('student_id');
 
         // Query the StudentInternship model to fetch internships by student ID
-        $ecc = User::where("id",$studentId)->with("StudentExtraCurr")->get();
+        $ecc = User::where("id", $studentId)->with("StudentExtraCurr")->get();
 
         // Return the fetched internships as a JSON response
         return response()->json(['ecc' => $ecc]);
+    }
 
+    public function fetch_achievements_by_student_id(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'student_id' => 'required|exists:users,id',
+        ]);
+
+        // Get the student ID from the request
+        $studentId = $request->input('student_id');
+
+        // Query the StudentInternship model to fetch internships by student ID
+        $studentAchievements = User::where("id", $studentId)->with("studentAchievements")->get();
+
+        // Return the fetched internships as a JSON response
+        return response()->json(['achievements' => $studentAchievements]);
+    }
+
+    public function fetch_hackathons_by_student_id(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'student_id' => 'required|exists:users,id',
+        ]);
+
+        // Get the student ID from the request
+        $studentId = $request->input('student_id');
+
+        // Query the StudentInternship model to fetch internships by student ID
+        $StudentHackathons = User::where("id", $studentId)->with("StudentHackathons")->get();
+
+        // Return the fetched internships as a JSON response
+        return response()->json(['hackathons' => $StudentHackathons]);
     }
 
     /**
