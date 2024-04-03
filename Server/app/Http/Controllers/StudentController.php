@@ -131,6 +131,23 @@ class StudentController extends Controller
         return response()->json(['internships' => $internships]);
     }
 
+    public function fetch_ecc_by_student_id(Request $request){
+          // Validate the incoming request data
+          $request->validate([
+            'student_id' => 'required|exists:users,id',
+        ]);
+
+        // Get the student ID from the request
+        $studentId = $request->input('student_id');
+
+        // Query the StudentInternship model to fetch internships by student ID
+        $ecc = User::where("id",$studentId)->with("StudentExtraCurr")->get();
+
+        // Return the fetched internships as a JSON response
+        return response()->json(['ecc' => $ecc]);
+
+    }
+
     /**
      * Show the form for creating a new resource.
      */
