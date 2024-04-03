@@ -45,7 +45,6 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(f
     Route::post("/student/update/hackathon",[StudentHackathonsController::class,'update']);
     Route::post("/student/delete/hackathon",[StudentHackathonsController::class,'destroy']);
 
-
     Route::post("/student/add/higher-studies",[StudentHigherStudiesController::class,'store']);
     Route::get("/student/fetch/higher-studies",[StudentHigherStudiesController::class,'fetch']);
     Route::post("/student/update/higher-studies",[StudentHigherStudiesController::class,'update']);
@@ -61,7 +60,7 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(f
 Route::middleware(['auth:sanctum','verified', 'ability:token-admin'])->group(function () {
     Route::post('/update/profile',[ProfileController::class,'update']);
     Route::get("/admin/fetch/students",[StudentController::class,"index"]);
-
+    Route::get("/admin/fetch/internship",[StudentController::class,'fetch_internship_by_student_id']);
 });
 
 Route::middleware(['auth:sanctum','verified', 'ability:token-student,token-admin'])->group(function () {

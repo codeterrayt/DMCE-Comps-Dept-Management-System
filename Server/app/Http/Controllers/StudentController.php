@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StudentInternship;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -112,6 +113,22 @@ class StudentController extends Controller
 
         // Return the filtered users as JSON response
         return response()->json($users);
+    }
+
+    public function fetch_internship_by_student_id(Request $request){
+        // Validate the incoming request data
+        $request->validate([
+            'student_id' => 'required|exists:users,id',
+        ]);
+
+        // Get the student ID from the request
+        $studentId = $request->input('student_id');
+
+        // Query the StudentInternship model to fetch internships by student ID
+        $internships = User::where("id",$studentId)->with("studentInternship")->get();
+
+        // Return the fetched internships as a JSON response
+        return response()->json(['internships' => $internships]);
     }
 
     /**
