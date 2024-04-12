@@ -15,6 +15,8 @@ import Achivements from './components/Achivements';
 import ExtraCurr from './components/ExtraCurr';
 import Hackathon from './components/Hackathon';
 import HigherStudies from './components/HigherStudies';
+import SignUpForm from './components/SignUp';
+import LoginForm from './components/Login';
 
 function App() {
 
@@ -32,6 +34,8 @@ function App() {
           <Route path="extra-curriculum" element={<ExtraCurr />} />
           <Route path="hackathon" element={<Hackathon />} />
           <Route path="higher-studies" element={<HigherStudies />} />
+          <Route path="sign-up" element={<SignUpForm />} />
+          <Route path="login" element={<LoginForm />} />
 
         </Route>
 
