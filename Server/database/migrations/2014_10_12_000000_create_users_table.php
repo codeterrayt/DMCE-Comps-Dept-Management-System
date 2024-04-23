@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string("role")->default("student");
             $table->string('name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->year('admitted_year')->nullable();
             $table->char('div')->nullable();
             $table->string('student_id')->nullable();

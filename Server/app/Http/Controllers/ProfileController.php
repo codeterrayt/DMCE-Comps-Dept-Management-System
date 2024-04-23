@@ -62,6 +62,8 @@ class ProfileController extends Controller
 
             $rules = [
                 'name' => 'required|string|max:255',
+                'middle_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
                 // 'password' => 'nullable|string|min:8',
                 // 'roll_no' => 'required|string|max:255',
@@ -77,6 +79,8 @@ class ProfileController extends Controller
         }else{
             $rules = [
                 'name' => 'required|string|max:255',
+                'middle_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email,' . auth()->id(),
                 // 'password' => 'nullable|string|min:8',
                 'roll_no' => 'required|string|max:255',
@@ -123,7 +127,7 @@ class ProfileController extends Controller
         $user->update($data);
 
         // Return success response
-        return response()->json(['message' => 'User updated successfully']);
+        return response()->json(['message' => 'User updated successfully', 'data'=> $user]);
 
 
     }
