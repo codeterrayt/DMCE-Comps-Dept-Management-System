@@ -64,6 +64,8 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-admin'])->group(fun
     Route::get("/admin/fetch/ecc",[StudentController::class,'fetch_ecc_by_student_id']);
     Route::get("/admin/fetch/achievements",[StudentController::class,'fetch_achievements_by_student_id']);
     Route::get("/admin/fetch/hackathons",[StudentController::class,'fetch_hackathons_by_student_id']);
+    Route::get("/admin/fetch/higher-studies",[StudentController::class,'fetch_higherstudies_by_student_id']);
+    Route::get("/admin/fetch/placements",[StudentController::class,'fetch_placements_by_student_id']);
 });
 
 Route::middleware(['auth:sanctum','verified', 'ability:token-student,token-admin'])->group(function () {

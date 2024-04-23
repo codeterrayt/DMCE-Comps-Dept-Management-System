@@ -129,7 +129,7 @@ class StudentController extends Controller
         $internships = User::where("id", $studentId)->with("studentInternship")->get();
 
         // Return the fetched internships as a JSON response
-        return response()->json(['internships' => $internships]);
+        return response()->json(['data' => $internships]);
     }
 
     public function fetch_ecc_by_student_id(Request $request)
@@ -146,7 +146,7 @@ class StudentController extends Controller
         $ecc = User::where("id", $studentId)->with("StudentExtraCurr")->get();
 
         // Return the fetched internships as a JSON response
-        return response()->json(['ecc' => $ecc]);
+        return response()->json(['data' => $ecc]);
     }
 
     public function fetch_achievements_by_student_id(Request $request)
@@ -163,7 +163,7 @@ class StudentController extends Controller
         $studentAchievements = User::where("id", $studentId)->with("studentAchievements")->get();
 
         // Return the fetched internships as a JSON response
-        return response()->json(['achievements' => $studentAchievements]);
+        return response()->json(['data' => $studentAchievements]);
     }
 
     public function fetch_hackathons_by_student_id(Request $request)
@@ -180,8 +180,43 @@ class StudentController extends Controller
         $StudentHackathons = User::where("id", $studentId)->with("StudentHackathons")->get();
 
         // Return the fetched internships as a JSON response
-        return response()->json(['hackathons' => $StudentHackathons]);
+        return response()->json(['data' => $StudentHackathons]);
     }
+
+    public function fetch_higherstudies_by_student_id(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'student_id' => 'required|exists:users,id',
+        ]);
+
+        // Get the student ID from the request
+        $studentId = $request->input('student_id');
+
+        // Query the StudentInternship model to fetch internships by student ID
+        $studentHigherStudies = User::where("id", $studentId)->with("studentHigherStudies")->get();
+
+        // Return the fetched internships as a JSON response
+        return response()->json(['data' => $studentHigherStudies]);
+    }
+
+    public function fetch_placements_by_student_id(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'student_id' => 'required|exists:users,id',
+        ]);
+
+        // Get the student ID from the request
+        $studentId = $request->input('student_id');
+
+        // Query the StudentInternship model to fetch internships by student ID
+        $StudentPlacements = User::where("id", $studentId)->with("StudentPlacements")->get();
+
+        // Return the fetched internships as a JSON response
+        return response()->json(['data' => $StudentPlacements]);
+    }
+
 
     /**
      * Show the form for creating a new resource.
