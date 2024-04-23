@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import Avatar from '@mui/material/Avatar';
+import { useNavigate } from 'react-router-dom';
 
 const SideNav = () => {
     let page = window.location.pathname.split("/")[2];
     let [pageState, setPageState] = useState(page ? page.replace("-", " ") : '');
+    const navigate = useNavigate();
 
     useEffect(() => {
         setShowSideNav(false);
@@ -25,9 +28,11 @@ const SideNav = () => {
         }
     };
 
+
+
     return (
         <section className="border relative flex py-0 m-0 max-md:flex-col w-full">
-            <div className="sticky md:top-[20px] z-30 ">
+            <div className="sticky md:fixed  md:top-[20px] z-30 ">
                 <div className="md:hidden bg-white  border-b border-grey flex flex-nowrap overflow-x-auto ">
                     <button
                         onClick={changePageState}
@@ -52,7 +57,7 @@ const SideNav = () => {
 
                 <div
                     className={
-                        "min-w-[300px] h-[calc(100vh-80px-60px)] md:h-cover md:sticky  overflow-y-auto p-4 md:pr-0 md:border-grey md:border-r absolute max-md:top:[64px] bg-white  duration-500 " +
+                        "min-w-[300px] max-md:w-full h-[calc(100vh-80px)] md:h-cover md:sticky  overflow-y-auto p-4 md:pr-0 md:border-grey md:border-r absolute max-md:top:[64px] bg-white  duration-500 " +
                         (!showSideNav
                             ? " max-md:opacity-0 max-md:pointer-events-none "
                             : " opacity-100 pointer-events-auto")
@@ -133,11 +138,44 @@ const SideNav = () => {
                     </NavLink>
                     <br />
                     <br />
+                    <div className="w-[80%] ml-[1.2rem] p-4 absolute bottom-3">
+                        {
+                            true ? <div className="w-full flex gap-3 text-xs mx-auto">
+
+                                <div className="flex  flex-col gap-2 w-full">
+                                    <button className="btn1 mx-auto"><NavLink
+                                        to={"/dmce/sign-up"}
+                                        onClick={(e) => setPageState(e.target.innerText)}
+                                   
+                                    >
+
+                                        Sign Up
+                                    </NavLink></button>
+                                    <button className="btn1 mx-auto"><NavLink
+                                        to={"/dmce/login"}
+                                        onClick={(e) => setPageState(e.target.innerText)}
+                                   
+                                    >
+
+                                        Login
+                                    </NavLink></button>
+                                </div>
+
+                            </div> : <div className="w-full  p-2 flex gap-4 text-xs mx-auto justify-center items-center  flex-col ">
+                                <div className="flex w-full items-center gap-4 ">
+
+                                    <Avatar alt="profile" src="https://varad177.github.io/portfolio/assets/hero.jpg" />
+                                    <h1 className="text-xl font-bold">Hii 🖐️ Varad</h1>
+                                </div>
+                                <button className="btn1 mx-auto">Sign Out</button>
+                            </div>
+                        }
+                    </div>
 
                 </div>
             </div>
 
-            <div className="max-md:-mt-8 mt-5 w-full">
+            <div className="max-md:-mt-8 mt-5 md:pl-[300px] w-full">
                 <Outlet />
             </div>
         </section>
