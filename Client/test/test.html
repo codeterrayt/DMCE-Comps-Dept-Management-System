@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Form</title>
+</head>
+<body>
+  <h1>Upload Achievement Form</h1>
+  <form id="uploadForm">
+    <label for="academic_year">Academic Year:</label>
+    <input type="text" id="academic_year" name="academic_year" required><br><br>
+
+    <label for="student_year">Student Year:</label>
+    <input type="text" id="student_year" name="student_year" required><br><br>
+
+    <label for="college_name">College Name:</label>
+    <input type="text" id="college_name" name="college_name" required><br><br>
+
+    <label for="achievement_domain">Achievement Domain:</label>
+    <input type="text" id="achievement_domain" name="achievement_domain" required><br><br>
+
+    <label for="achievement_level">Achievement Level:</label>
+    <input type="text" id="achievement_level" name="achievement_level" required><br><br>
+
+    <label for="achievement_location">Achievement Location:</label>
+    <input type="text" id="achievement_location" name="achievement_location" required><br><br>
+
+    <label for="achievement_date">Achievement Date:</label>
+    <input type="text" id="achievement_date" name="achievement_date" required><br><br>
+
+    <label for="achievement_certificate_path">Achievement Certificate:</label>
+    <input type="file" id="achievement_certificate_path" name="achievement_certificate_path" required><br><br>
+
+    <label for="prize">Prize:</label>
+    <input type="text" id="prize" name="prize" required><br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+
+      let formData = new FormData(); // Create FormData object
+      let fileInput = document.getElementById('achievement_certificate_path'); // Get file input element
+
+      // Append form fields to FormData object
+      formData.append("academic_year", document.getElementById('academic_year').value);
+      formData.append("student_year", document.getElementById('student_year').value);
+      formData.append("college_name", document.getElementById('college_name').value);
+      formData.append("achievement_domain", document.getElementById('achievement_domain').value);
+      formData.append("achievement_level", document.getElementById('achievement_level').value);
+      formData.append("achievement_location", document.getElementById('achievement_location').value);
+      formData.append("achievement_date", document.getElementById('achievement_date').value);
+      formData.append("achievement_certificate_path", fileInput.files[0]);
+      formData.append("prize", document.getElementById('prize').value);
+
+      let config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: "http://127.0.0.1:8000/api/student/add/achievement",
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer 1|s2wCi5nCxdjniFkTDdK9MNPdipHh46cc5JQ92tX759ff1712",
+          "Content-Type": "multipart/form-data", // Set Content-Type to indicate form data with files
+        },
+        data: formData,
+      };
+
+      axios
+        .request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+  </script>
+</body>
+</html>
