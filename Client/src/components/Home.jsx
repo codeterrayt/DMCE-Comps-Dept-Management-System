@@ -1,7 +1,15 @@
 
-import React from 'react'
+import React, { useEffect } from 'react'
+import { checkLogin } from '../helper/checkLogin'
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!checkLogin()) {
+      navigate('/dmce/login')
+    }
+  }, [])
   return (
     <div className="bg-gray-100 mb-[12px]  w-full h-screen flex items-center justify-center flex-col">
       <div className=' flex items-center justify-center'>

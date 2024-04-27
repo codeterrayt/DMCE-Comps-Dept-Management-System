@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { createContext, useState } from 'react'
 import './App.css'
 import {
   BrowserRouter as Router,
@@ -18,31 +18,39 @@ import HigherStudies from './components/HigherStudies';
 import SignUpForm from './components/SignUp';
 import LoginForm from './components/Login';
 
+export const userContext = createContext()
+
+
+
 function App() {
 
+  const [user, setUser] = useState()
 
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Start />} />
-        <Route path="/dmce" element={<SideNav />}>
-          <Route path="home" element={<Home />} />
-          <Route path="about" element={<About />} />
-          <Route path="internship" element={<Internship />} />
-          <Route path="achivement" element={<Achivements />} />
-          <Route path="extra-curriculum" element={<ExtraCurr />} />
-          <Route path="hackathon" element={<Hackathon />} />
-          <Route path="higher-studies" element={<HigherStudies />} />
-          <Route path="sign-up" element={<SignUpForm />} />
-          <Route path="login" element={<LoginForm />} />
+    <userContext.Provider value={{ user, setUser }}>
 
-        </Route>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Start />} />
+          <Route path="/dmce" element={<SideNav />}>
+            <Route path="home" element={<Home />} />
+            <Route path="about" element={<About />} />
+            <Route path="internship" element={<Internship />} />
+            <Route path="achivement" element={<Achivements />} />
+            <Route path="extra-curriculum" element={<ExtraCurr />} />
+            <Route path="hackathon" element={<Hackathon />} />
+            <Route path="higher-studies" element={<HigherStudies />} />
+            <Route path="sign-up" element={<SignUpForm />} />
+            <Route path="login" element={<LoginForm />} />
 
-      </Routes>
+          </Route>
+
+        </Routes>
 
 
-    </Router>
+      </Router>
+    </userContext.Provider>
 
   )
 }

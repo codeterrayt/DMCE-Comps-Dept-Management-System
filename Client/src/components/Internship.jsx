@@ -69,10 +69,13 @@ const Internship = () => {
                     </Box>
 
                     <label className='label' htmlFor="year">Select Year</label>
-                    <Box sx={{ minWidth: 120 }}>
+                    <Box sx={{ minWidth: 120,}}>
                         <FormControl
+                        
                             style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="year-label">Year</InputLabel>
+                            <InputLabel 
+                           
+                            id="year-label">Year</InputLabel>
                             <Select
                                 labelId="year-label"
                                 id="year"

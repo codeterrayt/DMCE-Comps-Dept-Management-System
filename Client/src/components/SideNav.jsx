@@ -1,17 +1,36 @@
-import React, { useEffect, useRef, useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { NavLink, Outlet, json } from "react-router-dom";
 import Avatar from '@mui/material/Avatar';
 import { useNavigate } from 'react-router-dom';
+import { checkLogin } from "../helper/checkLogin";
+import { userContext } from "../App";
 
 const SideNav = () => {
     let page = window.location.pathname.split("/")[2];
     let [pageState, setPageState] = useState(page ? page.replace("-", " ") : '');
     const navigate = useNavigate();
 
+    const { user } = useContext(userContext)
+
     useEffect(() => {
         setShowSideNav(false);
         pageStateTab.current.click();
     }, [pageState]);
+
+    const [userInSession, setUserInSession] = useState({})
+    const [login, setLogin] = useState(false)
+
+    useEffect(() => {
+        if (!checkLogin()) {
+            navigate('/dmce/login')
+
+        } else {
+            const user = localStorage.getItem('dmceuser')
+            const userData = JSON.parse(user)
+            setUserInSession(userData)
+            setLogin(true)
+        }
+    }, [login, user])
 
     let activeTabLine = useRef();
     let sideBarIcon = useRef();
@@ -29,6 +48,10 @@ const SideNav = () => {
     };
 
 
+    const handleSignOut = () => {
+        localStorage.clear()
+        setLogin(false)
+    }
 
     return (
         <section className="border relative flex py-0 m-0 max-md:flex-col w-full">
@@ -140,35 +163,37 @@ const SideNav = () => {
                     <br />
                     <div className="w-[80%] ml-[1.2rem] p-4 absolute bottom-3">
                         {
-                            true ? <div className="w-full flex gap-3 text-xs mx-auto">
-
-                                <div className="flex  flex-col gap-2 w-full">
-                                    <button className="btn1 mx-auto"><NavLink
-                                        to={"/dmce/sign-up"}
-                                        onClick={(e) => setPageState(e.target.innerText)}
-                                   
-                                    >
-
-                                        Sign Up
-                                    </NavLink></button>
-                                    <button className="btn1 mx-auto"><NavLink
-                                        to={"/dmce/login"}
-                                        onClick={(e) => setPageState(e.target.innerText)}
-                                   
-                                    >
-
-                                        Login
-                                    </NavLink></button>
-                                </div>
-
-                            </div> : <div className="w-full  p-2 flex gap-4 text-xs mx-auto justify-center items-center  flex-col ">
+                            login ? <div className="w-full  p-2 flex gap-4 text-xs mx-auto justify-center items-center  flex-col ">
                                 <div className="flex w-full items-center gap-4 ">
 
                                     <Avatar alt="profile" src="https://varad177.github.io/portfolio/assets/hero.jpg" />
-                                    <h1 className="text-xl font-bold">Hii 🖐️ Varad</h1>
+                                    <h1 className="text-xl font-bold">Hii {userInSession.name}</h1>
                                 </div>
-                                <button className="btn1 mx-auto">Sign Out</button>
+                                <button onClick={handleSignOut} className="btn1 mx-auto">Sign Out</button>
                             </div>
+                                : <div className="w-full flex gap-3 text-xs mx-auto">
+
+                                    <div className="flex  flex-col gap-2 w-full">
+                                        <button className="btn1 mx-auto"><NavLink
+                                            to={"/dmce/sign-up"}
+                                            onClick={(e) => setPageState(e.target.innerText)}
+
+                                        >
+
+                                            Sign Up
+                                        </NavLink></button>
+                                        <button className="btn1 mx-auto"><NavLink
+                                            to={"/dmce/login"}
+                                            onClick={(e) => setPageState(e.target.innerText)}
+
+                                        >
+
+                                            Login
+                                        </NavLink></button>
+                                    </div>
+
+                                </div>
+
                         }
                     </div>
 

@@ -1,10 +1,26 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { userContext } from '../App';
 
 const LoginForm = () => {
+
+    const { user, setUser } = useContext(userContext)
+
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
+    const navigate = useNavigate()
+    useEffect(() => {
+        const token = localStorage.getItem('dmceuser')
+        if (token) {
+
+            navigate('/dmce/home')
+
+        }
+    }, [])
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -12,8 +28,46 @@ const LoginForm = () => {
     };
 
     const handleSubmit = () => {
-        console.log(formData);
-        // Perform login authentication with the form data
+
+        const loading = toast.loading('wait! Login in progress')
+
+        let data = new FormData();
+        data.append('email', formData.email);
+        data.append('password', formData.password);
+
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: 'http://127.0.0.1:8000/api/login',
+            headers: {
+                'Accept': 'application/json',
+                // ...data.getHeaders()
+            },
+            data: data
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+
+                const user = {
+                    name: response.data.user.name,
+                    token: response.data.token,
+                    role: response.data.user.role
+                }
+
+                localStorage.setItem('dmceuser', JSON.stringify(user))
+                toast.dismiss(loading)
+                toast.success('login successful..')
+                setUser(user)
+                return navigate('/dmce/home')
+            })
+            .catch((error) => {
+                console.log(error);
+                toast.dismiss(loading)
+
+            });
+
     };
 
     return (
@@ -30,7 +84,7 @@ const LoginForm = () => {
 
                         <label className='label' htmlFor="password">Password</label>
                         <input type="password" id='password' name="password" className='input' onChange={handleChange} />
-                        
+
                         <div className='flex justify-center mt-4'>
                             <button type='button' className='btn' onClick={handleSubmit}>Login</button>
                         </div>
