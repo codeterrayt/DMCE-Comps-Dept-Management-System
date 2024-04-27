@@ -57,13 +57,19 @@
       formData.append("achievement_certificate_path", fileInput.files[0]);
       formData.append("prize", document.getElementById('prize').value);
 
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ', ' + pair[1]);
+    }
+
+   
+
       let config = {
         method: "post",
         maxBodyLength: Infinity,
         url: "http://127.0.0.1:8000/api/student/add/achievement",
         headers: {
           Accept: "application/json",
-          Authorization: "Bearer 1|s2wCi5nCxdjniFkTDdK9MNPdipHh46cc5JQ92tX759ff1712",
+          Authorization: "Bearer 34|8UCagMXcN2SWuOmX90UsSnyjvnMSixPuD9zftbwJ02be8382",
           "Content-Type": "multipart/form-data", // Set Content-Type to indicate form data with files
         },
         data: formData,

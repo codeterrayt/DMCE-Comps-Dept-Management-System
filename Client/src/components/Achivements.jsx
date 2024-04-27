@@ -17,7 +17,7 @@ const Achievements = () => {
         achievementDomain: '',
         achievementLevel: '',
         achievementLocation: '',
-        achievementDate: '', // Added achievementDate
+        achievementDate: '', 
         achievementCertificate: null,
         prize: ''
     });
@@ -40,11 +40,10 @@ const Achievements = () => {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        setData((prevData) => ({
-            ...prevData,
-            achievementCertificate: file,
-            achievementCertificatePath: e.target.value // Assuming e.target.value contains the file path
-        }));
+        setData({
+            ...data,
+            achievementCertificate: file
+        });
     }
 
     const years = [];
@@ -71,7 +70,7 @@ const Achievements = () => {
         formData.append('achievement_location', data.achievementLocation);
         formData.append('achievement_date', data.achievementDate);
         formData.append('prize', data.prize);
-        formData.append('achievement_certificate', data.achievementCertificate); // Append the file object directly
+        formData.append('achievement_certificate', data.achievementCertificate);
 
         try {
             const response = await axios.post(
