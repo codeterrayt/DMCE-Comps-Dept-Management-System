@@ -57,6 +57,8 @@ const Achievements = () => {
     }
 
     const handleSubmit = async () => {
+
+    
         const loading = toast.loading('Adding your achievement');
         const userInSession = localStorage.getItem('dmceuser');
         const token = JSON.parse(userInSession).token;
@@ -70,7 +72,7 @@ const Achievements = () => {
         formData.append('achievement_location', data.achievementLocation);
         formData.append('achievement_date', data.achievementDate);
         formData.append('prize', data.prize);
-        formData.append('achievement_certificate', data.achievementCertificate);
+        formData.append('achievement_certificate_path', data.achievementCertificate);
 
         try {
             const response = await axios.post(
@@ -181,11 +183,11 @@ const Achievements = () => {
                                 value={data.prize}
                                 onChange={handleChange}
                             >
-                                <MenuItem value="First">First</MenuItem>
-                                <MenuItem value="Second">Second</MenuItem>
-                                <MenuItem value="Third">Third</MenuItem>
-                                <MenuItem value="Fourth">Fourth</MenuItem>
-                                <MenuItem value="Participated">Participated</MenuItem>
+                                <MenuItem value="first">First</MenuItem>
+                                <MenuItem value="second">Second</MenuItem>
+                                <MenuItem value="third">Third</MenuItem>
+                                <MenuItem value="fourth">Fourth</MenuItem>
+                                <MenuItem value="participated">Participated</MenuItem>
                             </Select>
                         </FormControl>
                     </Box>

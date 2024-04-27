@@ -4,20 +4,22 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { getToken } from '../helper/getToken';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const HigherStudies = () => {
     const [formData, setFormData] = useState({
-        academicYear: '',
-        examType: '',
+        academic_year: '',
+        exam_type: '',
         score: '',
         city: '',
         state: '',
         country: '',
-        university: '',
+        university_name: '',
         course: '',
-        admissionLetter: null,
-        projectGuide: '',
-        collegeName: '', // Added collegeName field
+        guide: '',
+        admission_letter: null,
     });
 
     // Handle input changes and update formData state
@@ -57,7 +59,48 @@ const HigherStudies = () => {
 
     // Handle form submission
     const handleSubmit = () => {
-        console.log(formData); // You can perform further actions with the data here
+
+        const loading = toast.loading('wait.. adding your details')
+
+        let data = new FormData();
+        data.append('student_academic_year', formData.academic_year);
+        data.append('student_exam_type', formData.exam_type);
+        data.append('student_score', formData.score);
+        data.append('university_city', formData.city);
+        data.append('university_state', formData.state);
+        data.append('university_country', formData.country);
+        data.append('university_name', formData.university_name);
+        data.append('student_course', formData.course);
+        data.append('student_project_guide', formData.guide);
+        data.append('student_admission_letter', formData.admission_letter);
+
+        const token = getToken()
+
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/higher-studies`,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...data.getHeaders
+            },
+            data: data
+        };
+
+        axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+
+                toast.dismiss(loading)
+                toast.success(response.data.message)
+            })
+            .catch((error) => {
+                toast.dismiss(loading)
+                return toast.error(error.message)
+                console.log(error);
+            });
+
     };
 
     return (
@@ -67,28 +110,25 @@ const HigherStudies = () => {
             </div>
             <div className='w-full grid md:grid-cols-2 grid-cols-1'>
                 <div className='w-full md:p-8 md:mt-4 '>
-                    <label className='label' htmlFor="academicYear">Select Academic Year</label>
+                    <label className='label' htmlFor="academic_year">Select Academic Year</label>
                     <Box sx={{ minWidth: 120 }}>
-                         <FormControl  
-style={{marginBottom:"12px"}} fullWidth>
+                        <FormControl
+                            style={{ marginBottom: "12px" }} fullWidth>
                             <InputLabel id="academic-year-label">Academic Year</InputLabel>
                             <Select
                                 labelId="academic-year-label"
-                                id="academicYear"
-                                name="academicYear"
-                                value={formData.academicYear || ''}
+                                id="academic_year"
+                                name="academic_year"
+                                value={formData.academic_year || ''}
                                 onChange={handleChange}
                             >
                                 {years}
                             </Select>
                         </FormControl>
                     </Box>
-                      {/* Additional field */}
-                      <label className='label' htmlFor="collegeName">College Name</label>
-                    <input type="text" id='collegeName' name='collegeName' className='input' onChange={handleChange} />
 
-                    <label className='label' htmlFor="examType">Exam Type</label>
-                    <input type="text" id='examType' name='examType' className='input' onChange={handleChange} />
+                    <label className='label' htmlFor="exam_type">Exam Type <p className='text-sm inline'>e.g:- GRE, VITEEE, NDA</p></label>
+                    <input type="text" id='exam_type' name='exam_type' className='input' onChange={handleChange} />
 
                     <label className='label' htmlFor="score">Score</label>
                     <input type="number" id='score' name='score' className='input' onChange={handleChange} />
@@ -99,36 +139,32 @@ style={{marginBottom:"12px"}} fullWidth>
                     <label className='label' htmlFor="state">State</label>
                     <input type="text" id='state' name='state' className='input' onChange={handleChange} />
 
-
-                </div>
-                <div className='w-full md:p-8 md:mt-4 '>
                     <label className='label' htmlFor="country">Country</label>
                     <input type="text" id='country' name='country' className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="university">University</label>
-                    <input type="text" id='university' name='university' className='input' onChange={handleChange} />
+                </div>
+                <div className='w-full md:p-8 md:mt-4 '>
+                    <label className='label' htmlFor="university_name">University Name</label>
+                    <input type="text" id='university_name' name='university_name' className='input' onChange={handleChange} />
 
                     <label className='label' htmlFor="course">Course</label>
                     <input type="text" id='course' name='course' className='input' onChange={handleChange} />
 
-                    <label className='label' htmlFor="admissionLetter">Admission Letter</label>
+                    <label className='label' htmlFor="guide">Guide</label>
+                    <input type="text" id='guide' name='guide' className='input' onChange={handleChange} />
+
+                    <label className='label' htmlFor="admission_letter">Admission Letter</label>
                     <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="admissionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
+                        <label htmlFor="admission_letter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                             <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
                             Admission Letter
                         </label>
-                        <input id="admissionLetter" name="admissionLetter" type="file" className="hidden" onChange={handleFileChange} />
-                        {formData.admissionLetter && (
-                            <p className="mt-2 text-gray-700">Selected file: {formData.admissionLetter.name}</p>
+                        <input id="admission_letter" name="admission_letter" type="file" className="hidden" onChange={handleFileChange} />
+                        {formData.admission_letter && (
+                            <p className="mt-2 text-gray-700">Selected file: {formData.admission_letter.name}</p>
                         )}
                     </div>
-
-                    <label className='label' htmlFor="projectGuide">Project Guide</label>
-                    <input type="text" id='projectGuide' name='projectGuide' className='input' onChange={handleChange} />
-
-                  
                 </div>
             </div>
             <div className='flex justify-center mt-4'>
