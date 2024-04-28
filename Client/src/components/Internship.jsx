@@ -1,210 +1,117 @@
-import React, { useState } from 'react';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { checkLogin } from '../helper/checkLogin';
 import { getToken } from '../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
+import Loaders from './Loaders';
+
 const Internship = () => {
-    const [data, setData] = useState({
-        academicYear: '',
-        duration: '',
-        domain: '',
-        startDate: '',
-        endDate: '',
-        completionLetter: null,
-        certificate: null,
-        offerLetter: null,
-        permissionLetter: null,
-        year: '',
-    });
+    const navigate = useNavigate();
+    const [internships, setInternships] = useState([]);
+    const [loader, setLoader] = useState(false);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setData({ ...data, [name]: value });
-        console.log(data);
-    };
-
-    const handleFileChange = (e) => {
-        const { name, files } = e.target;
-        setData({ ...data, [name]: files[0] });
-    };
-
-    const years = [];
-    for (let year = 2021; year <= 2030; year++) {
-        const academicYear = `${year}-${year + 1}`;
-        years.push(
-            <MenuItem key={academicYear} value={academicYear}>
-                {academicYear}
-            </MenuItem>
-        );
+    function removeUnwantedFields(internships) {
+        return internships.map(internship => {
+            const { user_id, created_at, updated_at, ...rest } = internship;
+            return rest;
+        });
     }
 
-    const handleSubmit = () => {
+    useEffect(() => {
+        if (!checkLogin()) {
+            return navigate('dmce/login');
+        }
+    }, []);
 
-        const loading = toast.loading('wait. intership details adding')
+    useEffect(() => {
+        getAllInternships();
+    }, []);
 
-        let form = new FormData();
-        form.append('academic_year', data.academicYear);
-        form.append('duration', data.duration);
-        form.append('domain', data.domain);
-        form.append('start_date', data.startDate);
-        form.append('end_date', data.endDate);
-        form.append('completion_letter_path', data.completionLetter);
-        form.append('certificate_path', data.certificate);
-        form.append('offer_letter_path', data.offerLetter);
-        form.append('permission_letter_path', data.permissionLetter);
-        form.append('student_year', data.year);
+    useEffect(() => {
+        if (internships.length > 0) {
+            // Initialize DataTable after the table has been rendered
+            new DataTable('#example');
+        }
+    }, [internships]);
 
-        const token = getToken()
+    const getAllInternships = () => {
+        setLoader(true);
+        const token = getToken();
+
         let config = {
-            method: 'post',
-            maxBodyLength: Infinity,
-            url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/internship`,
+            method: 'get',
+            url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/internships`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
-                ...data.getHeaders
             },
-            data: form
         };
 
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                toast.dismiss(loading)
-                toast.success(response.data.message)
+                const data = removeUnwantedFields(response.data.internships)
+                setInternships(data);
+                setLoader(false);
             })
             .catch((error) => {
+                setLoader(false);
                 console.log(error);
-                toast.dismiss(loading)
-                return toast.error(error.message)
             });
-
     };
 
+    const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
+
     return (
-        <section className='w-full min-h-screen p-4 md:p-8'>
-            <div className='w-full max-md:mt-8  max-md:mb-8'>
-                <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Fill Internship Detail</h1>
-            </div>
-            <div className='w-full grid md:grid-cols-2 grid-cols-1'>
-                <div className='w-full md:p-8 md:mt-4 '>
-                    <label className='label' htmlFor="academicYear">Select Academic Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel
-                                id="academic-year-label">Academic Year</InputLabel>
-                            <Select
-                                labelId="academic-year-label"
-                                id="academicYear"
-                                name="academicYear"
-                                value={data.academicYear}
-                                onChange={handleChange}
-                            >
-                                {years}
-                            </Select>
-                        </FormControl>
-                    </Box>
+        <section className='w-full  min-h-screen p-4 md:p-8 '>
+            {loader ? <Loaders message={"loading your internships"} /> :
+                <div className='w-full'>
+                    <div className='w-full flex items-center justify-between px-4 mt-8 '>
+                        <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your Internships</h2>
+                        <button
+                            className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block md:hidden md:text-xl"
+                            onClick={() => navigate('/dmce/add/internship')}
+                        >
+                            <i className="fa-solid fa-plus"></i>
+                        </button>
+                        <button
+                            className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block max-md:hidden md:text-xl"
+                            onClick={() => navigate('/dmce/add/internship')}
+                        >
+                            Add Internship
+                        </button>
+                    </div>
 
-                    <label className='label' htmlFor="year">Select Year</label>
-                    <Box sx={{ minWidth: 120, }}>
-                        <FormControl
-                            style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel
-                                id="year-label">Year</InputLabel>
-                            <Select
-                                labelId="year-label"
-                                id="year"
-                                name="year"
-                                value={data.year}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={1}>First Year</MenuItem>
-                                <MenuItem value={2}>Second Year</MenuItem>
-                                <MenuItem value={3}>Third Year</MenuItem>
-                                <MenuItem value={4}>Fourth Year</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <label className='label' htmlFor="duration">Duration (in months)</label>
-                    <input type="Number" id='duration' name="duration" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="startDate">Start Date</label>
-                    <input type="Date" id='startDate' name="startDate" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="endDate">End Date</label>
-                    <input type="Date" id='endDate' name="endDate" className='input' onChange={handleChange} />
+                    <div className="overflow-x-auto w-full mt-8 ">
+                        <table  id="example" className="table table-striped " style={{width :'100%'}}>
+                            <thead>
+                                <tr>
+                                    {internships.length && Object.keys(internships[0]).map(key => (
+                                        <th className='text-sm text-center' key={key}>{key.toUpperCase().replace('_', ' ')}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {internships.length && internships.map(internship => (
+                                    <tr key={internship.id}>
+                                        {Object.values(internship).map((value, index) => (
+                                            <td className='text-center text-sm' key={index}>
+                                                {String(value).startsWith('http') ? (
+                                                    <a href={String(value)}>View</a>
+                                                ) : (
+                                                    value
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
 
                 </div>
-                <div className='w-full md:p-8 md:mt-4 '>
-                    <label className='label' htmlFor="domain">Domain</label>
-                    <input type="text" id='domain' name="domain" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="completionLetter">Completion Letter</label>
-                    <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="completionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Completion Letter/ Certificate
-                        </label>
-                        <input id="completionLetter" name="completionLetter" type="file" className="hidden" onChange={handleFileChange} />
-                        {data.completionLetter && (
-                            <p className="mt-2 text-gray-700">Selected file: {data.completionLetter.name}</p>
-                        )}
-                    </div>
-
-                    <label className='label' htmlFor="certificate">Certificate</label>
-                    <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="certificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Certificate
-                        </label>
-                        <input id="certificate" name="certificate" type="file" className="hidden" onChange={handleFileChange} />
-                        {data.certificate && (
-                            <p className="mt-2 text-gray-700">Selected file: {data.certificate.name}</p>
-                        )}
-                    </div>
-
-                    <label className='label' htmlFor="offerLetter">Offer Letter</label>
-                    <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="offerLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Offer Letter
-                        </label>
-                        <input id="offerLetter" name="offerLetter" type="file" className="hidden" onChange={handleFileChange} />
-                        {data.offerLetter && (
-                            <p className="mt-2 text-gray-700">Selected file: {data.offerLetter.name}</p>
-                        )}
-                    </div>
-
-                    <label className='label' htmlFor="permissionLetter">Permission Letter</label>
-                    <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="permissionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Permission Letter
-                        </label>
-                        <input id="permissionLetter" name="permissionLetter" type="file" className="hidden" onChange={handleFileChange} />
-                        {data.permissionLetter && (
-                            <p className="mt-2 text-gray-700">Selected file: {data.permissionLetter.name}</p>
-                        )}
-                    </div>
-                </div>
-            </div>
-            <div className='flex justify-center mt-4'>
-                <button className='btn' onClick={handleSubmit}>Submit</button>
-            </div>
+            }
         </section>
     );
 };

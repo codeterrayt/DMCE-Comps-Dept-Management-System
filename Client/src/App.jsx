@@ -18,6 +18,7 @@ import HigherStudies from './components/HigherStudies';
 import SignUpForm from './components/SignUp';
 import LoginForm from './components/Login';
 import UploadForm from './components/UploadForm';
+import AddInternship from './components/AddInternship';
 
 export const userContext = createContext()
 
@@ -38,14 +39,15 @@ function App() {
             <Route path="home" element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="internship" element={<Internship />} />
+            <Route path="add/internship" element={<AddInternship />} />
             <Route path="achivement" element={<Achivements />} />
             <Route path="extra-curriculum" element={<ExtraCurr />} />
             <Route path="hackathon" element={<Hackathon />} />
             <Route path="higher-studies" element={<HigherStudies />} />
             <Route path="sign-up" element={<SignUpForm />} />
             <Route path="login" element={<LoginForm />} />
-            <Route path="test" element={<UploadForm/>} />
-            
+            <Route path="test" element={<UploadForm />} />
+
 
           </Route>
 
