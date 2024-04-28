@@ -133,9 +133,13 @@ const AddInternship = () => {
                 toast.success(response.data.message);
             })
             .catch((error) => {
+                if (error.response && error.response.status === 401) {
+                    localStorage.clear();
+                    return navigate('/dmce/login');
+                }
                 console.log(error);
                 toast.dismiss(loading);
-                return toast.error(error.message);
+                return toast.error(error.response.data.message);
             });
     };
 

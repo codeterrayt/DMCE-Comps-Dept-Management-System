@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const SignUpForm = () => {
     const [formData, setFormData] = useState({
@@ -14,11 +15,25 @@ const SignUpForm = () => {
     };
 
     const handleSubmit = () => {
-        console.log(import.meta.env.BACKEND_URL);
-        if (formData.firstName.split(' ').length > 1) {
-            alert('First name should only contain one word.');
+
+
+        if (!formData.firstName) {
+            return toast.error('pleased provide first name')
+
+        }
+        if (!formData.firstName.split(' ').length > 1) {
+            toast.error('First name should only contain one word.');
             return; // Exit the function if first name contains more than one word
         }
+
+        if (!formData.email) {
+            return toast.error('please provide the email address')
+        }
+
+        if (!formData.password) {
+            return toast.error('please provide the password')
+        }
+
 
         let data = new FormData();
         data.append('name', formData.firstName);
@@ -30,8 +45,8 @@ const SignUpForm = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: 'http://127.0.0.1:8000/api/register',
-            // url: `${import.meta.env.BACKEND_URL}/register`, 
+
+            url: `${import.meta.env.VITE_SERVER_DOMAIN}/register`,
             headers: {
                 'Accept': 'application/json',
 
@@ -43,9 +58,11 @@ const SignUpForm = () => {
         axios.request(config)
             .then((response) => {
                 console.log(JSON.stringify(response.data));
+                return toast.success('sign up successful')
             })
             .catch((error) => {
                 console.log(error);
+                return toast.error(error.response.data.message)
             });
     };
 

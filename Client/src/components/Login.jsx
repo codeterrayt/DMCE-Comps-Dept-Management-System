@@ -29,6 +29,13 @@ const LoginForm = () => {
 
     const handleSubmit = () => {
 
+        if (!formData.email) {
+            return toast.error('please provide the email address')
+        }
+
+        if (!formData.password) {
+            return toast.error('please provide the password')
+        }
         const loading = toast.loading('wait! Login in progress')
 
         let data = new FormData();
@@ -38,10 +45,10 @@ const LoginForm = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: 'http://127.0.0.1:8000/api/login',
+            url: `${import.meta.env.VITE_SERVER_DOMAIN}/login`,
             headers: {
                 'Accept': 'application/json',
-                // ...data.getHeaders()
+                ...data.getHeaders
             },
             data: data
         };
@@ -58,13 +65,14 @@ const LoginForm = () => {
 
                 localStorage.setItem('dmceuser', JSON.stringify(user))
                 toast.dismiss(loading)
-                toast.success('login successful..')
                 setUser(user)
+                toast.success("login successful")
                 return navigate('/dmce/home')
             })
             .catch((error) => {
                 console.log(error);
                 toast.dismiss(loading)
+                return toast.error(error.response.data.message)
 
             });
 

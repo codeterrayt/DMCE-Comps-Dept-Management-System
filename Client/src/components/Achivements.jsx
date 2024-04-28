@@ -1,219 +1,166 @@
 import React, { useEffect, useState } from 'react';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { checkLogin } from '../helper/checkLogin';
 import { useNavigate } from 'react-router-dom';
+import { checkLogin } from '../helper/checkLogin';
+import { getToken } from '../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
-const Achievements = () => {
-    const [data, setData] = useState({
-        academicYear: '',
-        studentYear: '',
-        collegeName: '',
-        achievementDomain: '',
-        achievementLevel: '',
-        achievementLocation: '',
-        achievementDate: '', 
-        achievementCertificate: null,
-        prize: ''
-    });
+import Loaders from './Loaders';
 
+const Achivements = () => {
     const navigate = useNavigate();
+    const [achivement, setAchivement] = useState([]);
+    const [loader, setLoader] = useState(false);
+
+    function removeUnwantedFields(achievements) {
+        // Create an array to store modified achievement objects
+        let modifiedAchievementsArray = [];
+
+        achievements.forEach(achievement => {
+            // Create a new object to store modified keys
+            let modifiedAchievement = {};
+
+            // Iterate over the keys of the current achievement object
+            for (let key in achievement) {
+                // If the key ends with '_path', remove the suffix
+                // Otherwise, keep the key as it is
+                modifiedAchievement[key.replace(/_path$/, '')] = achievement[key];
+            }
+
+            // Destructure the unwanted keys and store the rest
+            const { user_id, created_at, updated_at, ...rest } = modifiedAchievement;
+
+            // Push the modified object to the array
+            modifiedAchievementsArray.push(rest);
+        });
+
+        // Return the array of modified achievement objects
+        return modifiedAchievementsArray;
+    }
+
 
     useEffect(() => {
         if (!checkLogin()) {
-            navigate('/dmce/login');
+            return navigate('/dmce/login');
         }
     }, []);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
+    useEffect(() => {
+        getAllAchievements();
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setData({
-            ...data,
-            achievementCertificate: file
-        });
-    }
+    }, []);
 
-    const years = [];
-    for (let year = 2021; year <= 2030; year++) {
-        const academicYear = `${year}-${year + 1}`;
-        years.push(
-            <MenuItem key={academicYear} value={academicYear}>
-                {academicYear}
-            </MenuItem>
-        );
-    }
-
-    const handleSubmit = async () => {
-
-    
-        const loading = toast.loading('Adding your achievement');
-        const userInSession = localStorage.getItem('dmceuser');
-        const token = JSON.parse(userInSession).token;
-
-        const formData = new FormData();
-        formData.append('academic_year', data.academicYear);
-        formData.append('student_year', data.studentYear);
-        formData.append('college_name', data.collegeName);
-        formData.append('achievement_domain', data.achievementDomain);
-        formData.append('achievement_level', data.achievementLevel);
-        formData.append('achievement_location', data.achievementLocation);
-        formData.append('achievement_date', data.achievementDate);
-        formData.append('prize', data.prize);
-        formData.append('achievement_certificate_path', data.achievementCertificate);
-
-        try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/achievement`,
-                formData,
-                {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data',
-                    },
-                    maxBodyLength: Infinity,
-                }
-            );
-            console.log(JSON.stringify(response.data));
-            toast.dismiss(loading);
-            toast.success('Achievement added successfully');
-        } catch (error) {
-            console.error(error);
-            toast.dismiss(loading);
-            toast.error('Something went wrong');
+    useEffect(() => {
+        if (achivement.length > 0) {
+            // Initialize DataTable after the table has been rendered
+            new DataTable('#example');
         }
+    }, [achivement]);
+
+    const getAllAchievements = () => {
+        setLoader(true);
+        const token = getToken();
+
+        let config = {
+            method: 'get',
+            url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/achievements`,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        };
+
+        axios.request(config)
+            .then((response) => {
+                const data = removeUnwantedFields(response.data.achievements)
+                setAchivement(data);
+                setLoader(false);
+            })
+            .catch((error) => {
+                if (error.response.status == 401) {
+                    localStorage.clear()
+                    return navigate('/dmce/login')
+                }
+                setLoader(false);
+                return toast.error(error.response.data.message);
+
+            });
     };
+
 
     return (
-        <section className='w-full min-h-screen p-4 md:p-8'>
-            <div className='w-full max-md:mt-8 max-md:mb-8'>
-                <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Fill Your Achievements</h1>
-            </div>
-            <div className='w-full grid md:grid-cols-2 grid-cols-1'>
-                <div className='w-full md:p-8 md:mt-4 '>
-                    <label className='label' htmlFor="academicYear">Academic Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="academic-year-label">Academic Year</InputLabel>
-                            <Select
-                                labelId="academic-year-label"
-                                id="academicYear"
-                                name="academicYear"
-                                value={data.academicYear}
-                                onChange={handleChange}
-                            >
-                                {years}
-                            </Select>
-                        </FormControl>
-                    </Box>
+        <section className='w-full  min-h-screen p-4 md:p-8 '>
+            {loader ? <Loaders message={"loading your achievement"} /> :
+                <div className='w-full'>
+                    <div className='w-full flex items-center justify-between px-4 mt-8 '>
+                        <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your Achievements</h2>
+                        <button
+                            className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block md:hidden md:text-xl"
+                            onClick={() => navigate('/dmce/add/achivement')}
+                        >
+                            <i className="fa-solid fa-plus"></i>
+                        </button>
+                        <button
+                            className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block max-md:hidden md:text-xl"
+                            onClick={() => navigate('/dmce/add/achivement')}
+                        >
+                            Add Achievements
+                        </button>
+                    </div>
 
-                    <label className='label' htmlFor="studentYear">Student Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="student-year-label">Student Year</InputLabel>
-                            <Select
-                                labelId="student-year-label"
-                                id="studentYear"
-                                name="studentYear"
-                                value={data.studentYear}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={1}>First Year</MenuItem>
-                                <MenuItem value={2}>Second Year</MenuItem>
-                                <MenuItem value={3}>Third Year</MenuItem>
-                                <MenuItem value={4}>Fourth Year</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
+                    <div className="overflow-x-auto w-full mt-8 ">
+                        {
+                            achivement.length ? (
+                                <table id="example" className="table table-striped" style={{ width: '100%' }}>
+                                    <thead>
+                                        <tr>
+                                            <th className='text-sm text-center'>Academic Year</th>
+                                            <th className='text-sm text-center'>Achievement Certificate</th>
+                                            <th className='text-sm text-center'>Achievement Date</th>
+                                            <th className='text-sm text-center'>Achievement Domain</th>
+                                            <th className='text-sm text-center'>Achievement Level</th>
+                                            <th className='text-sm text-center'>Achievement Location</th>
+                                            <th className='text-sm text-center'>College Name</th>
+                                            <th className='text-sm text-center'>Prize</th>
+                                            <th className='text-sm text-center'>Student Year</th>
+                                            <th className='text-sm text-center'>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {achivement.map(achievement => (
+                                            <tr key={achievement.id}>
+                                                <td className='text-center text-sm'>{achievement.academic_year}</td>
+                                                <td className='text-center text-sm'>
+                                                    <a href={achievement.achievement_certificate} target="_blank" rel="noopener noreferrer">View Certificate</a>
+                                                </td>
+                                                <td className='text-center text-sm'>{achievement.achievement_date}</td>
+                                                <td className='text-center text-sm'>{achievement.achievement_domain}</td>
+                                                <td className='text-center text-sm'>{achievement.achievement_level}</td>
+                                                <td className='text-center text-sm'>{achievement.achievement_location}</td>
+                                                <td className='text-center text-sm'>{achievement.college_name}</td>
+                                                <td className='text-center text-sm'>{achievement.prize}</td>
+                                                <td className='text-center text-sm'>{achievement.student_year}</td>
+                                                <td className='text-center text-sm '>
+                                                    <div className='flex items-center gap-2 justify-center'>
+                                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded mr-2" onClick={() => handleEdit(achievement)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded" onClick={() => handleDelete(achievement.id)}><i className="fa-solid fa-trash"></i></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <h1 className='text-xl md:text-2xl mt-3 text-center font-bold text-[#262847]'>No Data Available</h1>
+                            )
+                        }
 
-                    <label className='label' htmlFor="collegeName">College Name</label>
-                    <input type="text" id='collegeName' name="collegeName" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="achievementDomain">Domain / Title</label>
-                    <input type="text" id='achievementDomain' name="achievementDomain" className='input' onChange={handleChange} />
-                </div>
-                <div className='w-full md:p-8 md:mt-4'>
-                    <label className='label' htmlFor="achievementLevel">Achievement Level</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="achievement-level-label">Achievement Level</InputLabel>
-                            <Select
-                                labelId="achievement-level-label"
-                                id="achievementLevel"
-                                name="achievementLevel"
-                                value={data.achievementLevel}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="college-level">College Level</MenuItem>
-                                <MenuItem value="inter-college-level">Inter College Level Year</MenuItem>
-                                <MenuItem value="district-level">District Level</MenuItem>
-                                <MenuItem value="state-level">State Level</MenuItem>
-                                <MenuItem value="national-level">National Level</MenuItem>
-                                <MenuItem value="inter-national-level">Inter National Level</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <label className='label' htmlFor="achievementLocation">Achievement Location</label>
-                    <input type="text" id='achievementLocation' name="achievementLocation" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="achievementDate">Achievement Date</label>
-                    <input type="date" id='achievementDate' name="achievementDate" className='input' onChange={handleChange} />
-                    <label className='label' htmlFor="prize">Prize</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="prize-label">Prize</InputLabel>
-                            <Select
-                                labelId="prize-label"
-                                id="prize"
-                                name="prize"
-                                value={data.prize}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="first">First</MenuItem>
-                                <MenuItem value="second">Second</MenuItem>
-                                <MenuItem value="third">Third</MenuItem>
-                                <MenuItem value="fourth">Fourth</MenuItem>
-                                <MenuItem value="participated">Participated</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-
-                    <label className='label' htmlFor="achievementCertificate">Achievement Certificate</label>
-                    <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="achievementCertificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Achievement Certificate
-                        </label>
-                        <input id="achievementCertificate" name="achievementCertificate" type="file" className="hidden" onChange={handleFileChange} />
-                        {data.achievementCertificate && (
-                            <p className="mt-2 text-gray-700">Selected file: {data.achievementCertificate.name}</p>
-                        )}
                     </div>
 
                 </div>
-            </div>
-            <div className='flex justify-center mt-4 '>
-                <button className='btn' onClick={handleSubmit}>Submit</button>
-            </div>
+            }
         </section>
     );
 };
 
-export default Achievements;
+export default Achivements;

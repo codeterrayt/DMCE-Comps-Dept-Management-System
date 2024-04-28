@@ -22,7 +22,7 @@ const SideNav = () => {
 
     useEffect(() => {
         if (!checkLogin()) {
-            navigate('/dmce/login')
+            return navigate('/dmce/login')
 
         } else {
             const user = localStorage.getItem('dmceuser')
@@ -88,7 +88,7 @@ const SideNav = () => {
                 >
 
 
-                    <div className=" mb-3 w-full "><img src="https://www.dmce.ac.in/assets/img/dmce.png" className="w-16 m-auto" alt="logo" /> </div>
+                    <div  className=" mb-3 w-full "><img src="https://www.dmce.ac.in/assets/img/dmce.png" onClick={()=>navigate('/dmce/home')} className="w-16 m-auto cursor-pointer" alt="logo" /> </div>
                     <hr className="border-grey mx-auto ml-6 mb-8 mr-6 " />
 
                     <NavLink
@@ -101,7 +101,7 @@ const SideNav = () => {
                     </NavLink>
                     <br />
                     <br />
-                    <NavLink
+                    {/* <NavLink
                         to={"/dmce/about"}
                         onClick={(e) => setPageState(e.target.innerText)}
                         className="ml-8 text-xl font-bold"
@@ -110,7 +110,7 @@ const SideNav = () => {
                         About
                     </NavLink>
                     <br />
-                    <br />
+                    <br /> */}
                     <NavLink
                         to={"/dmce/internship"}
                         onClick={(e) => setPageState(e.target.innerText)}
@@ -161,15 +161,26 @@ const SideNav = () => {
                     </NavLink>
                     <br />
                     <br />
-                    <div className="w-[80%] ml-[1.2rem] p-4 absolute bottom-3">
-                        {
-                            login ? <div className="w-full  p-2 flex gap-4 text-xs mx-auto justify-center items-center  flex-col ">
-                                <div className="flex w-full items-center gap-4 ">
+                    <NavLink
+                        to={"/dmce/placement"}
+                        onClick={(e) => setPageState(e.target.innerText)}
+                        className="ml-8 text-xl font-bold"
+                    >
 
-                                    <Avatar alt="profile" src="https://varad177.github.io/portfolio/assets/hero.jpg" />
-                                    <h1 className="text-xl font-bold">Hii {userInSession.name}</h1>
+                        Placement
+                    </NavLink>
+                    <br />
+                    <br />
+                    <div className="w-[80%]  mt-8 absolute bottom-2">
+                        {
+                            login? <div className="w-full  p-2 flex gap-4 text-xs mx-auto justify-center items-center  flex-col ">
+                                <div className="flex flex-col w-full items-center gap-2 mt-8 ">
+
+
+                                    <h1 className="text-xl font-bold text-center">Hii {userInSession.name}</h1>
+                                    <button onClick={handleSignOut} className="btn1 mx-auto">Sign Out</button>
                                 </div>
-                                <button onClick={handleSignOut} className="btn1 mx-auto">Sign Out</button>
+
                             </div>
                                 : <div className="w-full flex gap-3 text-xs mx-auto">
 
