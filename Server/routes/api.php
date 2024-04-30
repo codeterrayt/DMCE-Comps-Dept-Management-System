@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(f
     Route::get("/student/fetch/internships",[StudentInternshipController::class,'fetch']);
     Route::post("/student/update/internship",[StudentInternshipController::class,'update']);
     Route::post("/student/delete/internship",[StudentInternshipController::class,'destroy']);
+    Route::get("/student/fetch/internship/{id}",[StudentInternshipController::class,'fetchInternshipByID']);
 
     Route::post("/student/add/achievement",[StudentAchivementsController::class,'store']);
     Route::get("/student/fetch/achievements",[StudentAchivementsController::class,'fetch']);
