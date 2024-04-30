@@ -53,6 +53,7 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(f
     Route::get("/student/fetch/higher-studies",[StudentHigherStudiesController::class,'fetch']);
     Route::post("/student/update/higher-studies",[StudentHigherStudiesController::class,'update']);
     Route::post("/student/delete/higher-studies",[StudentHigherStudiesController::class,'destroy']);
+    Route::get("/student/fetch/higher-studies/{id}",[StudentHigherStudiesController::class,'fetch_hs_by_id']);
 
     Route::post("/student/add/placement",[StudentPlacementsController::class,'store']);
     Route::get("/student/fetch/placement",[StudentPlacementsController::class,'fetch']);

@@ -102,6 +102,19 @@ class StudentHigherStudiesController extends Controller
         return response()->json(['higher_studies' => $fetch_higher_studies]);
     }
 
+    public function fetch_hs_by_id($id){
+        $user = Auth::user();
+        $student_internship = StudentHigherStudies::where("user_id",$user->id)->where("id",$id)->first();
+        // Get the currently authenticated user
+
+        if($student_internship === null){
+            return response()->json([
+                "message" => "Higher Study Not Found"
+            ], 404);
+        }
+        return response()->json($student_internship);
+    }
+
     public function destroy(Request $request)
     {
 
