@@ -63,6 +63,19 @@ class StudentHackathonsController extends Controller
         return response()->json(['hackathon_participations' => $StudentHackathonss]);
     }
 
+    public function fetch_hackathon_by_id($id){
+        $user = Auth::user();
+        $student_internship = StudentHackathons::where("user_id",$user->id)->where("id",$id)->first();
+        // Get the currently authenticated user
+
+        if($student_internship === null){
+            return response()->json([
+                "message" => "Hackathon Not Found"
+            ], 404);
+        }
+        return response()->json($student_internship);
+    }
+
     public function update(Request $request)
     {
         // Validate the incoming request data

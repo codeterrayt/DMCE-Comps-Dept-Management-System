@@ -50,7 +50,7 @@ class StudentInternshipController extends Controller
         // Fill the internship attributes from the request data
         $internship->fill($request->all());
 
-
+        $internship->start_date = date('Y-m-d', strtotime($request->start_date));
         $internship->end_date = date('Y-m-d', strtotime($request->end_date));
         $internship->completion_letter_path = url()->to(Storage::url($completionLetterPath));
         $internship->certificate_path = url()->to(Storage::url($certificatePath));
@@ -77,13 +77,13 @@ class StudentInternshipController extends Controller
     public function update(Request $request)
     {
         // Validate the incoming request data
-         // Validate the incoming request data
-         $request->validate([
+        // Validate the incoming request data
+        $request->validate([
             'id' => [
                 'required',
                 Rule::exists('student_internships')->where(function ($query) {
                     return $query->where('id', request()->id)
-                                 ->where('user_id', auth()->id());
+                        ->where('user_id', auth()->id());
                 }),
             ],
             'academic_year' => 'required|string|max:255',
@@ -126,7 +126,7 @@ class StudentInternshipController extends Controller
         }
 
         // Fill the other internship attributes from the request data
-        $internship->fill($request->except(['certificate_path', 'offer_letter_path', 'permission_letter_path','completion_letter_path']));
+        $internship->fill($request->except(['certificate_path', 'offer_letter_path', 'permission_letter_path', 'completion_letter_path']));
         $internship->start_date = date('Y-m-d', strtotime($request->start_date));
         $internship->end_date = date('Y-m-d', strtotime($request->end_date));
 
@@ -151,6 +151,21 @@ class StudentInternshipController extends Controller
         return response()->json(["internships" => $internships]);
     }
 
+    public function fetchInternshipByID($id)
+    {
+        $user = Auth::user();
+        $student_internship = StudentInternship::where("user_id",$user->id)->where("id",$id)->first();
+        // Get the currently authenticated user
+
+        if($student_internship === null){
+            return response()->json([
+                "message" => "Internship Not Found"
+            ], 404);
+        }
+        return response()->json($student_internship);
+
+    }
+
     public function destroy(Request $request)
     {
 
@@ -159,7 +174,7 @@ class StudentInternshipController extends Controller
                 'required',
                 Rule::exists('student_internships')->where(function ($query) {
                     return $query->where('id', request()->id)
-                                 ->where('user_id', auth()->id());
+                        ->where('user_id', auth()->id());
                 }),
             ],
         ]);
@@ -173,5 +188,4 @@ class StudentInternshipController extends Controller
         // Return a response
         return response()->json(['message' => 'Internship deleted successfully']);
     }
-
 }

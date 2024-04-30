@@ -107,6 +107,19 @@ class StudentPlacementsController extends Controller
          return response()->json(["placements" => $placements]);
     }
 
+    public function fetch_placement_by_id($id){
+        $user = Auth::user();
+        $student_internship = StudentPlacements::where("user_id",$user->id)->where("id",$id)->first();
+        // Get the currently authenticated user
+
+        if($student_internship === null){
+            return response()->json([
+                "message" => "Placement Not Found"
+            ], 404);
+        }
+        return response()->json($student_internship);
+    }
+
     public function destroy(Request $request)
     {
 
