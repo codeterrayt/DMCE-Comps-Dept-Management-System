@@ -5,11 +5,17 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { checkLogin } from '../helper/checkLogin';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { getToken } from '../helper/getToken';
+import Loaders from './Loaders';
 
 const AddAchievements = () => {
+
+    
+    const [loader, setloader] = useState(false);
+
     const [data, setData] = useState({
         academicYear: '',
         studentYear: '',
@@ -23,6 +29,13 @@ const AddAchievements = () => {
     });
 
     const navigate = useNavigate();
+    const { id } = useParams()
+    useEffect(() => {
+        if (id) {
+            getDataById(id)
+        }
+
+    }, [])
 
     useEffect(() => {
         if (!checkLogin()) {
@@ -58,36 +71,36 @@ const AddAchievements = () => {
 
     const handleSubmit = async () => {
         // Check if any required field is empty
-        if (!data.academicYear) {
+        if (!id && !data.academicYear) {
             return toast.error("Please enter the academic year.");
         }
-        if (!data.studentYear) {
+        if (!id && !data.studentYear) {
             return toast.error("Please enter the student year.");
         }
-        if (!data.collegeName) {
+        if (!id && !data.collegeName) {
             return toast.error("Please enter the college name.");
         }
-        if (!data.achievementDomain) {
+        if (!id && !data.achievementDomain) {
             return toast.error("Please enter the achievement domain.");
         }
-        if (!data.achievementLevel) {
+        if (!id && !data.achievementLevel) {
             return toast.error("Please enter the achievement level.");
         }
-        if (!data.achievementLocation) {
+        if (!id && !data.achievementLocation) {
             return toast.error("Please enter the achievement location.");
         }
-        if (!data.achievementDate) {
+        if (!id && !data.achievementDate) {
             return toast.error("Please enter the achievement date.");
         }
-        if (!data.prize) {
+        if (!id && !data.prize) {
             return toast.error("Please enter the prize.");
         }
-        if (!data.achievementCertificate) {
+        if (!id && !data.achievementCertificate) {
             return toast.error("Please upload the achievement certificate.");
         }
 
         // Check file size for achievementCertificate
-        if (data.achievementCertificate.size > 512 * 1024) {
+        if (!id && data.achievementCertificate.size > 512 * 1024) {
             return toast.error("Achievement certificate size should be less than 512 KB.");
         }
 
@@ -104,11 +117,19 @@ const AddAchievements = () => {
         formData.append('achievement_location', data.achievementLocation);
         formData.append('achievement_date', data.achievementDate);
         formData.append('prize', data.prize);
-        formData.append('achievement_certificate_path', data.achievementCertificate);
+        if (data.achievementCertificate) {
+
+            formData.append('achievement_certificate_path', data.achievementCertificate);
+        }
+        if (id) {
+            formData.append('id', id);
+        }
+
 
         try {
+            const url = id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/achievement` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/achievement`
             const response = await axios.post(
-                `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/achievement`,
+                url,
                 formData,
                 {
                     headers: {
@@ -136,121 +157,177 @@ const AddAchievements = () => {
     };
 
 
+    const getDataById = (id) => {
+        setloader(true)
+        try {
+            const token = getToken()
+
+            let config = {
+                method: 'get',
+                maxBodyLength: Infinity,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/achievement/${id}`,
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    ...data.getHeaders
+                },
+
+            };
+
+            axios.request(config)
+                .then((response) => {
+                    setloader(false)
+                    setData({
+                        academicYear: response.data.academic_year,
+                        studentYear: response.data.student_year,
+                        collegeName: response.data.college_name,
+                        achievementDomain: response.data.achievement_domain,
+                        achievementLevel: response.data.achievement_level,
+                        achievementLocation: response.data.achievement_location,
+                        achievementDate: response.data.achievement_date,
+                        prize: response.data.prize
+                    })
+                })
+                .catch((error) => {
+                    setloader(false)
+                    if (error.response && error.response.status === 401) {
+                        localStorage.clear();
+                        return navigate('/dmce/login');
+                    }
+
+                    console.log(error);
+                });
+
+
+
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
+
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
-            <div className='w-full max-md:mt-8 max-md:mb-8'>
-                <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Fill Your Achievements</h1>
-            </div>
-            <div className='w-full grid md:grid-cols-2 grid-cols-1'>
-                <div className='w-full md:p-8 md:mt-4 '>
-                    <label className='label' htmlFor="academicYear">Academic Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="academic-year-label">Academic Year</InputLabel>
-                            <Select
-                                labelId="academic-year-label"
-                                id="academicYear"
-                                name="academicYear"
-                                value={data.academicYear}
-                                onChange={handleChange}
-                            >
-                                {years}
-                            </Select>
-                        </FormControl>
-                    </Box>
+                    
+            {
+                loader ? <Loaders /> : <>
 
-                    <label className='label' htmlFor="studentYear">Student Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="student-year-label">Student Year</InputLabel>
-                            <Select
-                                labelId="student-year-label"
-                                id="studentYear"
-                                name="studentYear"
-                                value={data.studentYear}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={1}>First Year</MenuItem>
-                                <MenuItem value={2}>Second Year</MenuItem>
-                                <MenuItem value={3}>Third Year</MenuItem>
-                                <MenuItem value={4}>Fourth Year</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <label className='label' htmlFor="collegeName">College Name</label>
-                    <input type="text" id='collegeName' name="collegeName" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="achievementDomain">Domain / Title</label>
-                    <input type="text" id='achievementDomain' name="achievementDomain" className='input' onChange={handleChange} />
-                </div>
-                <div className='w-full md:p-8 md:mt-4'>
-                    <label className='label' htmlFor="achievementLevel">Achievement Level</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="achievement-level-label">Achievement Level</InputLabel>
-                            <Select
-                                labelId="achievement-level-label"
-                                id="achievementLevel"
-                                name="achievementLevel"
-                                value={data.achievementLevel}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="college-level">College Level</MenuItem>
-                                <MenuItem value="inter-college-level">Inter College Level Year</MenuItem>
-                                <MenuItem value="district-level">District Level</MenuItem>
-                                <MenuItem value="state-level">State Level</MenuItem>
-                                <MenuItem value="national-level">National Level</MenuItem>
-                                <MenuItem value="inter-national-level">Inter National Level</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <label className='label' htmlFor="achievementLocation">Achievement Location</label>
-                    <input type="text" id='achievementLocation' name="achievementLocation" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="achievementDate">Achievement Date</label>
-                    <input type="date" id='achievementDate' name="achievementDate" className='input' onChange={handleChange} />
-                    <label className='label' htmlFor="prize">Prize</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="prize-label">Prize</InputLabel>
-                            <Select
-                                labelId="prize-label"
-                                id="prize"
-                                name="prize"
-                                value={data.prize}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="first">First</MenuItem>
-                                <MenuItem value="second">Second</MenuItem>
-                                <MenuItem value="third">Third</MenuItem>
-                                <MenuItem value="fourth">Fourth</MenuItem>
-                                <MenuItem value="participated">Participated</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-
-                    <label className='label' htmlFor="achievementCertificate">Achievement Certificate</label>
-                    <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="achievementCertificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Achievement Certificate
-                        </label>
-                        <input id="achievementCertificate" name="achievementCertificate" type="file" className="hidden" onChange={handleFileChange} />
-                        {data.achievementCertificate && (
-                            <p className="mt-2 text-gray-700">Selected file: {data.achievementCertificate.name}</p>
-                        )}
+                    <div className='w-full max-md:mt-8 max-md:mb-8'>
+                        <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Your Achievement"}</h1>
                     </div>
+                    <div className='w-full grid md:grid-cols-2 grid-cols-1'>
+                        <div className='w-full md:p-8 md:mt-4 '>
+                            <label className='label' htmlFor="academicYear">Academic Year</label>
+                            <Box sx={{ minWidth: 120 }}>
+                                <FormControl style={{ marginBottom: "12px" }} fullWidth>
+                                    <InputLabel id="academic-year-label">Academic Year</InputLabel>
+                                    <Select
+                                        labelId="academic-year-label"
+                                        id="academicYear"
+                                        name="academicYear"
+                                        value={data.academicYear}
+                                        onChange={handleChange}
+                                    >
+                                        {years}
+                                    </Select>
+                                </FormControl>
+                            </Box>
 
-                </div>
-            </div>
-            <div className='flex justify-center mt-4 '>
-                <button className='btn' onClick={handleSubmit}>Submit</button>
-            </div>
+                            <label className='label' htmlFor="studentYear">Student Year</label>
+                            <Box sx={{ minWidth: 120 }}>
+                                <FormControl style={{ marginBottom: "12px" }} fullWidth>
+                                    <InputLabel id="student-year-label">Student Year</InputLabel>
+                                    <Select
+                                        labelId="student-year-label"
+                                        id="studentYear"
+                                        name="studentYear"
+                                        value={data.studentYear}
+                                        onChange={handleChange}
+                                    >
+                                        <MenuItem value={1}>First Year</MenuItem>
+                                        <MenuItem value={2}>Second Year</MenuItem>
+                                        <MenuItem value={3}>Third Year</MenuItem>
+                                        <MenuItem value={4}>Fourth Year</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Box>
+
+                            <label className='label' htmlFor="collegeName">College Name</label>
+                            <input type="text" value={data.collegeName} id='collegeName' name="collegeName" className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="achievementDomain">Domain / Title <p className='example'>e.g:- web-development , app-developement</p></label>
+                            <input type="text" value={data.achievementDomain} id='achievementDomain' name="achievementDomain" className='input' onChange={handleChange} />
+                        </div>
+                        <div className='w-full md:p-8 md:mt-4'>
+                            <label className='label' htmlFor="achievementLevel">Achievement Level</label>
+                            <Box sx={{ minWidth: 120 }}>
+                                <FormControl style={{ marginBottom: "12px" }} fullWidth>
+                                    <InputLabel id="achievement-level-label">Achievement Level</InputLabel>
+                                    <Select
+                                        labelId="achievement-level-label"
+                                        id="achievementLevel"
+                                        name="achievementLevel"
+                                        value={data.achievementLevel}
+                                        onChange={handleChange}
+                                    >
+                                        <MenuItem value="college-level">College Level</MenuItem>
+                                        <MenuItem value="inter-college-level">Inter College Level Year</MenuItem>
+                                        <MenuItem value="district-level">District Level</MenuItem>
+                                        <MenuItem value="state-level">State Level</MenuItem>
+                                        <MenuItem value="national-level">National Level</MenuItem>
+                                        <MenuItem value="inter-national-level">Inter National Level</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Box>
+
+                            <label className='label' htmlFor="achievementLocation">Achievement Location <p className='example'>e.g:- Airoli, Thane</p></label>
+                            <input value={data.achievementLocation} type="text" id='achievementLocation' name="achievementLocation" className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="achievementDate">Achievement Date</label>
+                            <input value={data.achievementDate} type="date" id='achievementDate' name="achievementDate" className='input' onChange={handleChange} />
+                            <label className='label' htmlFor="prize">Prize</label>
+                            <Box sx={{ minWidth: 120 }}>
+                                <FormControl style={{ marginBottom: "12px" }} fullWidth>
+                                    <InputLabel id="prize-label">Prize</InputLabel>
+                                    <Select
+                                        labelId="prize-label"
+                                        id="prize"
+                                        name="prize"
+                                        value={data.prize}
+                                        onChange={handleChange}
+                                    >
+                                        <MenuItem value="first">First</MenuItem>
+                                        <MenuItem value="second">Second</MenuItem>
+                                        <MenuItem value="third">Third</MenuItem>
+                                        <MenuItem value="fourth">Fourth</MenuItem>
+                                        <MenuItem value="participated">Participated</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Box>
+
+
+                            <label className='label' htmlFor="achievementCertificate">Achievement Certificate <p className='example'>prefer pdf, size &lt; 512kb</p></label>
+                            <div className="bg-gray-100 mb-[12px] ">
+                                <label htmlFor="achievementCertificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
+                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Achievement Certificate
+                                </label>
+                                <input id="achievementCertificate" name="achievementCertificate" type="file" className="hidden" onChange={handleFileChange} />
+                                {data.achievementCertificate && (
+                                    <p className="mt-2 text-gray-700">Selected file: {data.achievementCertificate.name}</p>
+                                )}
+                            </div>
+
+                        </div>
+                    </div>
+                    <div className='flex justify-center mt-4 '>
+                        <button className='btn' onClick={handleSubmit}>Submit</button>
+                    </div>
+                </>
+            }
         </section>
     );
 };

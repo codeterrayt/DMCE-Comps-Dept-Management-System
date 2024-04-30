@@ -25,6 +25,7 @@ import AddHackathons from './components/AddHackathons';
 import AddHigherStudies from './components/AddHigherStudies';
 import AddPlacementDetails from './components/AddPlacement';
 import Placement from './components/Placement';
+import Profile from './components/Profile';
 
 export const userContext = createContext()
 
@@ -49,20 +50,25 @@ function App() {
             <Route path="add/internship/:id" element={<AddInternship />} />
             <Route path="achivement" element={<Achivements />} />
             <Route path="add/achivement" element={<AddAchievements />} />
+            <Route path="add/achivement/:id" element={<AddAchievements />} />
             <Route path="extra-curriculum" element={<ExtraCurr />} />
             <Route path="add/extra-curriculum" element={<AddExtraCurr />} />
+            <Route path="add/extra-curriculum/:id" element={<AddExtraCurr />} />
             <Route path="hackathon" element={<Hackathon />} />
             <Route path="add/hackathon" element={<AddHackathons />} />
+            <Route path="add/hackathon/:id" element={<AddHackathons />} />
             <Route path="higher-studies" element={<HigherStudies />} />
             <Route path="add/higher-studies" element={<AddHigherStudies />} />
+            <Route path="add/higher-studies/:id" element={<AddHigherStudies />} />
             <Route path="placement" element={<Placement />} />
             <Route path="add/placement" element={<AddPlacementDetails />} />
+            <Route path="add/placement/:id" element={<AddPlacementDetails />} />
             <Route path="sign-up" element={<SignUpForm />} />
             <Route path="login" element={<LoginForm />} />
-            <Route path="test" element={<UploadForm />} />
 
 
           </Route>
+          <Route path="/profile" element={<Profile />} />
 
         </Routes>
 

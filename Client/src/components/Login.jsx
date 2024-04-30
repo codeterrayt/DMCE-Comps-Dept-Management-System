@@ -96,6 +96,7 @@ const LoginForm = () => {
                         <div className='flex justify-center mt-4'>
                             <button type='button' className='btn' onClick={handleSubmit}>Login</button>
                         </div>
+                        <p className='font-bold text-center'>Don't have account? <p onClick={()=>navigate('/dmce/sign-up')} className=' text-[13px] cursor-pointer text-blue-700 underline inline'>Sign Up</p> </p>
                     </form>
                 </div>
             </div>

@@ -166,3 +166,41 @@
     scrollbar-color: #000 transparent;
   }
 */
+
+#iframe{
+  object-fit: contain !important;
+}
+
+.certificate{
+  background-color: #262847;
+  color: white;
+  transition: background-color 300ms ease-in-out;
+  border-radius: 0.375rem; /* Equivalent to 6px */
+  display: inline-block;
+  padding: 0.5rem 0.8rem;
+  font-weight: 600;
+}
+
+.example {
+  font-size: 16px;
+  display: inline;
+  font-weight: bold;
+}
+
+
+
+/* /////// */
+
+/* HTML: <div class="loader"></div> */
+.loader2 {
+  width: 120px;
+  height: 20px;
+  -webkit-mask:linear-gradient(90deg,#000 70%,#0000 0) 0/20%;
+  background:
+   linear-gradient(#000 0 0) 0/0% no-repeat
+   #ddd;
+  animation: l4 2s infinite steps(6);
+}
+@keyframes l4 {
+    100% {background-size:120%}
+}

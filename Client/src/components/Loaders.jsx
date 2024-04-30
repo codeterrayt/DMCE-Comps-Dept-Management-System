@@ -10,3 +10,11 @@ const Loaders = ({message}) => {
 }
 
 export default Loaders
+
+
+
+
+
+
+
+

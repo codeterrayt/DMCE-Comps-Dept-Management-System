@@ -275,10 +275,10 @@ const AddInternship = () => {
 
                         </div>
                         <div className='w-full md:p-8 md:mt-4 '>
-                            <label className='label' htmlFor="domain">Domain</label>
+                            <label className='label' htmlFor="domain">Domain <p className='example'>e.g:- web-development , app-developement</p></label>
                             <input value={data.domain} type="text" id='domain' name="domain" className='input' onChange={handleChange} />
 
-                            <label className='label' htmlFor="completionLetter">Completion Letter</label>
+                            <label className='label' htmlFor="completionLetter">Completion Letter <p className='example'>prefer pdf, size &lt; 512kb</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="completionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -292,7 +292,7 @@ const AddInternship = () => {
                                 )}
                             </div>
 
-                            <label className='label' htmlFor="certificate">Certificate</label>
+                            <label className='label' htmlFor="certificate">Certificate <p className='example'>prefer pdf, size &lt; 512kb</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="certificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -306,7 +306,7 @@ const AddInternship = () => {
                                 )}
                             </div>
 
-                            <label className='label' htmlFor="offerLetter">Offer Letter</label>
+                            <label className='label' htmlFor="offerLetter">Offer Letter <p className='example'>prefer pdf, size &lt; 512kb</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="offerLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -320,7 +320,7 @@ const AddInternship = () => {
                                 )}
                             </div>
 
-                            <label className='label' htmlFor="permissionLetter">Permission Letter</label>
+                            <label className='label' htmlFor="permissionLetter">Permission Letter <p className='example'>prefer pdf, size &lt; 512kb</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="permissionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

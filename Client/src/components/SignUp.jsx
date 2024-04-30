@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { userContext } from '../App';
 
 const SignUpForm = () => {
+    const { user, setUser } = useContext(userContext)
+
     const [formData, setFormData] = useState({
         firstName: '',
         email: '',
         password: ''
     });
+    const navigate = useNavigate()
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -34,6 +39,7 @@ const SignUpForm = () => {
             return toast.error('please provide the password')
         }
 
+        const loading = toast.loading('wait! Sign up in progress')
 
         let data = new FormData();
         data.append('name', formData.firstName);
@@ -57,11 +63,21 @@ const SignUpForm = () => {
         console.log(config);
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
-                return toast.success('sign up successful')
+                const user = {
+                    name: response.data.user.name,
+                    token: response.data.token,
+                    role: response.data.user.role
+                }
+                setUser(user)
+
+                localStorage.setItem('dmceuser', JSON.stringify(user))
+                toast.dismiss(loading)
+                toast.success("signup successful")
+                return navigate('/dmce/home')
             })
             .catch((error) => {
                 console.log(error);
+                toast.dismiss(loading)
                 return toast.error(error.response.data.message)
             });
     };
@@ -92,12 +108,16 @@ const SignUpForm = () => {
 
                         </div>
 
+                        <div className='flex justify-center mt-4'>
+                            <button className='btn' onClick={handleSubmit}>Sign Up</button>
+                        </div>
+                        <p className='font-bold text-center mt-8'>Already have account? <p onClick={() => navigate('/dmce/login')} className=' text-[13px] cursor-pointer text-blue-700 underline inline'>Login</p> </p>
+
 
                     </div>
+
                 </div>
-                <div className='flex justify-center mt-4'>
-                    <button className='btn' onClick={handleSubmit}>Sign Up</button>
-                </div>
+
             </div>
         </section>
     );

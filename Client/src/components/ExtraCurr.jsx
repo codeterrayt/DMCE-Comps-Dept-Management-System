@@ -5,8 +5,32 @@ import { getToken } from '../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import Loaders from './Loaders';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { Modal } from 'react-responsive-modal';
+import 'react-responsive-modal/styles.css';
+import CertificatePopup from './Pop';
 
 const ExtraCurr = () => {
+
+    //pop up 
+    const [certificateUrl, setCertificateUrl] = useState('');
+    const [showCertificate, setShowCertificate] = useState(false);
+
+    const openCertificate = (certificateUrl) => {
+        setCertificateUrl(certificateUrl);
+        setShowCertificate(true);
+    };
+
+    const closeCertificate = () => {
+        setCertificateUrl('');
+        setShowCertificate(false);
+    };
+
+
+    ////
+    const [checkDelete, setCheckDelete] = useState(false)
+
     const navigate = useNavigate();
     const [activity, setActivity] = useState([]);
     const [loader, setLoader] = useState(false);
@@ -78,11 +102,88 @@ const ExtraCurr = () => {
             });
     };
 
+    const handleDelete = (id) => {
+        try {
+            const confirmOptions = {
+                customUI: ({ onClose }) => (
+                    <Modal open={true} onClose={onClose} center>
+                        <div>
+                            <h2 className='font-bold text-xl'>Confirm Deletion</h2>
+                            <p className='my-3 text-[#262847] font-bold'>Are you sure you want to delete this activity?</p>
+                            <div className='w-full flex items-center px-4 justify-between'>
+                                <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={async () => {
+                                    onClose();
+                                    setLoader(true);
+
+                                    let data = new FormData();
+                                    data.append('id', id);
+
+                                    const token = getToken();
+                                    setCheckDelete(true)
+
+                                    let config = {
+                                        method: 'post',
+                                        maxBodyLength: Infinity,
+                                        url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/delete/extra-curricular-activities`,
+                                        headers: {
+                                            'Accept': 'application/json',
+                                            'Authorization': `Bearer ${token}`,
+                                            ...data.getHeaders
+                                        },
+                                        data: data
+                                    };
+
+                                    // Send delete request
+                                    axios.request(config)
+                                        .then((response) => {
+                                            setActivity(data => data.filter(value => value.id !== id));
+                                            setCheckDelete(false)
+
+                                            setLoader(false)
+                                        })
+                                        .catch((error) => {
+                                            setCheckDelete(false)
+
+                                            if (error.response && error.response.status === 401) {
+                                                localStorage.clear();
+                                                return navigate('/dmce/login');
+                                            }
+                                            console.log(error);
+                                        });
+
+                                }}>
+                                    Yes
+                                </button>
+                                <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={() => {
+                                    onClose();
+                                    setLoader(false);
+                                }}>
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                    </Modal>
+                ),
+            };
+
+            // Display responsive confirmation dialog
+            confirmAlert(confirmOptions);
+        } catch (error) {
+            setCheckDelete(false)
+
+            setLoader(false);
+            toast.error(error.message);
+        }
+    }
+
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
+            {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
+
             {
+
                 loader ? (
-                    <Loaders message={"loading your activity"} />
+                    <Loaders message={(checkDelete ? "deleting " : "loading ") + "your activity"} />
                 ) : (
                     <div className='w-full'>
                         <div className='w-full flex items-center justify-between px-4 mt-8 '>
@@ -109,13 +210,14 @@ const ExtraCurr = () => {
                                             <tr>
                                                 <th className='text-sm text-center'>Academic Year</th>
                                                 <th className='text-sm text-center'>College Name</th>
-                                                <th className='text-sm text-center'>ECC Certificate</th>
+
                                                 <th className='text-sm text-center'>ECC Date</th>
                                                 <th className='text-sm text-center'>ECC Domain</th>
                                                 <th className='text-sm text-center'>ECC Level</th>
                                                 <th className='text-sm text-center'>ECC Location</th>
                                                 <th className='text-sm text-center'>Prize</th>
                                                 <th className='text-sm text-center'>Student Year</th>
+                                                <th className='text-sm text-center'>ECC Certificate</th>
                                                 <th className='text-sm text-center'>Actions</th>
                                             </tr>
                                         </thead>
@@ -124,18 +226,25 @@ const ExtraCurr = () => {
                                                 <tr key={index}>
                                                     <td className='text-center text-sm'>{item.academic_year}</td>
                                                     <td className='text-center text-sm'>{item.college_name}</td>
-                                                    <td className='text-center text-sm'>
-                                                        <a href={item.ecc_certificate} target="_blank" rel="noopener noreferrer">View Certificate</a>
-                                                    </td>
+
                                                     <td className='text-center text-sm'>{item.ecc_date}</td>
                                                     <td className='text-center text-sm'>{item.ecc_domain}</td>
                                                     <td className='text-center text-sm'>{item.ecc_level}</td>
                                                     <td className='text-center text-sm'>{item.ecc_location}</td>
                                                     <td className='text-center text-sm'>{item.prize}</td>
                                                     <td className='text-center text-sm'>{item.student_year}</td>
-                                                    <td className='text-center text-sm flex gap-2 items-center '>
-                                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded mr-2" onClick={() => handleEdit(item)}><i className="fa-solid fa-pen-to-square"></i></button>
-                                                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded" onClick={() => handleDelete(item.id)}><i className="fa-solid fa-trash"></i></button>
+                                                    <td className='text-center text-sm'>
+                                                        <td className='text-center text-sm'>
+                                                            <button onClick={() => openCertificate(item.ecc_certificate)} className="certificate">
+                                                                View Certificate
+                                                            </button>
+                                                        </td>
+                                                    </td>
+                                                    <td className='text-center text-sm  '>
+                                                        <div className='flex gap-2 items-center'>
+                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded mr-2" onClick={() => navigate(`/dmce/add/extra-curriculum/${item.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded" onClick={() => handleDelete(item.id)}><i className="fa-solid fa-trash"></i></button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}

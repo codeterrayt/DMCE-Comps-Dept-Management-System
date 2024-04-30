@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -7,9 +7,19 @@ import Select from '@mui/material/Select';
 import { getToken } from '../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import Loaders from './Loaders';
 
 const AddHigherStudies = () => {
+    const [loader, setloader] = useState(false)
+
+    const { id } = useParams()
+    useEffect(() => {
+        if (id) {
+            getDataById(id)
+        }
+
+    }, [])
     const [formData, setFormData] = useState({
         academic_year: '',
         exam_type: '',
@@ -63,48 +73,48 @@ const AddHigherStudies = () => {
     // Handle form submission
     const handleSubmit = () => {
         // Check if all required fields are filled individually and provide error messages for each missing field
-        if (!formData.academic_year) {
+        if (!id && !formData.academic_year) {
             toast.error('Please select the academic year.');
             return;
         }
-        if (!formData.exam_type) {
+        if (!id && !formData.exam_type) {
             toast.error('Please enter the exam type.');
             return;
         }
-        if (!formData.score) {
+        if (!id && !formData.score) {
             toast.error('Please enter the score.');
             return;
         }
-        if (!formData.city) {
+        if (!id && !formData.city) {
             toast.error('Please enter the city.');
             return;
         }
-        if (!formData.state) {
+        if (!id && !formData.state) {
             toast.error('Please enter the state.');
             return;
         }
-        if (!formData.country) {
+        if (!id && !formData.country) {
             toast.error('Please enter the country.');
             return;
         }
-        if (!formData.university_name) {
+        if (!id && !formData.university_name) {
             toast.error('Please enter the university name.');
             return;
         }
-        if (!formData.course) {
+        if (!id && !formData.course) {
             toast.error('Please enter the course.');
             return;
         }
-        if (!formData.guide) {
+        if (!id && !formData.guide) {
             toast.error('Please enter the project guide.');
             return;
         }
-        if (!formData.admission_letter) {
+        if (!id && !formData.admission_letter) {
             toast.error('Please upload the admission letter.');
             return;
         }
 
-        if (formData.admission_letter.size > 512 * 1024) {
+        if (!id && formData.admission_letter.size > 512 * 1024) {
             toast.error('Admission letter file size should be less than 512 KB.');
             return;
         }
@@ -122,14 +132,20 @@ const AddHigherStudies = () => {
         data.append('university_name', formData.university_name);
         data.append('student_course', formData.course);
         data.append('student_project_guide', formData.guide);
-        data.append('student_admission_letter', formData.admission_letter);
+        if (formData.admission_letter) {
+
+            data.append('student_admission_letter', formData.admission_letter);
+        }
+        if (id) {
+            data.append('id', id);
+        }
 
         const token = getToken();
 
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/higher-studies`,
+            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/higher-studies` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/higher-studies`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -156,74 +172,127 @@ const AddHigherStudies = () => {
             });
     };
 
+    const getDataById = (id) => {
+        setloader(true)
+        try {
+            const token = getToken()
+
+            let config = {
+                method: 'get',
+                maxBodyLength: Infinity,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/higher-studies/${id}`,
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+
+            };
+
+            axios.request(config)
+                .then((response) => {
+                    setloader(false)
+                    setFormData({
+                        academic_year: response.data.student_academic_year,
+                        exam_type: response.data.student_exam_type,
+                        score: response.data.student_score,
+                        city: response.data.university_city,
+                        state: response.data.university_state,
+                        country: response.data.university_country,
+                        university_name: response.data.university_name,
+                        course: response.data.student_course,
+                        guide: response.data.student_project_guide,
+
+                    })
+                })
+                .catch((error) => {
+                    setloader(false)
+                    if (error.response && error.response.status === 401) {
+                        localStorage.clear();
+                        return navigate('/dmce/login');
+                    }
+
+                    console.log(error);
+                });
+
+
+
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
-            <div className='w-full max-md:mt-8  max-md:mb-8'>
-                <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Higher Studies Details</h1>
-            </div>
-            <div className='w-full grid md:grid-cols-2 grid-cols-1'>
-                <div className='w-full md:p-8 md:mt-4 '>
-                    <label className='label' htmlFor="academic_year">Select Academic Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl
-                            style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="academic-year-label">Academic Year</InputLabel>
-                            <Select
-                                labelId="academic-year-label"
-                                id="academic_year"
-                                name="academic_year"
-                                value={formData.academic_year || ''}
-                                onChange={handleChange}
-                            >
-                                {years}
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <label className='label' htmlFor="exam_type">Exam Type <p className='text-sm inline'>e.g:- GRE, VITEEE, NDA</p></label>
-                    <input type="text" id='exam_type' name='exam_type' className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="score">Score</label>
-                    <input type="number" id='score' name='score' className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="city">City</label>
-                    <input type="text" id='city' name='city' className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="state">State</label>
-                    <input type="text" id='state' name='state' className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="country">Country</label>
-                    <input type="text" id='country' name='country' className='input' onChange={handleChange} />
-                </div>
-                <div className='w-full md:p-8 md:mt-4 '>
-                    <label className='label' htmlFor="university_name">University Name</label>
-                    <input type="text" id='university_name' name='university_name' className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="course">Course</label>
-                    <input type="text" id='course' name='course' className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="guide">Guide</label>
-                    <input type="text" id='guide' name='guide' className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="admission_letter">Admission Letter</label>
-                    <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="admission_letter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Admission Letter
-                        </label>
-                        <input id="admission_letter" name="admission_letter" type="file" className="hidden" onChange={handleFileChange} />
-                        {formData.admission_letter && (
-                            <p className="mt-2 text-gray-700">Selected file: {formData.admission_letter.name}</p>
-                        )}
+            {
+                loader ? <Loaders /> : <>
+                    <div className='w-full max-md:mt-8  max-md:mb-8'>
+                        <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Higher Study Detail"}</h1>
                     </div>
-                </div>
-            </div>
-            <div className='flex justify-center mt-4'>
-                <button className='btn' onClick={handleSubmit}>Submit</button>
-            </div>
+                    <div className='w-full grid md:grid-cols-2 grid-cols-1'>
+                        <div className='w-full md:p-8 md:mt-4 '>
+                            <label className='label' htmlFor="academic_year">Select Academic Year</label>
+                            <Box sx={{ minWidth: 120 }}>
+                                <FormControl
+                                    style={{ marginBottom: "12px" }} fullWidth>
+                                    <InputLabel id="academic-year-label">Academic Year</InputLabel>
+                                    <Select
+                                        labelId="academic-year-label"
+                                        id="academic_year"
+                                        name="academic_year"
+                                        value={formData.academic_year || ''}
+                                        onChange={handleChange}
+                                    >
+                                        {years}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+
+                            <label className='label' htmlFor="exam_type">Exam Type <p className='example'>e.g:- GRE, VITEEE, NDA</p></label>
+                            <input value={formData.exam_type} type="text" id='exam_type' name='exam_type' className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="score">Score <p className='example'>e.g:- 60/100</p></label>
+                            <input value={formData.score} type="number" id='score' name='score' className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="city">City <p className='example'>e.g:- Los Angelous</p></label>
+                            <input value={formData.city} type="text" id='city' name='city' className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="state">State <p className='example'>e.g:- Miami</p></label>
+                            <input value={formData.state} type="text" id='state' name='state' className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="country">Country <p className='example'>e.g:- USA</p></label>
+                            <input value={formData.country} type="text" id='country' name='country' className='input' onChange={handleChange} />
+                        </div>
+                        <div className='w-full md:p-8 md:mt-4 '>
+                            <label className='label' htmlFor="university_name">University Name <p className='example'>e.g:- Oxford</p></label>
+                            <input value={formData.university_name} type="text" id='university_name' name='university_name' className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="course">Course <p className='example'>e.g:- MCE</p></label>
+                            <input value={formData.course} type="text" id='course' name='course' className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="guide">Guide Name</label>
+                            <input value={formData.guide} type="text" id='guide' name='guide' className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="admission_letter">Admission Letter <p className='example'>prefer pdf, size &lt; 512kb</p></label>
+                            <div className="bg-gray-100 mb-[12px] ">
+                                <label htmlFor="admission_letter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
+                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Admission Letter
+                                </label>
+                                <input id="admission_letter" name="admission_letter" type="file" className="hidden" onChange={handleFileChange} />
+                                {formData.admission_letter && (
+                                    <p className="mt-2 text-gray-700">Selected file: {formData.admission_letter.name}</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <div className='flex justify-center mt-4'>
+                        <button className='btn' onClick={handleSubmit}>Submit</button>
+                    </div></>
+            }
         </section>
     );
 };
