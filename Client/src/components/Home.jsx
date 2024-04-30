@@ -7,7 +7,7 @@ const Home = () => {
   const navigate = useNavigate()
   useEffect(() => {
     if (!checkLogin()) {
-      navigate('/dmce/login')
+      return navigate('/dmce/login')
     }
   }, [])
   return (

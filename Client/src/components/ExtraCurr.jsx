@@ -1,213 +1,159 @@
-import React, { useState } from 'react';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { checkLogin } from '../helper/checkLogin';
 import { getToken } from '../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import Loaders from './Loaders';
 
 const ExtraCurr = () => {
-    const [data, setData] = useState({
-        student_year: '',
-        college_name: '',
-        academic_year: '',
-        domain: '',
-        level: '',
-        location: '',
-        date: '',
-        certificate: null,
-        prize: '',
-    });
+    const navigate = useNavigate();
+    const [activity, setActivity] = useState([]);
+    const [loader, setLoader] = useState(false);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
+    useEffect(() => {
+        if (!checkLogin()) {
+            return navigate('/dmce/login');
+        }
+        console.log(activity);
 
-    const handleFileChange = (e) => {
-        const { name, files } = e.target;
-        setData((prevData) => ({
-            ...prevData,
-            [name]: files[0]
-        }));
-    };
+    }, [navigate]);
 
-    const years = [];
-    for (let year = 2021; year <= 2030; year++) {
-        const academicYear = `${year}-${year + 1}`;
-        years.push(
-            <MenuItem key={academicYear} value={academicYear}>
-                {academicYear}
-            </MenuItem>
-        );
+    useEffect(() => {
+        getAllActivities();
+    }, []);
+    useEffect(() => {
+        if (activity.length > 0) {
+            // Initialize DataTable after the table has been rendered
+            new DataTable('#example');
+        }
+    }, [activity]);
+
+    function removeUnwantedFields(data) {
+
+        let AllmodifiedData = [];
+
+        data.forEach(data => {
+
+            let modifiedData = {};
+
+            for (let key in data) {
+
+                modifiedData[key.replace(/_path$/, '')] = data[key];
+            }
+
+
+            const { user_id, created_at, updated_at, ...rest } = modifiedData;
+
+
+            AllmodifiedData.push(rest);
+        });
+
+        return AllmodifiedData;
     }
 
-    const handleSubmit = () => {
+    const getAllActivities = () => {
+        setLoader(true);
+        const token = getToken();
 
-        const loading = toast.loading("wait. adding your activity")
-
-        let formdata = new FormData();
-        formdata.append('academic_year', data.academic_year);
-        formdata.append('student_year', data.student_year);
-        formdata.append('college_name', data.college_name);
-        formdata.append('ecc_domain', data.domain);
-        formdata.append('ecc_level', data.level);
-        formdata.append('ecc_location', data.location);
-        formdata.append('ecc_date', data.date);
-        formdata.append('ecc_certificate_path', data.certificate);
-        formdata.append('prize', data.prize);
-
-        const token = getToken()
-
-
-        let config = {
-            method: 'post',
-            maxBodyLength: Infinity,
-            url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/extra-curricular-activities`,
+        axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/extra-curricular-activities`, {
             headers: {
-                'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
-                ...data.getHeaders
-            },
-            data: formdata
-        };
-
-        axios.request(config)
-            .then((response) => {
-                console.log(JSON.stringify(response.data));
-                toast.dismiss(loading)
-                toast.success('activity added successfully')
-                return
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => {
+                const modifiedData = removeUnwantedFields(response.data.ecc);
+                setActivity(modifiedData);
+                setLoader(false);
             })
-            .catch((error) => {
-                console.log(error);
-                toast.dismiss(loading)
-
+            .catch(error => {
+                console.error(error);
+                setLoader(false);
+                if (error.response && error.response.status === 401) {
+                    localStorage.clear();
+                    return navigate('/dmce/login');
+                }
+                toast.error(error.response.data.message);
             });
-
     };
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
-            <div className='w-full max-md:mt-8  max-md:mb-8'>
-                <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Extra Curriculum Activities</h1>
-            </div>
-            <div className='w-full grid md:grid-cols-2 grid-cols-1'>
-                <div className='w-full md:p-8 md:mt-4 '>
-                    <label className='label' htmlFor="academic_year">Academic Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl
-                            style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="academic-year-label">Academic Year</InputLabel>
-                            <Select
-                                labelId="academic-year-label"
-                                id="academic_year"
-                                name="academic_year"
-                                value={data.academic_year}
-                                onChange={handleChange}
+            {
+                loader ? (
+                    <Loaders message={"loading your activity"} />
+                ) : (
+                    <div className='w-full'>
+                        <div className='w-full flex items-center justify-between px-4 mt-8 '>
+                            <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your Activity</h2>
+                            <button
+                                className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block md:hidden md:text-xl"
+                                onClick={() => navigate('/dmce/add/extra-curriculum')}
                             >
-                                {years}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                    <label className='label' htmlFor="studentYear">Student Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="student-year-label">Student Year</InputLabel>
-                            <Select
-                                labelId="student-year-label"
-                                id="studentYear"
-                                name="student_year"
-                                value={data.student_year}
-                                onChange={handleChange}
+                                <i className="fa-solid fa-plus"></i>
+                            </button>
+                            <button
+                                className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block max-md:hidden md:text-xl"
+                                onClick={() => navigate('/dmce/add/extra-curriculum')}
                             >
-                                <MenuItem value={1}>First Year</MenuItem>
-                                <MenuItem value={2}>Second Year</MenuItem>
-                                <MenuItem value={3}>Third Year</MenuItem>
-                                <MenuItem value={4}>Fourth Year</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
+                                Add Activity
+                            </button>
+                        </div>
+
+                        <div className="overflow-x-auto w-full mt-8 ">
+                            {
+                                activity.length ? (
+                                    <table id="example" className="table table-striped" style={{ width: '100%' }}>
+                                        <thead>
+                                            <tr>
+                                                <th className='text-sm text-center'>Academic Year</th>
+                                                <th className='text-sm text-center'>College Name</th>
+                                                <th className='text-sm text-center'>ECC Certificate</th>
+                                                <th className='text-sm text-center'>ECC Date</th>
+                                                <th className='text-sm text-center'>ECC Domain</th>
+                                                <th className='text-sm text-center'>ECC Level</th>
+                                                <th className='text-sm text-center'>ECC Location</th>
+                                                <th className='text-sm text-center'>Prize</th>
+                                                <th className='text-sm text-center'>Student Year</th>
+                                                <th className='text-sm text-center'>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {activity.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td className='text-center text-sm'>{item.academic_year}</td>
+                                                    <td className='text-center text-sm'>{item.college_name}</td>
+                                                    <td className='text-center text-sm'>
+                                                        <a href={item.ecc_certificate} target="_blank" rel="noopener noreferrer">View Certificate</a>
+                                                    </td>
+                                                    <td className='text-center text-sm'>{item.ecc_date}</td>
+                                                    <td className='text-center text-sm'>{item.ecc_domain}</td>
+                                                    <td className='text-center text-sm'>{item.ecc_level}</td>
+                                                    <td className='text-center text-sm'>{item.ecc_location}</td>
+                                                    <td className='text-center text-sm'>{item.prize}</td>
+                                                    <td className='text-center text-sm'>{item.student_year}</td>
+                                                    <td className='text-center text-sm flex gap-2 items-center '>
+                                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded mr-2" onClick={() => handleEdit(item)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded" onClick={() => handleDelete(item.id)}><i className="fa-solid fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                ) : (
+                                    <h1 className='text-xl md:text-2xl mt-3 text-center font-bold text-[#262847]'>No Data Available</h1>
+                                )
+                            }
 
 
-                    <label className='label' htmlFor="college_name">College Name</label>
-                    <input type="text" id='college_name' name="college_name" className='input' onChange={handleChange} />
 
-                    <label className='label' htmlFor="domain">Domain</label>
-                    <input type="text" id='domain' name="domain" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="level">Select Level</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl
-                            style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="level-label">Level</InputLabel>
-                            <Select
-                                labelId="level-label"
-                                id="level"
-                                name="level"
-                                value={data.level}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="college-level">College Level</MenuItem>
-                                <MenuItem value="inter-college-level">Inter College Level Year</MenuItem>
-                                <MenuItem value="district-level">District Level</MenuItem>
-                                <MenuItem value="state-level">State Level</MenuItem>
-                                <MenuItem value="national-level">National Level</MenuItem>
-                                <MenuItem value="inter-national-level">Inter National Level</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </div>
-                <div className='w-full md:p-8 md:p-2 md:mt-4 '>
-                    <label className='label' htmlFor="location">Location</label>
-                    <input type="text" id='location' name="location" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="date">Date</label>
-                    <input type="date" id='date' name="date" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="certificate">Certificate</label>
-                    <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="certificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Certificate
-                        </label>
-                        <input id="certificate" name="certificate" type="file" className="hidden" onChange={handleFileChange} />
-                        {data.certificate && (
-                            <p className="mt-2 text-gray-700">Selected file: {data.certificate.name}</p>
-                        )}
+                        </div>
                     </div>
+                )
+            }
 
-                    <label className='label' htmlFor="prize">Prize</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="prize-label">Prize</InputLabel>
-                            <Select
-                                labelId="prize-label"
-                                id="prize"
-                                name="prize"
-                                value={data.prize}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="first">First</MenuItem>
-                                <MenuItem value="second">Second</MenuItem>
-                                <MenuItem value="third">Third</MenuItem>
-                                <MenuItem value="fourth">Fourth</MenuItem>
-                                <MenuItem value="participated">Participated</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </div>
-            </div>
-            <div className='flex justify-center mt-4 '>
-                <button className='btn' onClick={handleSubmit}>Submit</button>
-            </div>
+
         </section>
     );
 };

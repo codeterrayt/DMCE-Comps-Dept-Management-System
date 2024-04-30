@@ -1,238 +1,159 @@
-import React, { useState } from 'react';
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { checkLogin } from '../helper/checkLogin';
 import { getToken } from '../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import Loaders from './Loaders';
 
 const Hackathon = () => {
-    const [formData, setFormData] = useState({
-        academic_year: '',
-        from_date: '',
-        to_date: '',
-        year: '',
-        title: '',
-        level: '',
-        location: '',
-        college_name: '',
-        prize: '',
-        position: '',
-        certificate: null,
-    });
+    const navigate = useNavigate();
+    const [hackathon, setHackathon] = useState([]);
+    const [loader, setLoader] = useState(false);
 
-    // Handle input changes and update formData state
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
-
-    // Handle file input changes and update formData state
-    const handleFileChange = (e) => {
-        const { name, files } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: files[0]
-        }));
-    };
-
-    // Handle form submission
-    const handleSubmit = () => {
-
-        const loading = toast.loading('wait.. adding hackathon detail.')
-
-
-        let data = new FormData();
-        data.append('academic_year', formData.academic_year);
-        data.append('hackathon_from_date', formData.from_date);
-        data.append('hackathon_to_date', formData.to_date);
-        data.append('student_year', formData.year);
-        data.append('hackathon_title', formData.title);
-        data.append('hackathon_level', formData.level);
-        data.append('hackathon_location', formData.location);
-        data.append('hackathon_college_name', formData.college_name);
-        data.append('hackathon_prize', formData.prize);
-        data.append('hackathon_position', formData.position);
-        data.append('hackathon_certificate_path', formData.certificate);
-
-
-        for (let pair of data.entries()) {
-            console.log(pair[0] + ', ' + pair[1]);
+    useEffect(() => {
+        if (!checkLogin()) {
+            return navigate('/dmce/login');
         }
+        console.log(hackathon);
+    }, [navigate]);
 
-        const token = getToken()
+    useEffect(() => {
+        getAllHackathons();
+    }, []);
+    useEffect(() => {
+        if (hackathon.length > 0) {
+            // Initialize DataTable after the table has been rendered
+            new DataTable('#example');
+        }
+    }, [hackathon]);
 
-        let config = {
-            method: 'post',
-            maxBodyLength: Infinity,
-            url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/hackathon`,
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`,
-                ...data.getHeaders
-            },
-            data: data
-        };
 
-        axios.request(config)
-            .then((response) => {
-                console.log(JSON.stringify(response.data));
-                toast.dismiss(loading)
-                return toast.success(response.data.message)
-            })
+    function removeUnwantedFields(data) {
 
-            .catch((error) => {
+        let AllmodifiedData = [];
 
-                console.log(error);
-                toast.dismiss(loading)
-                return toast.error(error.message)
-            });
+        data.forEach(data => {
 
-    };
+            let modifiedData = {};
 
-    const years = [];
-    for (let year = 2021; year <= 2030; year++) {
-        const academicYear = `${year}-${year + 1}`;
-        years.push(
-            <MenuItem key={academicYear} value={academicYear}>
-                {academicYear}
-            </MenuItem>
-        );
+            for (let key in data) {
+
+                modifiedData[key.replace(/_path$/, '')] = data[key];
+            }
+
+
+            const { user_id, created_at, updated_at, ...rest } = modifiedData;
+
+
+            AllmodifiedData.push(rest);
+        });
+
+        return AllmodifiedData;
     }
 
+    const getAllHackathons = () => {
+        setLoader(true);
+        const token = getToken();
+
+        axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/hackathon`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => {
+                const modifiedData = removeUnwantedFields(response.data.hackathon_participations);
+                setHackathon(modifiedData);
+                setLoader(false);
+            })
+            .catch(error => {
+                console.error(error);
+                setLoader(false);
+                if (error.response && error.response.status === 401) {
+                    localStorage.clear();
+                    return navigate('/dmce/login');
+                }
+                toast.error(error.response.data.message);
+            });
+    };
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
-            <div className='w-full max-md:mt-8  max-md:mb-8'>
-                <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Fill Your Hackathon Details</h1>
-            </div>
-            <div className='w-full grid md:grid-cols-2 grid-cols-1'>
-                <div className='w-full md:p-8 md:mt-4 '>
-                    <label className='label' htmlFor="title">Hackathon Title</label>
-                    <input type="text" id='title' name='title' className='input' onChange={handleChange} />
+            {loader ? (
+                <Loaders message="Loading your hackathons..." />
+            ) : (
+                <div className='w-full'>
+                    <div className='w-full flex items-center justify-between px-4 mt-8 '>
+                        <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your hackathons</h2>
+                        <button
+                            className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block md:hidden md:text-xl"
+                            onClick={() => navigate('/dmce/add/hackathon')}
+                        >
+                            <i className="fa-solid fa-plus"></i>
+                        </button>
+                        <button
+                            className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block max-md:hidden md:text-xl"
+                            onClick={() => navigate('/dmce/add/hackathon')}
+                        >
+                            Add hackathons
+                        </button>
+                    </div>
 
-                    <label className='label' htmlFor="location">Location</label>
-                    <input type="text" id='location' name="location" className='input' onChange={handleChange} />
+                    <div className="overflow-x-auto w-full mt-8 ">
+                        {
+                            hackathon.length ? (
+                                <table id="example" className="table table-striped" style={{ width: '100%' }}>
+                                    <thead>
+                                        <tr>
+                                            <th className='text-sm text-center'>Academic Year</th>
+                                            <th className='text-sm text-center'>Hackathon Certificate</th>
+                                            <th className='text-sm text-center'>Hackathon College Name</th>
+                                            <th className='text-sm text-center'>Hackathon From Date</th>
+                                            <th className='text-sm text-center'>Hackathon To Date</th>
+                                            <th className='text-sm text-center'>Hackathon Level</th>
+                                            <th className='text-sm text-center'>Hackathon Location</th>
+                                            <th className='text-sm text-center'>Hackathon Position</th>
+                                            <th className='text-sm text-center'>Hackathon Prize</th>
+                                            <th className='text-sm text-center'>Hackathon Title</th>
+                                            <th className='text-sm text-center'>Student Year</th>
+                                            <th className='text-sm text-center'>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {hackathon.map(hackathon => (
+                                            <tr key={hackathon.id}>
+                                                <td className='text-center text-sm'>{hackathon.academic_year}</td>
+                                                <td className='text-center text-sm'>
+                                                    <a href={hackathon.hackathon_certificate} target="_blank" rel="noopener noreferrer">View Certificate</a>
+                                                </td>
+                                                <td className='text-center text-sm'>{hackathon.hackathon_college_name}</td>
+                                                <td className='text-center text-sm'>{hackathon.hackathon_from_date}</td>
+                                                <td className='text-center text-sm'>{hackathon.hackathon_to_date}</td>
+                                                <td className='text-center text-sm'>{hackathon.hackathon_level}</td>
+                                                <td className='text-center text-sm'>{hackathon.hackathon_location}</td>
+                                                <td className='text-center text-sm'>{hackathon.hackathon_position}</td>
+                                                <td className='text-center text-sm'>{hackathon.hackathon_prize}</td>
+                                                <td className='text-center text-sm'>{hackathon.hackathon_title}</td>
+                                                <td className='text-center text-sm'>{hackathon.student_year}</td>
+                                                <td className='text-center text-sm  '>
+                                                  <div className='flex items-center gap-2 justify-center'>
+                                                  <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded mr-2" onClick={() => handleEdit(hackathon)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded" onClick={() => handleDelete(hackathon.id)}><i className="fa-solid fa-trash"></i></button>
+                                                  </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <h1 className='text-xl md:text-2xl mt-3 text-center font-bold text-[#262847]'>No Data Available</h1>
+                            )
+                        }
 
-                    <label className='label' htmlFor="level">Select Level</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl
-                            style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="level-label">Level</InputLabel>
-                            <Select
-                                labelId="level-label"
-                                id="level"
-                                name="level"
-                                value={formData.level || ''}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="college-level">College Level</MenuItem>
-                                <MenuItem value="inter-college-level">Inter College Level Year</MenuItem>
-                                <MenuItem value="district-level">District Level</MenuItem>
-                                <MenuItem value="state-level">State Level</MenuItem>
-                                <MenuItem value="national-level">National Level</MenuItem>
-                                <MenuItem value="inter-national-level">Inter National Level</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <label className='label' htmlFor="prize">Prize (In Rupee)</label>
-                    <input type="number" id='prize' name="prize" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="college_name">Enter College Name</label>
-                    <input type="text" id='college_name' name='college_name' className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="certificate">Achievements Certificate</label>
-                    <div className="bg-gray-100 mb-[12px] ">
-                        <label htmlFor="certificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Completion Letter/ Certificate
-                        </label>
-                        <input id="certificate" name="certificate" type="file" className="hidden" onChange={handleFileChange} />
-                        {formData.certificate && (
-                            <p className="mt-2 text-gray-700">Selected file: {formData.certificate.name}</p>
-                        )}
                     </div>
                 </div>
-                <div className='w-full md:p-8 md:p-2 md:mt-4 '>
-                    <label className='label' htmlFor="academic_year">Select Academic Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl
-                            style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="academic-year-label">Academic Year</InputLabel>
-                            <Select
-                                labelId="academic-year-label"
-                                id="academic_year"
-                                name="academic_year"
-                                value={formData.academic_year || ''}
-                                onChange={handleChange}
-                            >
-                                {years}
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <label className='label' htmlFor="from_date">Start Date</label>
-                    <input type="date" id='from_date' name="from_date" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="to_date">End Date</label>
-                    <input type="date" id='to_date' name="to_date" className='input' onChange={handleChange} />
-
-                    <label className='label' htmlFor="position">Position</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl
-                            style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="position-label">Position</InputLabel>
-                            <Select
-                                labelId="position-label"
-                                id="position"
-                                name="position"
-                                value={formData.position || ''}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={1}>First</MenuItem>
-                                <MenuItem value={2}>Second</MenuItem>
-                                <MenuItem value={3}>Third</MenuItem>
-                                <MenuItem value={4}>Fourth</MenuItem>
-                                <MenuItem value={5}>Fifth</MenuItem>
-                                <MenuItem value={10}>Top 10</MenuItem>
-                                <MenuItem value={25}>Top 25</MenuItem>
-                                <MenuItem value={50}>Top 50</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-
-                    <label className='label' htmlFor="year">Select Year</label>
-                    <Box sx={{ minWidth: 120 }}>
-                        <FormControl
-                            style={{ marginBottom: "12px" }} fullWidth>
-                            <InputLabel id="year-label">Year</InputLabel>
-                            <Select
-                                labelId="year-label"
-                                id="year"
-                                name="year"
-                                value={formData.year || ''}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value={1}>First Year</MenuItem>
-                                <MenuItem value={2}>Second Year</MenuItem>
-                                <MenuItem value={3}>Third Year</MenuItem>
-                                <MenuItem value={4}>Fourth Year</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </div>
-            </div>
-            <div className='flex justify-center mt-4 '>
-                <button className='btn' onClick={handleSubmit}>Submit</button>
-            </div>
+            )}
         </section>
     );
 };
