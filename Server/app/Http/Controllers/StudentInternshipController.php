@@ -50,7 +50,7 @@ class StudentInternshipController extends Controller
         // Fill the internship attributes from the request data
         $internship->fill($request->all());
 
-
+        $internship->start_date = date('Y-m-d', strtotime($request->start_date));
         $internship->end_date = date('Y-m-d', strtotime($request->end_date));
         $internship->completion_letter_path = url()->to(Storage::url($completionLetterPath));
         $internship->certificate_path = url()->to(Storage::url($certificatePath));
