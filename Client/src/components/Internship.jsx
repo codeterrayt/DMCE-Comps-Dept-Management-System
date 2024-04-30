@@ -4,6 +4,10 @@ import { checkLogin } from '../helper/checkLogin';
 import { getToken } from '../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { Modal } from 'react-responsive-modal';
+import 'react-responsive-modal/styles.css';
 
 import Loaders from './Loaders';
 
@@ -11,6 +15,7 @@ const Internship = () => {
     const navigate = useNavigate();
     const [internships, setInternships] = useState([]);
     const [loader, setLoader] = useState(false);
+    const [checkDelete, setCheckDelete] = useState(false)
 
     function removeUnwantedFields(internships) {
 
@@ -90,12 +95,82 @@ const Internship = () => {
     };
 
 
-    console.log(internships);
+    const handleDelete = (id) => {
+        try {
+            const confirmOptions = {
+                customUI: ({ onClose }) => (
+                    <Modal open={true} onClose={onClose} center>
+                        <div>
+                            <h2 className='font-bold text-xl'>Confirm Deletion</h2>
+                            <p className='my-3 text-[#262847] font-bold'>Are you sure you want to delete this referral?</p>
+                            <div className='w-full flex items-center px-4 justify-between'>
+                                <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={async () => {
+                                    onClose();
+                                    setLoader(true);
+
+                                    let data = new FormData();
+                                    data.append('id', id);
+
+                                    const token = getToken();
+                                    setCheckDelete(true)
+
+                                    let config = {
+                                        method: 'post',
+                                        maxBodyLength: Infinity,
+                                        url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/delete/internship`,
+                                        headers: {
+                                            'Accept': 'application/json',
+                                            'Authorization': `Bearer ${token}`,
+                                            ...data.getHeaders
+                                        },
+                                        data: data
+                                    };
+
+                                    // Send delete request
+                                    axios.request(config)
+                                        .then((response) => {
+                                            setInternships(prevInternships => prevInternships.filter(internship => internship.id !== id));
+                                            setCheckDelete(false)
+
+                                            setLoader(false)
+                                        })
+                                        .catch((error) => {
+                                            if (error.response && error.response.status === 401) {
+                                                localStorage.clear();
+                                                return navigate('/dmce/login');
+                                            }
+                                            console.log(error);
+                                            return toast.error(error.response.data.message);
+                                        });
+
+                                }}>
+                                    Yes
+                                </button>
+                                <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={() => {
+                                    onClose();
+                                    setLoader(false);
+                                }}>
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                    </Modal>
+                ),
+            };
+
+            // Display responsive confirmation dialog
+            confirmAlert(confirmOptions);
+        } catch (error) {
+            setLoader(false);
+            toast.error(error.message);
+        }
+    }
+
 
 
     return (
         <section className='w-full  min-h-screen p-4 md:p-8 '>
-            {loader ? <Loaders message={"loading your internships"} /> :
+            {loader ? <Loaders message={checkDelete ? "wait , deleting your internship" : "loading your internships"} /> :
                 <div className='w-full'>
                     <div className='w-full flex items-center justify-between px-4 mt-8 '>
                         <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your Internships</h2>
@@ -155,7 +230,7 @@ const Internship = () => {
                                                 <td className='text-center text-sm'>{internship.student_year}</td>
                                                 <td className='text-center text-sm '>
                                                     <div className='flex items-center gap-2 justify-center'>
-                                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded " onClick={() => handleEdit(internship)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded " onClick={() => navigate(`/dmce/add/internship/${internship.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
                                                         <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded" onClick={() => handleDelete(internship.id)}><i className="fa-solid fa-trash"></i></button>
                                                     </div>
                                                 </td>

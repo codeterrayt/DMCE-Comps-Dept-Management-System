@@ -46,6 +46,7 @@ function App() {
             <Route path="about" element={<About />} />
             <Route path="internship" element={<Internship />} />
             <Route path="add/internship" element={<AddInternship />} />
+            <Route path="add/internship/:id" element={<AddInternship />} />
             <Route path="achivement" element={<Achivements />} />
             <Route path="add/achivement" element={<AddAchievements />} />
             <Route path="extra-curriculum" element={<ExtraCurr />} />
