@@ -106,6 +106,19 @@ class StudentExtraCuController extends Controller
       return response()->json(['message' => 'Internship updated successfully', 'ecc' => $ecc]);
   }
 
+  public function fetchEccById($id){
+    $user = Auth::user();
+    $student_internship = StudentExtraCu::where("user_id",$user->id)->where("id",$id)->first();
+    // Get the currently authenticated user
+
+    if($student_internship === null){
+        return response()->json([
+            "message" => "Ecc Not Found"
+        ], 404);
+    }
+    return response()->json($student_internship);
+  }
+
   public function destroy(Request $request)
   {
 
