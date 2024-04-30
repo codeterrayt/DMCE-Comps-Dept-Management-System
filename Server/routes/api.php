@@ -35,6 +35,7 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(f
     Route::get("/student/fetch/achievements",[StudentAchivementsController::class,'fetch']);
     Route::post("/student/update/achievement",[StudentAchivementsController::class,'update']);
     Route::post("/student/delete/achievement",[StudentAchivementsController::class,'destroy']);
+    Route::get("/student/fetch/achievement/{id}",[StudentAchivementsController::class,'fetchAchivementByID']);
 
     Route::post("/student/add/extra-curricular-activities",[StudentExtraCuController::class,'store']);
     Route::get("/student/fetch/extra-curricular-activities",[StudentExtraCuController::class,'fetch']);

@@ -22,6 +22,19 @@ class StudentAchivementsController extends Controller
           return response()->json(["achievements" => $achievements]);
     }
 
+    public function fetchAchivementByID($id){
+        $user = Auth::user();
+        $student_internship = StudentAchivements::where("user_id",$user->id)->where("id",$id)->first();
+        // Get the currently authenticated user
+
+        if($student_internship === null){
+            return response()->json([
+                "message" => "Achievement Not Found"
+            ], 404);
+        }
+        return response()->json($student_internship);
+    }
+
     public function store(Request $request)
     {
         // Validate the incoming request data
