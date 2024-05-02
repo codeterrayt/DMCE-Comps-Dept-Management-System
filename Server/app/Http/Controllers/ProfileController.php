@@ -151,7 +151,7 @@ class ProfileController extends Controller
                     }
                 },
             ],
-            'new_password' => ['required', 'min:8'],
+            'new_password' => ['required', Rules\Password::defaults()],
         ]);
 
         // Check if validation fails

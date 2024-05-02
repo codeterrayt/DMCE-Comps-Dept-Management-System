@@ -15,6 +15,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
@@ -395,6 +396,24 @@ class StudentController extends Controller
 
         // Retrieve the user based on the provided ID
         $user = User::findOrFail($request->id);
+
+        if($user->id === Auth::user()->id){
+            $validator = Validator::make($request->all(), [
+                'current_password' => [
+                    'required',
+                    function ($attribute, $value, $fail) {
+                        if (!Hash::check($value, Auth::user()->password)) {
+                            $fail('The current password is incorrect.');
+                        }
+                    },
+                ],
+                'new_password' => ['required', Rules\Password::defaults()],
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+        }
 
         // Update the user's password
         $user->password = Hash::make($request->new_password);
