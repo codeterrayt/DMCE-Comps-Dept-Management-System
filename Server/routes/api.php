@@ -66,12 +66,21 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-student'])->group(f
 Route::middleware(['auth:sanctum','verified', 'ability:token-admin'])->group(function () {
     Route::post('/update/profile',[ProfileController::class,'update']);
     Route::get("/admin/fetch/students",[StudentController::class,"index"]);
-    Route::get("/admin/fetch/internship",[StudentController::class,'fetch_internship_by_student_id']);
-    Route::get("/admin/fetch/ecc",[StudentController::class,'fetch_ecc_by_student_id']);
-    Route::get("/admin/fetch/achievements",[StudentController::class,'fetch_achievements_by_student_id']);
-    Route::get("/admin/fetch/hackathons",[StudentController::class,'fetch_hackathons_by_student_id']);
-    Route::get("/admin/fetch/higher-studies",[StudentController::class,'fetch_higherstudies_by_student_id']);
-    Route::get("/admin/fetch/placements",[StudentController::class,'fetch_placements_by_student_id']);
+    Route::get("/admin/fetch/student/internship",[StudentController::class,'fetch_internship_by_student_id']);
+    Route::get("/admin/fetch/student/ecc",[StudentController::class,'fetch_ecc_by_student_id']);
+    Route::get("/admin/fetch/student/achievements",[StudentController::class,'fetch_achievements_by_student_id']);
+    Route::get("/admin/fetch/student/hackathons",[StudentController::class,'fetch_hackathons_by_student_id']);
+    Route::get("/admin/fetch/student/higher-studies",[StudentController::class,'fetch_higherstudies_by_student_id']);
+    Route::get("/admin/fetch/student/placements",[StudentController::class,'fetch_placements_by_student_id']);
+
+
+    Route::get("/admin/fetch/student/{id}",[StudentController::class,"fetch_student"]);
+    Route::get("/admin/fetch/internship/{id}",[StudentController::class,"fetch_internship"]);
+    Route::get("/admin/fetch/ecc/{id}",[StudentController::class,'fetch_ecc']);
+    Route::get("/admin/fetch/achievement/{id}",[StudentController::class,'fetch_achievement']);
+    Route::get("/admin/fetch/hackathon/{id}",[StudentController::class,'fetch_hackathon']);
+    Route::get("/admin/fetch/higher-study/{id}",[StudentController::class,'fetch_hs']);
+    Route::get("/admin/fetch/placement/{id}",[StudentController::class,'fetch_placement']);
 
 
     Route::post("/admin/update/student",[StudentController::class,'update_student']);

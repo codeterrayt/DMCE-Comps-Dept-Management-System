@@ -123,6 +123,19 @@ class StudentController extends Controller
         return response()->json($users);
     }
 
+    public function fetch_student(Request $request, int $id){
+
+        $user = User::where("id",$id)->where("role","student")->first();
+        // Get the currently authenticated user
+
+        if($user === null){
+            return response()->json([
+                "message" => "User Not Found"
+            ], 404);
+        }
+        return response()->json($user);
+    }
+
     public function fetch_internship_by_student_id(Request $request)
     {
         // Validate the incoming request data
@@ -138,6 +151,19 @@ class StudentController extends Controller
 
         // Return the fetched internships as a JSON response
         return response()->json(['data' => $internships]);
+    }
+
+    public function fetch_internship(Request $request, int $id){
+
+        $student_internship = StudentInternship::where("id",$id)->first();
+        // Get the currently authenticated user
+
+        if($student_internship === null){
+            return response()->json([
+                "message" => "Internship Not Found"
+            ], 404);
+        }
+        return response()->json($student_internship);
     }
 
     public function fetch_ecc_by_student_id(Request $request)
@@ -157,6 +183,20 @@ class StudentController extends Controller
         return response()->json(['data' => $ecc]);
     }
 
+
+    public function fetch_ecc(Request $request, int $id){
+
+        $ecc = StudentExtraCu::where("id",$id)->first();
+        // Get the currently authenticated user
+
+        if($ecc === null){
+            return response()->json([
+                "message" => "Ecc Not Found"
+            ], 404);
+        }
+        return response()->json($ecc);
+    }
+
     public function fetch_achievements_by_student_id(Request $request)
     {
         // Validate the incoming request data
@@ -172,6 +212,19 @@ class StudentController extends Controller
 
         // Return the fetched internships as a JSON response
         return response()->json(['data' => $studentAchievements]);
+    }
+
+    public function fetch_achievement(Request $request, int $id){
+
+        $studentAchievements = StudentAchivements::where("id",$id)->first();
+        // Get the currently authenticated user
+
+        if($studentAchievements === null){
+            return response()->json([
+                "message" => "Achievement Not Found"
+            ], 404);
+        }
+        return response()->json($studentAchievements);
     }
 
     public function fetch_hackathons_by_student_id(Request $request)
@@ -191,6 +244,21 @@ class StudentController extends Controller
         return response()->json(['data' => $StudentHackathons]);
     }
 
+
+    public function fetch_hackathon(Request $request, int $id){
+
+        $StudentHackathons = StudentHackathons::where("id",$request->id)->first();
+        // Get the currently authenticated user
+
+        if($StudentHackathons === null){
+            return response()->json([
+                "message" => "Hackathon Not Found"
+            ], 404);
+        }
+        return response()->json($StudentHackathons);
+    }
+
+
     public function fetch_higherstudies_by_student_id(Request $request)
     {
         // Validate the incoming request data
@@ -208,6 +276,19 @@ class StudentController extends Controller
         return response()->json(['data' => $studentHigherStudies]);
     }
 
+    public function fetch_hs(Request $request, int $id){
+
+        $studentHigherStudies = StudentHigherStudies::where("id",$request->id)->first();
+        // Get the currently authenticated user
+
+        if($studentHigherStudies === null){
+            return response()->json([
+                "message" => "Higher Study Not Found"
+            ], 404);
+        }
+        return response()->json($studentHigherStudies);
+    }
+
     public function fetch_placements_by_student_id(Request $request)
     {
         // Validate the incoming request data
@@ -223,6 +304,19 @@ class StudentController extends Controller
 
         // Return the fetched internships as a JSON response
         return response()->json(['data' => $StudentPlacements]);
+    }
+
+    public function fetch_placement(Request $request, int $id){
+
+        $StudentPlacements = StudentPlacements::where("id",$request->id)->first();
+        // Get the currently authenticated user
+
+        if($StudentPlacements === null){
+            return response()->json([
+                "message" => "Placement Not Found"
+            ], 404);
+        }
+        return response()->json($StudentPlacements);
     }
 
     public function update_student(Request $request)
