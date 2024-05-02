@@ -77,6 +77,8 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-admin'])->group(fun
     Route::post("/admin/update/student",[StudentController::class,'update_student']);
     Route::post("/admin/update/internship",[StudentController::class,'update_internship']);
     Route::post("/admin/update/achievement",[StudentController::class,'update_achievement']);
+    Route::post("/admin/update/extra-curricular-activities",[StudentController::class,'update_ecc']);
+    Route::post("/admin/update/hackathon",[StudentController::class,'update_hackathon']);
 
 });
 

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\StudentAchivements;
+use App\Models\StudentExtraCu;
+use App\Models\StudentHackathons;
 use App\Models\StudentInternship;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -384,6 +386,85 @@ class StudentController extends Controller
         $achievement->save();
         // Return a response
         return response()->json(['message' => 'Achievement updated successfully', 'internship' => $achievement]);
+    }
+
+    public function update_ecc(Request $request){
+        $request->validate([
+            'id' => 'required|exists:student_extra_cus,id',
+            'academic_year' => 'required|string|max:255',
+            'student_year' => 'required|string|max:255',
+            'ecc_certificate_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'ecc_domain' => 'required|string|max:255',
+            'college_name' => 'required|string|max:255',
+            'ecc_level' => 'required|string|max:255',
+            'ecc_location' => 'required|string|max:255',
+            'ecc_date' => 'required|date',
+            'prize' => 'nullable|string|max:255',
+            // Add validation rules for other internship attributes here
+        ]);
+
+        // Find the internship by ID
+        $ecc = StudentExtraCu::findOrFail($request->id);
+
+        // Update the internship attributes if the corresponding file exists in the request
+
+        $ecc->fill($request->all());
+
+        if ($request->hasFile('ecc_certificate_path')) {
+            // dd("test");
+            $certificatePath = $request->file('ecc_certificate_path')->store('ecc_certificate', 'public');
+            $ecc->ecc_certificate_path = url()->to(Storage::url($certificatePath));
+        }
+
+        // Associate the ecc with the authenticated user
+        $ecc->ecc_date = date('Y-m-d', strtotime($request->ecc_date));
+        $ecc->user_id = auth()->id();
+
+        // Save the ecc
+        $ecc->save();
+        // Return a response
+        return response()->json(['message' => 'Internship updated successfully', 'ecc' => $ecc]);
+    }
+
+
+    public function update_hackathon(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'id' =>'required|exists:student_hackathons,id',
+            'academic_year' => 'required|string|max:255',
+            'student_year' => 'required|string|max:255',
+            'hackathon_title' => 'required|string|max:255',
+            'hackathon_level' => 'required|string|max:255',
+            'hackathon_location' => 'required|string|max:255',
+            'hackathon_from_date' => 'required|date',
+            'hackathon_to_date' => 'required|date|after_or_equal:hackathon_from_date',
+            'hackathon_prize' => 'nullable|string|max:255',
+            'hackathon_position' => 'nullable|string|max:255',
+            'hackathon_college_name' => 'required|string|max:255',
+            'hackathon_certificate_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+        ]);
+
+        // Find the StudentHackathons by ID
+        $StudentHackathons = StudentHackathons::findOrFail($request->id);
+
+        // Check if the authenticated user owns the hackathon participation
+        $StudentHackathons->fill($request->all());
+        if ($request->hasFile('hackathon_certificate_path')) {
+            // dd("test");
+            $hackathon_certificate_path = $request->file('hackathon_certificate_path')->store('hackathon_certificates', 'public');
+            $StudentHackathons->hackathon_certificate_path = url()->to(Storage::url($hackathon_certificate_path));
+        }
+
+        // Update the StudentHackathons attributes from the request data
+        $StudentHackathons->hackathon_from_date = date('Y-m-d', strtotime($request->hackathon_from_date));
+        $StudentHackathons->hackathon_to_date = date('Y-m-d', strtotime($request->hackathon_to_date));
+
+        // Save the StudentHackathons
+        $StudentHackathons->save();
+
+        // Return a response
+        return response()->json(['message' => 'Hackathon participation updated successfully', 'hackathon_participation' => $StudentHackathons]);
     }
 
 
