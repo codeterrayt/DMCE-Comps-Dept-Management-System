@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StudentAchivements;
 use App\Models\StudentInternship;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -218,24 +221,28 @@ class StudentController extends Controller
         return response()->json(['data' => $StudentPlacements]);
     }
 
-    public function update_student(Request $request, int $id)
+    public function update_student(Request $request)
     {
-        $user = User::where('id', $id)->where("role","student")->first();
+        $user = User::where('id', $request->id)->where('role', 'student')->first();
 
         if (!$user) {
-            return response()->json(['error' => 'User not found'],404);
+            return response()->json(["error"=>"Student Not Found!"],404);
         }
 
-        // dd($user->id);
-
         $rules = [
+            'id' => [
+                'required',
+                Rule::exists('users', 'id')->where(function ($query) {
+                    $query->where('role', 'student');
+                }),
+            ],
             'name' => 'required|string|max:255',
             'middle_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|email|max:255|unique:users,email,' . ($user ? $user->id : null),
             // 'password' => 'nullable|string|min:8',
-            'roll_no' => 'required|string|max:255|unique:users,roll_no,' . $user->id,
-            'student_id' => 'required|string|max:255|unique:users,student_id,' . $user->id,
+            'roll_no' => 'required|string|max:255|unique:users,roll_no,' . ($user ? $user->id : null),
+            'student_id' => 'required|string|max:255|unique:users,student_id,' . ($user ? $user->id : null),
             'admitted_year' => 'required|numeric|min:1900|max:' . date('Y'),
             'div' => 'required|string|max:2',
             // 'role' => [
@@ -243,6 +250,8 @@ class StudentController extends Controller
             //     Rule::in(['admin', 'student']), // assuming role can only be one of these values
             // ],
         ];
+
+
 
 
         // Get only the fields specified in the rules
@@ -277,5 +286,105 @@ class StudentController extends Controller
 
 
     }
+
+
+
+    public function update_internship(Request $request){
+
+        // Find the internship by ID
+
+        $request->validate([
+            'id' => 'required|exists:student_internships,id',
+            'academic_year' => 'required|string|max:255',
+            'duration' => 'required|integer|max:255',
+            'domain' => 'required|string|max:255',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'completion_letter_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'certificate_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'offer_letter_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'permission_letter_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'student_year' => 'required|string|max:255',
+            // Add validation rules for other internship attributes here
+        ]);
+
+
+        $internship = StudentInternship::findOrFail($request->id);
+
+        // Update the internship attributes if the corresponding file exists in the request
+
+        if ($request->hasFile('completion_letter_path')) {
+            // dd("test");
+            $certificatePath = $request->file('completion_letter_path')->store('completion_letter', 'public');
+            $internship->completion_letter_path = url()->to(Storage::url($certificatePath));
+        }
+
+        if ($request->hasFile('certificate_path')) {
+            $certificatePath = $request->file('certificate_path')->store('internship_certificate', 'public');
+            $internship->certificate_path = url()->to(Storage::url($certificatePath));
+        }
+
+        if ($request->hasFile('offer_letter_path')) {
+            $offerLetterPath = $request->file('offer_letter_path')->store('internship_offer_letter', 'public');
+            $internship->offer_letter_path = url()->to(Storage::url($offerLetterPath));
+        }
+
+        if ($request->hasFile('permission_letter_path')) {
+            $permissionLetterPath = $request->file('permission_letter_path')->store('internship_permission_letter', 'public');
+            $internship->permission_letter_path = url()->to(Storage::url($permissionLetterPath));
+        }
+
+        // Fill the other internship attributes from the request data
+        $internship->fill($request->except(['certificate_path', 'offer_letter_path', 'permission_letter_path', 'completion_letter_path']));
+        $internship->start_date = date('Y-m-d', strtotime($request->start_date));
+        $internship->end_date = date('Y-m-d', strtotime($request->end_date));
+
+
+
+        // Save the internship
+        $internship->save();
+
+        // Return a response
+        return response()->json(['message' => 'Internship updated successfully', 'internship' => $internship]);
+    }
+
+    public function update_achievement(Request $request){
+        $request->validate([
+            'id' => 'required|exists:student_achievements,id',
+            'academic_year' => 'required|string|max:255',
+            'student_year' => 'required|string|max:255',
+            'achievement_certificate_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'achievement_domain' => 'required|string|max:255',
+            'college_name' => 'required|string|max:255',
+            'achievement_level' => 'required|string|max:255',
+            'achievement_location' => 'required|string|max:255',
+            'achievement_date' => 'required|date',
+            'prize' => 'nullable|string|max:255',
+            // Add validation rules for other internship attributes here
+        ]);
+
+
+        // Find the internship by ID
+        $achievement = StudentAchivements::findOrFail($request->id);
+
+        // Update the internship attributes if the corresponding file exists in the request
+
+        $achievement->fill($request->all());
+
+        if ($request->hasFile('achievement_certificate_path')) {
+            // dd("test");
+            $certificatePath = $request->file('achievement_certificate_path')->store('achievement_certificate', 'public');
+            $achievement->achievement_certificate_path = url()->to(Storage::url($certificatePath));
+        }
+
+        // Associate the Achievement with the authenticated user
+        $achievement->achievement_date = date('Y-m-d', strtotime($request->achievement_date));
+
+        // Save the Achievement
+        $achievement->save();
+        // Return a response
+        return response()->json(['message' => 'Achievement updated successfully', 'internship' => $achievement]);
+    }
+
 
 }

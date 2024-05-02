@@ -74,9 +74,9 @@ Route::middleware(['auth:sanctum','verified', 'ability:token-admin'])->group(fun
     Route::get("/admin/fetch/placements",[StudentController::class,'fetch_placements_by_student_id']);
 
 
-    Route::post("/admin/update/student/{id}",[StudentController::class,'update_student']);
-
-
+    Route::post("/admin/update/student",[StudentController::class,'update_student']);
+    Route::post("/admin/update/internship",[StudentController::class,'update_internship']);
+    Route::post("/admin/update/achievement",[StudentController::class,'update_achievement']);
 
 });
 

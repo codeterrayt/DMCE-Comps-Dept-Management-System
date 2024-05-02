@@ -117,7 +117,7 @@ class StudentAchivementsController extends Controller
         // Save the Achievement
         $achievement->save();
         // Return a response
-        return response()->json(['message' => 'Internship updated successfully', 'internship' => $achievement]);
+        return response()->json(['message' => 'Achievement updated successfully', 'internship' => $achievement]);
     }
 
     public function destroy(Request $request)
