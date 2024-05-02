@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
@@ -385,7 +387,23 @@ class StudentController extends Controller
 
     }
 
+    public function update_password(Request $request){
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'new_password' => ['required', Rules\Password::defaults()],
+        ]);
 
+        // Retrieve the user based on the provided ID
+        $user = User::findOrFail($request->id);
+
+        // Update the user's password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        // Return a response indicating success
+        return response()->json(['message' => 'Password updated successfully']);
+
+    }
 
     public function update_internship(Request $request){
 

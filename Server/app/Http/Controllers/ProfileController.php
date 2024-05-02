@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
@@ -58,7 +60,7 @@ class ProfileController extends Controller
 
         $rules = [];
 
-        if(Auth::user()->role  == 'admin'){
+        if (Auth::user()->role  == 'admin') {
 
             $rules = [
                 'name' => 'required|string|max:255',
@@ -75,8 +77,7 @@ class ProfileController extends Controller
                 //     Rule::in(['admin', 'student']), // assuming role can only be one of these values
                 // ],
             ];
-
-        }else{
+        } else {
             $rules = [
                 'name' => 'required|string|max:255',
                 'middle_name' => 'required|string|max:255',
@@ -127,9 +128,7 @@ class ProfileController extends Controller
         $user->update($data);
 
         // Return success response
-        return response()->json(['message' => 'User updated successfully', 'data'=> $user]);
-
-
+        return response()->json(['message' => 'User updated successfully', 'data' => $user]);
     }
 
     /**
@@ -138,5 +137,36 @@ class ProfileController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function update_password(Request $request)
+    {
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'current_password' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if (!Hash::check($value, Auth::user()->password)) {
+                        $fail('The current password is incorrect.');
+                    }
+                },
+            ],
+            'new_password' => ['required', 'min:8'],
+        ]);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+         // Retrieve the currently authenticated user
+        $user = Auth::user();
+
+        // Update the user's password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        // Return a response indicating success
+        return response()->json(['message' => 'Password updated successfully']);
     }
 }
