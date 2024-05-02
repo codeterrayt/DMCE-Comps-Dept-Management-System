@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('academic_year')->nullable();
+            $table->string('company_name')->nullable();
             $table->integer('duration')->nullable();
             $table->string('domain')->nullable();
             $table->date('start_date')->nullable();

@@ -12,6 +12,7 @@ class StudentInternship extends Model
     protected $fillable = [
         'user_id',
         'academic_year',
+        'company_name',
         'duration',
         'domain',
         'start_date',

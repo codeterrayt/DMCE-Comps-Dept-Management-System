@@ -25,6 +25,7 @@ class StudentInternshipController extends Controller
         // Validate the incoming request data
         $request->validate([
             'academic_year' => 'required|string|max:255',
+            'company_name' => 'required|string|max:255',
             'duration' => 'required|integer|max:255',
             'domain' => 'required|string|max:255',
             'start_date' => 'required|date',
@@ -87,6 +88,7 @@ class StudentInternshipController extends Controller
                 }),
             ],
             'academic_year' => 'required|string|max:255',
+            'company_name' => 'required|string|max:255',
             'duration' => 'required|integer|max:255',
             'domain' => 'required|string|max:255',
             'start_date' => 'required|date',
