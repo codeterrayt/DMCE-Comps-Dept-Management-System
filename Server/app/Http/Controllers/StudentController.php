@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\StudentAchivements;
 use App\Models\StudentExtraCu;
 use App\Models\StudentHackathons;
+use App\Models\StudentHigherStudies;
 use App\Models\StudentInternship;
+use App\Models\StudentPlacements;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -467,5 +469,80 @@ class StudentController extends Controller
         return response()->json(['message' => 'Hackathon participation updated successfully', 'hackathon_participation' => $StudentHackathons]);
     }
 
+
+    public function update_higher_studies(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'id' =>'required|exists:student_higher_studies,id',
+            'student_academic_year' => 'required|string|max:255',
+            'student_exam_type' => 'required|string|max:255',
+            'student_score' => 'required|string|max:255',
+            'university_city' => 'required|string|max:255',
+            'university_state' => 'required|string|max:255',
+            'university_country' => 'required|string|max:255',
+            'university_name' => 'required|string|max:255',
+            'student_course' => 'required|string|max:255',
+            'student_admission_letter' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'student_project_guide' => 'required|string|max:255',
+        ]);
+        // Find the StudentHigherStudies by ID
+        $StudentHigherStudies = StudentHigherStudies::findOrFail($request->id);
+
+        // Check if the authenticated user owns the exam score
+
+        // Update the StudentHigherStudies attributes from the request data
+        $StudentHigherStudies->fill($request->all());
+
+        if ($request->hasFile('student_admission_letter')) {
+            // dd("test");
+            $student_admission_letter = $request->file('student_admission_letter')->store('student_admission_letters', 'public');
+            $StudentHigherStudies->student_admission_letter = url()->to(Storage::url($student_admission_letter));
+        }
+
+        // Save the StudentHigherStudies
+        $StudentHigherStudies->save();
+
+        // Return a response
+        return response()->json(['message' => 'Higher Studies updated successfully', 'exam_score' => $StudentHigherStudies]);
+    }
+
+
+    public function update_placement(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'id' =>'required|exists:student_placements,id',
+            'academic_year' => 'required|string|max:255',
+            'campus_or_off_campus' => 'required|boolean',
+            'company_name' => 'required|string|max:255',
+            'position' => 'required|string|max:255',
+            'country' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'pincode' => 'required|string|max:255',
+            'package' => 'required|string|max:255',
+            'domain' => 'required|string|max:255',
+            'passout_year' => 'required|string|max:255',
+            'offer_letter' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+        ]);
+
+        // Find the StudentPlacements by ID
+        $StudentPlacements = StudentPlacements::findOrFail($request->id);
+
+        // Update the StudentPlacements attributes from the request data
+        $StudentPlacements->fill($request->all());
+
+        if ($request->hasFile('offer_letter')) {
+            // dd("test");
+            $certificatePath = $request->file('offer_letter')->store('offer_letter', 'public');
+            $StudentPlacements->offer_letter = url()->to(Storage::url($certificatePath));
+        }
+
+        // Save the StudentPlacements
+        $StudentPlacements->save();
+
+        // Return a response
+        return response()->json(['message' => 'Job placement updated successfully', 'job_placement' => $StudentPlacements]);
+    }
 
 }

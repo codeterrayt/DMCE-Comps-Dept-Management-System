@@ -74,7 +74,7 @@ class StudentPlacementsController extends Controller
             'package' => 'required|string|max:255',
             'domain' => 'required|string|max:255',
             'passout_year' => 'required|string|max:255',
-            'offer_letter' => 'required|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'offer_letter' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
         ]);
 
         // Find the StudentPlacements by ID

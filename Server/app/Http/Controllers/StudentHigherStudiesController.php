@@ -67,7 +67,7 @@ class StudentHigherStudiesController extends Controller
             'university_country' => 'required|string|max:255',
             'university_name' => 'required|string|max:255',
             'student_course' => 'required|string|max:255',
-            'student_admission_letter' => 'required|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'student_admission_letter' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
             'student_project_guide' => 'required|string|max:255',
         ]);
         // Find the StudentHigherStudies by ID
