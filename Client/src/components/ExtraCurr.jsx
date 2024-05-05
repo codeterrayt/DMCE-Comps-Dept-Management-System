@@ -10,6 +10,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
 import CertificatePopup from './Pop';
+import { formatDate } from '../helper/getDate';
 
 const ExtraCurr = () => {
 
@@ -183,7 +184,8 @@ const ExtraCurr = () => {
             {
 
                 loader ? (
-                    <Loaders message={(checkDelete ? "deleting " : "loading ") + "your activity"} />
+                    <Loaders
+                        className="capitalize" message={(checkDelete ? "Deleting " : "Fetching ") + "Your Activity"} />
                 ) : (
                     <div className='w-full'>
                         <div className='w-full flex items-center justify-between px-4 mt-8 '>
@@ -209,15 +211,15 @@ const ExtraCurr = () => {
                                         <thead>
                                             <tr>
                                                 <th className='text-sm text-center'>Academic Year</th>
-                                                <th className='text-sm text-center'>College Name</th>
+                                                <th className='text-sm text-center'>College</th>
 
-                                                <th className='text-sm text-center'>ECC Date</th>
-                                                <th className='text-sm text-center'>ECC Domain</th>
-                                                <th className='text-sm text-center'>ECC Level</th>
-                                                <th className='text-sm text-center'>ECC Location</th>
+                                                <th className='text-sm text-center'>Date</th>
+                                                <th className='text-sm text-center'>omain</th>
+                                                <th className='text-sm text-center'>Level</th>
+                                                <th className='text-sm text-center'>Location</th>
                                                 <th className='text-sm text-center'>Prize</th>
-                                                <th className='text-sm text-center'>Student Year</th>
-                                                <th className='text-sm text-center'>ECC Certificate</th>
+                                                <th className='text-sm text-center'>Year</th>
+                                                <th className='text-sm text-center'>Certificate</th>
                                                 <th className='text-sm text-center'>Actions</th>
                                             </tr>
                                         </thead>
@@ -227,7 +229,7 @@ const ExtraCurr = () => {
                                                     <td className='text-center text-sm'>{item.academic_year}</td>
                                                     <td className='text-center text-sm'>{item.college_name}</td>
 
-                                                    <td className='text-center text-sm'>{item.ecc_date}</td>
+                                                    <td className='text-center text-sm whitespace-nowrap'>{formatDate(item.ecc_date)}</td>
                                                     <td className='text-center text-sm'>{item.ecc_domain}</td>
                                                     <td className='text-center text-sm'>{item.ecc_level}</td>
                                                     <td className='text-center text-sm'>{item.ecc_location}</td>
@@ -235,15 +237,24 @@ const ExtraCurr = () => {
                                                     <td className='text-center text-sm'>{item.student_year}</td>
                                                     <td className='text-center text-sm'>
                                                         <td className='text-center text-sm'>
-                                                            <button onClick={() => openCertificate(item.ecc_certificate)} className="certificate">
-                                                                View Certificate
-                                                            </button>
+                                                            <abbr title="See Certificate">
+
+                                                                <button onClick={() => openCertificate(item.ecc_certificate)} className="certificate">
+                                                                    <i className="fa-solid fa-eye"></i>
+                                                                </button>
+                                                            </abbr>
                                                         </td>
                                                     </td>
                                                     <td className='text-center text-sm  '>
                                                         <div className='flex gap-2 items-center'>
-                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded mr-2" onClick={() => navigate(`/dmce/add/extra-curriculum/${item.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
-                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded" onClick={() => handleDelete(item.id)}><i className="fa-solid fa-trash"></i></button>
+                                                            <abbr title="Edit">
+
+                                                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded" onClick={() => navigate(`/dmce/add/extra-curriculum/${item.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                            </abbr>
+                                                            <abbr title="Delete">
+
+                                                                <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(item.id)}><i className="fa-solid fa-trash"></i></button>
+                                                            </abbr>
                                                         </div>
                                                     </td>
                                                 </tr>

@@ -245,10 +245,10 @@ const AddAchievements = () => {
                                         value={data.studentYear}
                                         onChange={handleChange}
                                     >
-                                        <MenuItem value={1}>First Year</MenuItem>
-                                        <MenuItem value={2}>Second Year</MenuItem>
-                                        <MenuItem value={3}>Third Year</MenuItem>
-                                        <MenuItem value={4}>Fourth Year</MenuItem>
+                                        <MenuItem value={'FE'}>First Year</MenuItem>
+                                        <MenuItem value={'SE'}>Second Year</MenuItem>
+                                        <MenuItem value={'TE'}>Third Year</MenuItem>
+                                        <MenuItem value={'BE'}>Fourth Year</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -307,7 +307,7 @@ const AddAchievements = () => {
                             </Box>
 
 
-                            <label className='label' htmlFor="achievementCertificate">Achievement Certificate <p className='example'>prefer pdf, size &lt; 512kb</p></label>
+                            <label className='label' htmlFor="achievementCertificate">Achievement Certificate <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="achievementCertificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

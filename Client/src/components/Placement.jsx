@@ -12,22 +12,22 @@ import 'react-responsive-modal/styles.css';
 import CertificatePopup from './Pop';
 
 const Placement = () => {
-      //pop up 
-      const [certificateUrl, setCertificateUrl] = useState('');
-      const [showCertificate, setShowCertificate] = useState(false);
-  
-      const openCertificate = (certificateUrl) => {
-          setCertificateUrl(certificateUrl);
-          setShowCertificate(true);
-      };
-  
-      const closeCertificate = () => {
-          setCertificateUrl('');
-          setShowCertificate(false);
-      };
-  
-  
-      ////
+    //pop up 
+    const [certificateUrl, setCertificateUrl] = useState('');
+    const [showCertificate, setShowCertificate] = useState(false);
+
+    const openCertificate = (certificateUrl) => {
+        setCertificateUrl(certificateUrl);
+        setShowCertificate(true);
+    };
+
+    const closeCertificate = () => {
+        setCertificateUrl('');
+        setShowCertificate(false);
+    };
+
+
+    ////
     const navigate = useNavigate();
     const [placement, setPlacement] = useState([]);
     const [loader, setLoader] = useState(false);
@@ -180,14 +180,15 @@ const Placement = () => {
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
-                        {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
+            {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
             {loader ? (
-                <Loaders message={(checkDelete ? "deleting " : "loading ") + "your placement"}  />
+                <Loaders
+                    className="capitalize" message={(checkDelete ? "Deleting " : "Fetching ") + "Your Placement"} />
             ) : (
                 <div className='w-full'>
                     <div className='w-full flex items-center justify-between px-4 mt-8 '>
-                        <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your placement</h2>
+                        <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your Placement</h2>
                         <button
                             className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block md:hidden md:text-xl"
                             onClick={() => navigate('/dmce/add/placement')}
@@ -198,7 +199,7 @@ const Placement = () => {
                             className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block max-md:hidden md:text-xl"
                             onClick={() => navigate('/dmce/add/placement')}
                         >
-                            Add placement
+                            Add Placement
                         </button>
                     </div>
 
@@ -232,20 +233,29 @@ const Placement = () => {
                                                 <td className='text-center text-sm'>{row.company_name}</td>
                                                 <td className='text-center text-sm'>{row.country}</td>
                                                 <td className='text-center text-sm'>{row.domain}</td>
-                                              
                                                 <td className='text-center text-sm'>{row.package} Lac</td>
                                                 <td className='text-center text-sm'>{row.passout_year}</td>
                                                 <td className='text-center text-sm'>{row.pincode}</td>
                                                 <td className='text-center text-sm'>{row.position}</td>
                                                 <td className='text-center text-sm'>{row.state}</td>
                                                 <td className='text-center text-sm'>
-                                                <button onClick={() => openCertificate(row.offer_letter)} className="certificate">
-                                                        Offer Letter
-                                                    </button>                                                </td>
+                                                    <abbr title="see offer letter">
+
+                                                        <button onClick={() => openCertificate(row.offer_letter)} className="certificate">
+                                                        <i className="fa-solid fa-eye"></i>
+                                                        </button>
+                                                    </abbr>
+                                                </td>
                                                 <td className='text-center text-sm'>
                                                     <div className='flex items-center justify-center gap-2'>
-                                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={()=>navigate(`/dmce/add/placement/${row.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
-                                                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={() => handleDelete(row.id)}><i className="fa-solid fa-trash"></i></button>
+                                                        <abbr title="Edit">
+
+                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded" onClick={() => navigate(`/dmce/add/placement/${row.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                        </abbr>
+                                                        <abbr title="Delete">
+
+                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(row.id)}><i className="fa-solid fa-trash"></i></button>
+                                                        </abbr>
                                                     </div>
                                                 </td>
                                             </tr>

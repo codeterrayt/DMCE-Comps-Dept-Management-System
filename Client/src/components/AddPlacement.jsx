@@ -309,7 +309,7 @@ const AddPlacementDetails = () => {
 
                             <label className='label' htmlFor="domain">Domain <p className='example'>e.g:- web-development , app-developement</p></label>
                             <input value={formData.domain} type="text" id='domain' name='domain' className='input' onChange={handleChange} />
-                            <label className='label' htmlFor="offer_letter">Offer Letter <p className='example'>prefer pdf, size &lt; 512kb</p></label>
+                            <label className='label' htmlFor="offer_letter">Offer Letter <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="offer_letter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

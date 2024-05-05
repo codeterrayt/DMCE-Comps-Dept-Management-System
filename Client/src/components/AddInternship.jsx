@@ -37,6 +37,7 @@ const AddInternship = () => {
         offerLetter: null,
         permissionLetter: null,
         year: '',
+        companyName: ''
     });
 
     const handleChange = (e) => {
@@ -92,6 +93,9 @@ const AddInternship = () => {
         if (!id && !data.year) {
             return toast.error("Please enter the student year.");
         }
+        if (!id && !data.companyName) {
+            return toast.error("Please enter the company name.");
+        }
 
         // Check file size for completionLetter
         if (!id && data.completionLetter.size > 512 * 1024) {
@@ -110,6 +114,7 @@ const AddInternship = () => {
             return toast.error("Permission letter size should be less than 512 KB.");
         }
 
+    
         const loading = toast.loading('Wait. Internship details are being processed.');
 
 
@@ -121,6 +126,7 @@ const AddInternship = () => {
         form.append('start_date', data.startDate);
         form.append('end_date', data.endDate);
         form.append('student_year', data.year);
+        form.append('company_name', data.companyName);
         if (data.completionLetter) {
             form.append('completion_letter_path', data.completionLetter);
         }
@@ -256,10 +262,10 @@ const AddInternship = () => {
                                         value={data.year}
                                         onChange={handleChange}
                                     >
-                                        <MenuItem value={1}>First Year</MenuItem>
-                                        <MenuItem value={2}>Second Year</MenuItem>
-                                        <MenuItem value={3}>Third Year</MenuItem>
-                                        <MenuItem value={4}>Fourth Year</MenuItem>
+                                        <MenuItem value={'FE'}>First Year</MenuItem>
+                                        <MenuItem value={'SE'}>Second Year</MenuItem>
+                                        <MenuItem value={'TE'}>Third Year</MenuItem>
+                                        <MenuItem value={'BE'}>Fourth Year</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -275,10 +281,12 @@ const AddInternship = () => {
 
                         </div>
                         <div className='w-full md:p-8 md:mt-4 '>
+                            <label className='label' htmlFor="companyName">Company Name</label>
+                            <input type="text" value={data.companyName} id='companyName' name="companyName" className='input' onChange={handleChange} />
                             <label className='label' htmlFor="domain">Domain <p className='example'>e.g:- web-development , app-developement</p></label>
                             <input value={data.domain} type="text" id='domain' name="domain" className='input' onChange={handleChange} />
 
-                            <label className='label' htmlFor="completionLetter">Completion Letter <p className='example'>prefer pdf, size &lt; 512kb</p></label>
+                            <label className='label' htmlFor="completionLetter">Completion Letter <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="completionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -292,7 +300,7 @@ const AddInternship = () => {
                                 )}
                             </div>
 
-                            <label className='label' htmlFor="certificate">Certificate <p className='example'>prefer pdf, size &lt; 512kb</p></label>
+                            <label className='label' htmlFor="certificate">Certificate <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="certificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -306,7 +314,7 @@ const AddInternship = () => {
                                 )}
                             </div>
 
-                            <label className='label' htmlFor="offerLetter">Offer Letter <p className='example'>prefer pdf, size &lt; 512kb</p></label>
+                            <label className='label' htmlFor="offerLetter">Offer Letter <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="offerLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -320,7 +328,7 @@ const AddInternship = () => {
                                 )}
                             </div>
 
-                            <label className='label' htmlFor="permissionLetter">Permission Letter <p className='example'>prefer pdf, size &lt; 512kb</p></label>
+                            <label className='label' htmlFor="permissionLetter">Permission Letter <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="permissionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

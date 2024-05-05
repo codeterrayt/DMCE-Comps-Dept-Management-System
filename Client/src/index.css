@@ -65,6 +65,7 @@
 
 .btn1:hover {
   background-color: #1e4f8f; /* Dark blue shade */
+  color: white;
 }
 
 .btn1.w-fit {
@@ -85,6 +86,7 @@
 
 .btn:hover {
   background-color: #1e4f8f; /* Dark blue shade */
+  color: white;
 }
 
 .btn.w-fit {
@@ -121,7 +123,6 @@
     transform: rotate(1turn);
   }
 }
-
 
 /* scroll bar */
 /* Assuming you want to style the scrollbar for the entire app */
@@ -167,11 +168,12 @@
   }
 */
 
-#iframe{
+#iframe {
   object-fit: contain !important;
 }
 
-.certificate{
+.certificate {
+  margin: 0 auto !important;
   background-color: #262847;
   color: white;
   transition: background-color 300ms ease-in-out;
@@ -187,20 +189,64 @@
   font-weight: bold;
 }
 
-
-
 /* /////// */
 
 /* HTML: <div class="loader"></div> */
 .loader2 {
   width: 120px;
   height: 20px;
-  -webkit-mask:linear-gradient(90deg,#000 70%,#0000 0) 0/20%;
-  background:
-   linear-gradient(#000 0 0) 0/0% no-repeat
-   #ddd;
+  -webkit-mask: linear-gradient(90deg, #000 70%, #0000 0) 0/20%;
+  background: linear-gradient(#000 0 0) 0/0% no-repeat #ddd;
   animation: l4 2s infinite steps(6);
 }
 @keyframes l4 {
-    100% {background-size:120%}
+  100% {
+    background-size: 120%;
+  }
+}
+
+.sidebar-link {
+  display: flex;
+  gap: 1rem; /* gap-4 in Tailwind is equivalent to 1rem */
+  align-items: center; /* items-center in Tailwind */
+  padding: 1rem; /* py-5 in Tailwind */
+  color: #262847; /* text-dark-grey in Tailwind */
+  padding-left: 3rem !important;
+}
+
+.sidebar-link:hover {
+  color: #262847; /* hover:text-black in Tailwind */
+  background-color: rgba(224, 224, 224, 0.458);
+}
+
+.sidebar-link.active {
+  color: #262847; /* text-black in Tailwind */
+  border-right-width: 2px; /* border-r-2 in Tailwind */
+  border-color: #262847; /* border-black in Tailwind */
+  background-color: rgba(224, 224, 224, 0.722); /* bg-grey/50 in Tailwind */
+  border-top-left-radius: 0.5rem; /* md:rounded-tl-lg in Tailwind */
+  border-bottom-left-radius: 0.5rem; /* md:rounded-bl-lg in Tailwind */
+}
+
+.sidebar-link.active.max-md {
+  border: none; /* max-md:border-none in Tailwind */
+}
+
+/* chec box 
+ */
+
+.checkBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkBox input {
+  cursor: pointer;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+.checkBox label {
+  cursor: pointer;
+ 
 }

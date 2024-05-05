@@ -80,7 +80,7 @@ const SideNav = () => {
 
                 <div
                     className={
-                        "min-w-[300px] max-md:w-full h-[calc(100vh-80px)] md:h-cover md:sticky  overflow-y-auto p-4 md:pr-0 md:border-grey md:border-r absolute max-md:top:[64px] bg-white  duration-500 " +
+                        "min-w-[300px] max-md:w-full h-[calc(100vh-80px)] md:h-cover md:sticky  overflow-y-auto md:pr-0 md:border-grey md:border-r absolute max-md:top:[64px] bg-white  duration-500 " +
                         (!showSideNav
                             ? " max-md:opacity-0 max-md:pointer-events-none "
                             : " opacity-100 pointer-events-auto")
@@ -88,23 +88,22 @@ const SideNav = () => {
                 >
 
 
-                    <div  className=" mb-3 w-full "><img src="https://www.dmce.ac.in/assets/img/dmce.png" onClick={()=>navigate('/dmce/home')} className="w-16 m-auto cursor-pointer" alt="logo" /> </div>
+                    <div className=" mb-3 w-full "><img src="https://www.dmce.ac.in/assets/img/dmce.png" onClick={() => navigate('/dmce/home')} className="w-16 m-auto cursor-pointer" alt="logo" /> </div>
                     <hr className="border-grey mx-auto ml-6 mb-8 mr-6 " />
 
                     <NavLink
                         to={"/dmce/home"}
                         onClick={(e) => setPageState(e.target.innerText)}
-                        className="ml-8 text-xl font-bold"
+                        className="pl-8 text-xl font-bold sidebar-link"
                     >
 
                         Home
                     </NavLink>
-                    <br />
-                    <br />
+
                     {/* <NavLink
                         to={"/dmce/about"}
                         onClick={(e) => setPageState(e.target.innerText)}
-                        className="ml-8 text-xl font-bold"
+                        className="pl-8 text-xl font-bold sidebar-link"
                     >
 
                         About
@@ -114,70 +113,66 @@ const SideNav = () => {
                     <NavLink
                         to={"/dmce/internship"}
                         onClick={(e) => setPageState(e.target.innerText)}
-                        className="ml-8 text-xl font-bold"
+                        className="pl-8 text-xl font-bold sidebar-link"
                     >
 
                         Internship
                     </NavLink>
-                    <br />
-                    <br />
+
                     <NavLink
                         to={"/dmce/achivement"}
                         onClick={(e) => setPageState(e.target.innerText)}
-                        className="ml-8 text-xl font-bold"
+                        className="pl-8 text-xl font-bold sidebar-link"
                     >
 
-                        Achivements
+                        Achievements
                     </NavLink>
-                    <br />
-                    <br />
+
                     <NavLink
                         to={"/dmce/extra-curriculum"}
                         onClick={(e) => setPageState(e.target.innerText)}
-                        className="ml-8 text-xl font-bold"
+                        className="pl-8 text-xl font-bold sidebar-link"
                     >
 
                         Extra Activities
                     </NavLink>
-                    <br />
-                    <br />
+
                     <NavLink
                         to={"/dmce/hackathon"}
                         onClick={(e) => setPageState(e.target.innerText)}
-                        className="ml-8 text-xl font-bold"
+                        className="pl-8 text-xl font-bold sidebar-link"
                     >
 
                         Hackathon
                     </NavLink>
-                    <br />
-                    <br />
+
                     <NavLink
                         to={"/dmce/higher-studies"}
                         onClick={(e) => setPageState(e.target.innerText)}
-                        className="ml-8 text-xl font-bold"
+                        className="pl-8 text-xl font-bold sidebar-link"
                     >
 
                         Higher Studies
                     </NavLink>
-                    <br />
-                    <br />
+
                     <NavLink
                         to={"/dmce/placement"}
                         onClick={(e) => setPageState(e.target.innerText)}
-                        className="ml-8 text-xl font-bold"
+                        className="pl-8 text-xl font-bold sidebar-link"
                     >
 
                         Placement
                     </NavLink>
-                    <br />
-                    <br />
-                    <div className="w-[80%]  mt-8 absolute bottom-2">
+
+                    <div className="w-full px-4  mt-8 absolute bottom-2">
                         {
-                            login? <div className="w-full  p-2 flex gap-4 text-xs mx-auto justify-center items-center  flex-col ">
+                            login ? <div className="w-full  p-2 flex gap-4 text-xs mx-auto justify-center items-center  flex-col ">
                                 <div className="flex flex-col w-full items-center gap-2 mt-8 ">
 
 
-                                    <h1 className="text-xl font-bold text-center">Hii {userInSession.name}</h1>
+                                    <h1 className="text-xl font-bold text-center">Hii {userInSession.name} <i className="fa-solid fa-pen-to-square pl-3 hover:text-xl cursor-pointer" onClick={()=>navigate('/dmce/edit-profile')}></i></h1>
+
+                                    
                                     <button onClick={handleSignOut} className="btn1 mx-auto">Sign Out</button>
                                 </div>
 

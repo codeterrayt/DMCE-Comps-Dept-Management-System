@@ -11,6 +11,7 @@ import 'react-responsive-modal/styles.css';
 
 import Loaders from './Loaders';
 import CertificatePopup from './Pop';
+import { formatDate } from '../helper/getDate';
 
 const Internship = () => {
     const navigate = useNavigate();
@@ -118,8 +119,8 @@ const Internship = () => {
         try {
             const confirmOptions = {
                 customUI: ({ onClose }) => (
-                    <Modal open={true} onClose={onClose} center>
-                        <div>
+                    <Modal classNames={"rounded-md"} open={true} onClose={onClose} center>
+                        <div className='rounded-md'>
                             <h2 className='font-bold text-xl'>Confirm Deletion</h2>
                             <p className='my-3 text-[#262847] font-bold'>Are you sure you want to delete this internship?</p>
                             <div className='w-full flex items-center px-4 justify-between'>
@@ -191,7 +192,7 @@ const Internship = () => {
         <section className='w-full  min-h-screen p-4 md:p-8 '>
             {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
-            {loader ? <Loaders message={checkDelete ? "wait , deleting your internship" : "loading your internships"} /> :
+            {loader ? <Loaders message={checkDelete ? "Wait , Deleting Your Internship" : "Fetching Your Internships"} /> :
                 <div className='w-full'>
                     <div className='w-full flex items-center justify-between px-4 mt-8 '>
                         <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your Internships</h2>
@@ -214,19 +215,20 @@ const Internship = () => {
                             internships.length ? (
                                 <table id="example" className="table table-striped text-black" style={{ width: '100%' }}>
                                     <thead>
-                                        <tr>
+                                        <tr className='c capitalize'>
                                             <th className='text-sm text-center'>Academic Year</th>
 
                                             <th className='text-sm text-center'>Domain</th>
-                                            <th className='text-sm text-center'>Duration</th>
-                                            <th className='text-sm text-center'>Start Date</th>
-                                            <th className='text-sm text-center'>End Date</th>
-                                            <th className='text-sm text-center'>Student Year</th>
+                                            <th className='text-sm text-center'>Company Name</th>
+                                            <th className='text-sm text-center'>Duration in months</th>
+                                            <th className='text-sm text-center'>Start</th>
+                                            <th className='text-sm text-center'>End</th>
+                                            <th className='text-sm text-center'>Year</th>
                                             <th className='text-sm text-center'>Certificate</th>
                                             <th className='text-sm text-center'>Completion Letter</th>
                                             <th className='text-sm text-center'>Offer Letter</th>
                                             <th className='text-sm text-center'>Permission Letter</th>
-                                         
+
                                             <th className='text-sm text-center'>Actions</th>
                                         </tr>
                                     </thead>
@@ -236,35 +238,50 @@ const Internship = () => {
                                                 <td className='text-center text-sm'>{internship.academic_year}</td>
 
                                                 <td className='text-center text-sm'>{internship.domain}</td>
+                                                <td className='text-center text-sm'>{internship.company_name}</td>
                                                 <td className='text-center text-sm'>{internship.duration}</td>
-                                                <td className='text-center text-sm'>{internship.start_date}</td>
-                                                <td className='text-center text-sm'>{internship.end_date}</td>
+                                                <td className='text-center text-sm whitespace-nowrap'>{formatDate(internship.start_date)}</td>
+                                                <td className='text-center text-sm whitespace-nowrap'>{formatDate(internship.end_date)}</td>
                                                 <td className='text-center text-sm'>{internship.student_year}</td>
                                                 <td className='text-center text-sm'>
-                                                    <button onClick={() => openCertificate(internship.certificate)} className="certificate">
-                                                        View Certificate
-                                                    </button>
+                                                    <abbr title="See Certificate">
+                                                        <button onClick={() => openCertificate(internship.certificate)} className="certificate">
+                                                            <i className="fa-solid fa-eye"></i>
+
+                                                        </button>
+                                                    </abbr>
                                                 </td>
                                                 <td className='text-center text-sm'>
-                                                    <button onClick={() => openCertificate(internship.completion_letter)} className="certificate">
-                                                        View completion Certificate
-                                                    </button>
+                                                    <abbr title="See Completion Letter">
+                                                        <button onClick={() => openCertificate(internship.completion_letter)} className="certificate">
+                                                            <i className="fa-solid fa-eye"></i>
+                                                        </button>
+                                                    </abbr>
                                                 </td>
                                                 <td className='text-center text-sm'>
-                                                    <button onClick={() => openCertificate(internship.offer_letter)} className="certificate">
-                                                        View offer letter
-                                                    </button>
+                                                    <abbr title="See Offer Letter">
+                                                        <button onClick={() => openCertificate(internship.offer_letter)} className="certificate">
+                                                            <i className="fa-solid fa-eye"></i>
+                                                        </button>
+                                                    </abbr>
                                                 </td>
                                                 <td className='text-center text-sm'>
-                                                    <button onClick={() => openCertificate(internship.permission_letter)} className="certificate">
-                                                        View permission letter
-                                                    </button>
+                                                    <abbr title="See Permission Letter">
+                                                        <button onClick={() => openCertificate(internship.permission_letter)} className="certificate">
+                                                            <i className="fa-solid fa-eye"></i>
+                                                        </button>
+                                                    </abbr>
                                                 </td>
-                                              
+
                                                 <td className='text-center text-sm '>
-                                                    <div className='flex items-center gap-2 justify-center'>
-                                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded " onClick={() => navigate(`/dmce/add/internship/${internship.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
-                                                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded" onClick={() => handleDelete(internship.id)}><i className="fa-solid fa-trash"></i></button>
+                                                    <div className='flex items-center gap-3 justify-center'>
+                                                        <abbr title="Edit">
+                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded " onClick={() => navigate(`/dmce/add/internship/${internship.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                        </abbr>
+                                                        <abbr title="Delete">
+
+                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(internship.id)}><i className="fa-solid fa-trash"></i></button>
+                                                        </abbr>
                                                     </div>
                                                 </td>
                                             </tr>

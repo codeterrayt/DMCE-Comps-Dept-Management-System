@@ -26,6 +26,8 @@ import AddHigherStudies from './components/AddHigherStudies';
 import AddPlacementDetails from './components/AddPlacement';
 import Placement from './components/Placement';
 import Profile from './components/Profile';
+import EditProfile from './components/EditProfile';
+import HomeAdmin from './components/Admin/HomeAdmin';
 
 export const userContext = createContext()
 
@@ -63,12 +65,19 @@ function App() {
             <Route path="placement" element={<Placement />} />
             <Route path="add/placement" element={<AddPlacementDetails />} />
             <Route path="add/placement/:id" element={<AddPlacementDetails />} />
+            <Route path="edit-profile" element={<EditProfile />} />
             <Route path="sign-up" element={<SignUpForm />} />
             <Route path="login" element={<LoginForm />} />
 
 
+
           </Route>
           <Route path="/profile" element={<Profile />} />
+
+          <Route path="/Admin" element={<HomeAdmin />}>
+            <Route path="*" element={<HomeAdmin />} />
+          </Route>
+
 
         </Routes>
 
