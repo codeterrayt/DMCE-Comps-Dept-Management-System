@@ -52,10 +52,10 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function sendEmailVerificationNotification()
-    {
-        $this->notify(new \App\Notifications\UserVerifyNotification(Auth::user()));  //pass the currently logged in user to the notification class
-    }
+    // public function sendEmailVerificationNotification()
+    // {
+    //     $this->notify(new \App\Notifications\UserVerifyNotification(Auth::user()));  //pass the currently logged in user to the notification class
+    // }
 
     public function fetch_internships()
     {

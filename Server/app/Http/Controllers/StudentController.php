@@ -551,12 +551,12 @@ class StudentController extends Controller
 
         // Associate the ecc with the authenticated user
         $ecc->ecc_date = date('Y-m-d', strtotime($request->ecc_date));
-        $ecc->user_id = auth()->id();
+        // $ecc->user_id = auth()->id();
 
         // Save the ecc
         $ecc->save();
         // Return a response
-        return response()->json(['message' => 'Internship updated successfully', 'ecc' => $ecc]);
+        return response()->json(['message' => 'ECC Updated Successfully', 'ecc' => $ecc]);
     }
 
 
