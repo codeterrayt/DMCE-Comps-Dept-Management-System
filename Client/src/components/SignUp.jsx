@@ -67,7 +67,9 @@ const SignUpForm = () => {
                 const user = {
                     name: response.data.user.name,
                     token: response.data.token,
-                    role: response.data.user.role
+                    role: response.data.user.role,
+                    id: response.data.user.id
+
                 }
                 setUser(user)
 

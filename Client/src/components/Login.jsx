@@ -84,6 +84,12 @@ const LoginForm = () => {
 
     };
 
+    const [show, setShow] = useState(false)
+    const handleEye = () => {
+        setShow(pre => !pre)
+
+    }
+
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
             <AnimationWrapper className='mx-auto w-full'>
@@ -97,7 +103,10 @@ const LoginForm = () => {
                         <input type="email" id='email' name="email" className='input' onChange={handleChange} />
 
                         <label className='label' htmlFor="password">Password</label>
-                        <input type="password" id='password' name="password" className='input' onChange={handleChange} />
+                        <div className='w-full  flex items-center relative' >
+                        <input type={show ? "text" : "password"}  id='password' name="password" className='input' onChange={handleChange} />
+                        <i onClick={handleEye} className={"fa-solid " + (show ? "fa-eye-slash" : "fa-eye") + " absolute right-2 top-1/3"}></i>
+                        </div>
 
                         <div className='flex justify-center mt-4'>
                             <button type='button' className='btn' onClick={handleSubmit}>Login</button>
