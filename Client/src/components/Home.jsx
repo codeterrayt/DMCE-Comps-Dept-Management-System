@@ -4,6 +4,7 @@ import { checkLogin } from '../helper/checkLogin'
 import { useNavigate } from 'react-router-dom'
 import { isUserInfoCompleted } from '../helper/isUserInfoCompleted'
 import Loaders2 from './Loader2'
+import AnimationWrapper from './Page-Animation'
 
 const Home = () => {
   const navigate = useNavigate();
@@ -13,9 +14,14 @@ const Home = () => {
 
 
     if (!checkLogin()) {
-      return navigate('/dmce/login');
+      return navigate('/login');
     }
     const userInsession = localStorage.getItem('dmceuser')
+    const { role } = JSON.parse(userInsession)
+    if (role == 'admin') {
+      return navigate('/admin')
+    }
+
     const isProfileComplete = JSON.parse(userInsession).profile_completed
 
     if (!isProfileComplete) {
@@ -50,7 +56,7 @@ const Home = () => {
     <>
       {
         loader ? <Loaders2 /> :
-          <div className="bg-gray-100 mb-[12px]  w-full h-screen flex items-center justify-center flex-col">
+          <AnimationWrapper className="bg-gray-100 mb-[12px]  w-full h-screen flex items-center justify-center flex-col">
             <div className=' flex items-center justify-center'>
               <img className='w-[60%] max-md:w-[80%]' src="https://www.dmce.ac.in/assets/img/dmce.png" alt="logo" />
             </div>
@@ -60,7 +66,7 @@ const Home = () => {
               {/* Add more content or components as needed */}
             </div>
 
-          </div>
+          </AnimationWrapper>
       }
     </>
   )

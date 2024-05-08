@@ -10,9 +10,9 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { getToken } from '../helper/getToken';
 import Loaders from './Loaders';
-import AnimationWrapper from './Page-Animation';
+import AnimationWrapper from '../Page-Animation';
 
-const AddAchievements = () => {
+const DetailAchievementAdmin = () => {
 
     
     const [loader, setloader] = useState(false);
@@ -128,7 +128,7 @@ const AddAchievements = () => {
 
 
         try {
-            const url = id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/achievement` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/achievement`
+            const url = id && `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/achievement`
             const response = await axios.post(
                 url,
                 formData,
@@ -166,7 +166,7 @@ const AddAchievements = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/achievement/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/achievement/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -333,4 +333,4 @@ const AddAchievements = () => {
     );
 };
 
-export default AddAchievements;
+export default DetailAchievementAdmin;

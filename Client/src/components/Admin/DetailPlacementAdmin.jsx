@@ -4,14 +4,14 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { getToken } from '../helper/getToken';
+import { getToken } from '../../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import Loaders from './Loaders';
-import AnimationWrapper from './Page-Animation';
+import Loaders from '../Loaders';
+import AnimationWrapper from '../Page-Animation';
 
-const AddPlacementDetails = () => {
+const DetailPlacementAdmin = () => {
     const [loader, setloader] = useState(false)
     const { id } = useParams()
     useEffect(() => {
@@ -141,7 +141,7 @@ const AddPlacementDetails = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/placement` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/placement`,
+            url: id && `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/placement`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -155,7 +155,7 @@ const AddPlacementDetails = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                return navigate('/dmce/placement');
+                return navigate(-1);
             })
             .catch((error) => {
                 console.error(error);
@@ -189,7 +189,7 @@ const AddPlacementDetails = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/placement/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/placement/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -333,4 +333,4 @@ const AddPlacementDetails = () => {
     );
 };
 
-export default AddPlacementDetails;
+export default DetailPlacementAdmin;

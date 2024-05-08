@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { checkLogin } from '../helper/checkLogin';
-import { getToken } from '../helper/getToken';
+import { useNavigate, useParams } from 'react-router-dom';
+import { checkLogin } from '../../helper/checkLogin';
+import { getToken } from '../../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
-import CertificatePopup from './Pop';
-import AnimationWrapper from './Page-Animation';
+import CertificatePopup from '../Pop';
 
 
+import Loaders from '../Loaders';
+import { formatDate } from '../../helper/getDate';
+import AnimationWrapper from '../Page-Animation';
 
-import Loaders from './Loaders';
-import { formatDate } from '../helper/getDate';
-
-const Achivements = () => {
+const AchievementAdmin = () => {
 
     //pop up 
     const [certificateUrl, setCertificateUrl] = useState('');
     const [showCertificate, setShowCertificate] = useState(false);
+    const [user , setUser]= useState()
 
     const openCertificate = (certificateUrl) => {
         setCertificateUrl(certificateUrl);
@@ -67,6 +67,7 @@ const Achivements = () => {
         return modifiedAchievementsArray;
     }
 
+    const {id} = useParams()
 
     useEffect(() => {
         if (!checkLogin()) {
@@ -92,7 +93,7 @@ const Achivements = () => {
 
         let config = {
             method: 'get',
-            url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/achievements`,
+            url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/student/achievements?student_id=${id}`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -101,7 +102,8 @@ const Achivements = () => {
 
         axios.request(config)
             .then((response) => {
-                const data = removeUnwantedFields(response.data.achievements)
+                setUser(response?.data?.data[0])
+                const data = removeUnwantedFields(response.data.data[0].student_achievements)
                 setAchivement(data);
                 setLoader(false);
             })
@@ -116,91 +118,90 @@ const Achivements = () => {
             });
     };
 
-    const handleDelete = (id) => {
-        try {
-            const confirmOptions = {
-                customUI: ({ onClose }) => (
-                    <Modal open={true} onClose={onClose} center>
-                        <div>
-                            <h2 className='font-bold text-xl'>Confirm Deletion</h2>
-                            <p className='my-3 text-[#262847] font-bold'>Are you sure you want to delete this achievement?</p>
-                            <div className='w-full flex items-center px-4 justify-between'>
-                                <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={async () => {
-                                    onClose();
-                                    setLoader(true);
+    // const handleDelete = (id) => {
+    //     try {
+    //         const confirmOptions = {
+    //             customUI: ({ onClose }) => (
+    //                 <Modal open={true} onClose={onClose} center>
+    //                     <div>
+    //                         <h2 className='font-bold text-xl'>Confirm Deletion</h2>
+    //                         <p className='my-3 text-[#262847] font-bold'>Are you sure you want to delete this achievement?</p>
+    //                         <div className='w-full flex items-center px-4 justify-between'>
+    //                             <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={async () => {
+    //                                 onClose();
+    //                                 setLoader(true);
 
-                                    let data = new FormData();
-                                    data.append('id', id);
+    //                                 let data = new FormData();
+    //                                 data.append('id', id);
 
-                                    const token = getToken();
-                                    setCheckDelete(true)
+    //                                 const token = getToken();
+    //                                 setCheckDelete(true)
 
-                                    let config = {
-                                        method: 'post',
-                                        maxBodyLength: Infinity,
-                                        url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/delete/achievement`,
-                                        headers: {
-                                            'Accept': 'application/json',
-                                            'Authorization': `Bearer ${token}`,
-                                            ...data.getHeaders
-                                        },
-                                        data: data
-                                    };
+    //                                 let config = {
+    //                                     method: 'post',
+    //                                     maxBodyLength: Infinity,
+    //                                     url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/delete/achievement`,
+    //                                     headers: {
+    //                                         'Accept': 'application/json',
+    //                                         'Authorization': `Bearer ${token}`,
+    //                                         ...data.getHeaders
+    //                                     },
+    //                                     data: data
+    //                                 };
 
-                                    // Send delete request
-                                    axios.request(config)
-                                        .then((response) => {
-                                            setAchivement(data => data.filter(value => value.id !== id));
-                                            setCheckDelete(false)
+    //                                 // Send delete request
+    //                                 axios.request(config)
+    //                                     .then((response) => {
+    //                                         setAchivement(data => data.filter(value => value.id !== id));
+    //                                         setCheckDelete(false)
 
-                                            setLoader(false)
-                                        })
-                                        .catch((error) => {
-                                            setCheckDelete(false)
+    //                                         setLoader(false)
+    //                                     })
+    //                                     .catch((error) => {
+    //                                         setCheckDelete(false)
 
-                                            if (error.response && error.response.status === 401) {
-                                                localStorage.clear();
-                                                return navigate('/login');
-                                            }
-                                            console.log(error);
-                                        });
+    //                                         if (error.response && error.response.status === 401) {
+    //                                             localStorage.clear();
+    //                                             return navigate('/login');
+    //                                         }
+    //                                         console.log(error);
+    //                                     });
 
-                                }}>
-                                    Yes
-                                </button>
-                                <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={() => {
-                                    onClose();
-                                    setLoader(false);
-                                }}>
-                                    No
-                                </button>
-                            </div>
-                        </div>
-                    </Modal>
-                ),
-            };
+    //                             }}>
+    //                                 Yes
+    //                             </button>
+    //                             <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={() => {
+    //                                 onClose();
+    //                                 setLoader(false);
+    //                             }}>
+    //                                 No
+    //                             </button>
+    //                         </div>
+    //                     </div>
+    //                 </Modal>
+    //             ),
+    //         };
 
-            // Display responsive confirmation dialog
-            confirmAlert(confirmOptions);
-        } catch (error) {
-            setCheckDelete(false)
+    //         // Display responsive confirmation dialog
+    //         confirmAlert(confirmOptions);
+    //     } catch (error) {
+    //         setCheckDelete(false)
 
-            setLoader(false);
-            toast.error(error.message);
-        }
-    }
+    //         setLoader(false);
+    //         toast.error(error.message);
+    //     }
+    // }
 
 
     return (
         <section className='w-full  min-h-screen p-4 md:p-8 '>
-            
             {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
-            {loader ? <Loaders message={(checkDelete ? "Deleting " : "Fetching") + "Your Achievement"} /> :
+            {loader ? <Loaders message={(checkDelete ? "Deleting " : "Fetching ") + "Achievement"} /> :
                 <AnimationWrapper className='w-full'>
                     <div className='w-full flex items-center justify-between px-4 mt-8 '>
-                        <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your Achievements</h2>
-                        <button
+                    <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>{user && user.name}&rsquo;s Achievement</h2>
+                        {/* <button
                             className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block md:hidden md:text-xl"
                             onClick={() => navigate('/dmce/add/achivement')}
                         >
@@ -211,7 +212,7 @@ const Achivements = () => {
                             onClick={() => navigate('/dmce/add/achivement')}
                         >
                             Add Achievements
-                        </button>
+                        </button> */}
                     </div>
 
                     <div className="overflow-x-auto w-full mt-8 ">
@@ -256,12 +257,12 @@ const Achivements = () => {
                                                 <td className='text-center text-sm '>
                                                     <div className='flex items-center gap-3 justify-center'>
                                                         <abbr title="Edit">
-                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/dmce/add/achivement/${achievement.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/admin/achivement/detail/${achievement.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
                                                         </abbr>
-                                                        <abbr title="Delete">
+                                                        {/* <abbr title="Delete">
 
                                                             <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(achievement.id)}><i className="fa-solid fa-trash"></i></button>
-                                                        </abbr>
+                                                        </abbr> */}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -281,4 +282,4 @@ const Achivements = () => {
     );
 };
 
-export default Achivements;
+export default AchievementAdmin;

@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from './Loaders';
 import { checkLogin } from '../helper/checkLogin';
+import AnimationWrapper from './Page-Animation';
 
 const Profile = () => {
     const [loader, setLoader] = useState(false);
@@ -32,7 +33,7 @@ const Profile = () => {
     useEffect(() => {
         const isLogin = checkLogin()
         if (!isLogin) {
-            navigate('/dmce/login')
+            navigate('/login')
         }
         fetchUser()
     }, [])
@@ -233,7 +234,7 @@ const Profile = () => {
         <section className='w-full min-h-screen p-4 md:p-8'>
             {/* Loader */}
             {loader ? <Loaders message={(checkUpdate ? 'Updating' : 'Fetching') + 'Your Profile'} /> : (
-                <div className='md:w-[80%] mx-auto w-[98%]'>
+                <AnimationWrapper className='md:w-[80%] mx-auto w-[98%]'>
                     {/* Form Title */}
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Add Student Detail</h1>
@@ -321,7 +322,7 @@ const Profile = () => {
                             </div>
                         </div>
                     )}
-                </div>
+                </AnimationWrapper>
             )}
         </section>
     );

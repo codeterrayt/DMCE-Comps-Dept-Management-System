@@ -4,6 +4,13 @@ import axios from 'axios';
 import { checkLogin } from '../../helper/checkLogin';
 import { useNavigate } from 'react-router-dom';
 import Loaders from '../Loaders';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { Modal } from 'react-responsive-modal';
+import 'react-responsive-modal/styles.css';
+import toast from 'react-hot-toast';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
+import AnimationWrapper from '../Page-Animation';
 
 const HomeAdmin = () => {
   const [student, setStudent] = useState([]);
@@ -38,7 +45,13 @@ const HomeAdmin = () => {
 
   useEffect(() => {
     if (!checkLogin()) {
-      return navigate('/dmce/login');
+      return navigate('/login');
+    }
+
+    const userInsession = localStorage.getItem('dmceuser')
+    const { role } = JSON.parse(userInsession)
+    if (role != 'admin') {
+      return navigate('/dmce/home')
     }
     getAllStudent();
   }, [filters, admittedYears]);
@@ -117,15 +130,192 @@ const HomeAdmin = () => {
       }));
     }
   };
+  // const [newPassword, setNeLwPassword] = useState('');
+
+  const handleChangePassword = (info) => {
+    try {
+      const confirmOptions = {
+        customUI: ({ onClose }) => (
+          <Modal classNames={"rounded-md"} open={true} onClose={onClose} center>
+            <div className="rounded-md p-6">
+              <h2 className="font-bold text-xl mb-4">{'Change Password for ' + info.name}</h2>
+              <input
+                id='pass'
+                type="text"
+                placeholder="New Password"
+
+                className="border rounded-md px-3 py-2 w-full mb-4"
+              />
+              <div className="flex items-center gap-4 justify-between">
+                <button
+                  id='btn'
+                  className="py-2 px-4 rounded-md bg-[#262847] text-white"
+                  onClick={() => {
+                    const newPassword = document.getElementById('pass').value
+                    console.log(newPassword);
+                    const btn = document.getElementById('btn')
+
+                    let data = new FormData();
+                    data.append('id', info.id);
+                    data.append('new_password', newPassword);
+
+                    const token = getToken();
+
+                    let config = {
+                      method: 'post',
+                      maxBodyLength: Infinity,
+                      url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/password`,
+                      headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        ...data.getHeaders
+                      },
+                      data: data
+                    };
+                    btn.innerText = 'Loading';
+
+                    axios.request(config)
+                      .then((response) => {
+                        console.log(JSON.stringify(response.data));
+                        toast.success('Password changed successfully');
+                        onClose(); // Close modal on success
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        toast.error(error.response.data.message);
+                      });
+                  }}
+
+                >
+                  Change
+                </button>
+                <button
+                  className="py-2 px-4 rounded-md bg-[#262847] text-white"
+                  onClick={onClose}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </Modal>
+        ),
+      };
+
+      confirmAlert(confirmOptions);
+    } catch (error) {
+      setLoader(false);
+      toast.error(error.message);
+    }
+  }
+
+  const handleSignout = () => {
+    localStorage.clear()
+
+    return navigate('/login')
+  }
+
+
+  const handleAdminChangePassword = () => {
+    try {
+      const confirmOptions = {
+        customUI: ({ onClose }) => (
+          <Modal classNames={"rounded-md"} open={true} onClose={onClose} center>
+            <div className="rounded-md p-6">
+              <h2 className="font-bold text-xl mb-4">Change Password</h2>
+              <input
+                id='pass'
+                type="text"
+                placeholder="Current Password"
+
+                className="border rounded-md px-3 py-2 w-full mb-4"
+              />
+              <input
+                id='pass2'
+                type="text"
+                placeholder="New Password"
+
+                className="border rounded-md px-3 py-2 w-full mb-4"
+              />
+              <div className="flex items-center gap-4 justify-between">
+                <button
+                  id='btn'
+                  className="py-2 px-4 rounded-md bg-[#262847] text-white"
+                  onClick={() => {
+                    const password = document.getElementById('pass').value
+                    const password2 = document.getElementById('pass2').value
+                    const btn = document.getElementById('btn')
+
+                    const user = localStorage.getItem('dmceuser')
+                    const { id } = JSON.parse(user)
+                    let data = new FormData();
+                    data.append('id', id);
+                    data.append('new_password', password2);
+
+                    data.append('current_password', password);
+
+                    const token = getToken();
+
+                    let config = {
+                      method: 'post',
+                      maxBodyLength: Infinity,
+                      url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/password`,
+                      headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        ...data.getHeaders
+                      },
+                      data: data
+                    };
+                    btn.innerText = 'Loading';
+
+                    axios.request(config)
+                      .then((response) => {
+                        console.log(JSON.stringify(response.data));
+                        toast.success('Password changed successfully');
+                        onClose(); // Close modal on success
+                      })
+                      .catch((error) => {
+                        console.log(error.response.data);
+                        toast.error(getFirstErrorMessage(error.response.data));
+                      });
+                  }}
+
+                >
+                  Change
+                </button>
+                <button
+                  className="py-2 px-4 rounded-md bg-[#262847] text-white"
+                  onClick={onClose}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </Modal>
+        ),
+      };
+
+      confirmAlert(confirmOptions);
+    } catch (error) {
+      setLoader(false);
+      toast.error(error.message);
+    }
+  }
 
   return (
-    <section className='min-h-screen w-full p-4 '>
-      <div className='w-full max-md:mt-8  max-md:mb-8'>
-        <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Admin Panel</h1>
-      </div>
+    <section className='min-h-screen w-full  '>
+      <nav className='w-full max-md:mt-8  max-md:mb-8 bg-[#262847] py-4 px-8 flex items-center justify-between'>
+        <h1 className='text-center text-xl md:text-4xl font-bold text-white'>Admin Panel</h1>
+        <div className=' p-2 flex items-center gap-8 text-xl  text-black cursor-pointer rounded-md font-bold' >
+          <button onClick={handleAdminChangePassword} className='bg-white p-2 rounded-md' > Change Password </button>
+          <button onClick={handleSignout} className='bg-white p-2 rounded-md' >Sign out </button>
+
+
+        </div>
+      </nav>
 
       {/* filters  */}
-      <div className='w-full p-4 flex items-center gap-8 max-md:gap-3  '>
+      <div className='w-full p-4 flex items-center gap-4 max-md:gap-3 border-b-2 '>
         <div className='font-bold'>
           <label htmlFor='divSelect' className='block text-sm font-medium text-gray-700'>Select Division:</label>
           <select
@@ -231,12 +421,12 @@ const HomeAdmin = () => {
       {loading ? (
         <Loaders message={'Fetching Student'} />
       ) : (
-        <>
+        <AnimationWrapper>
 
 
 
 
-          <div className="overflow-x-auto w-full mt-8">
+          <div className="overflow-x-auto w-full mt-8 p-8 ">
             {student.length > 0 ? (
               <table id="example" className="table table-striped text-black" style={{ width: '100%' }}>
                 <thead>
@@ -268,34 +458,34 @@ const HomeAdmin = () => {
                       <td className='text-center text-sm'>{student.student_id}</td>
                       <td className='text-center text-sm'>{student.email}</td>
                       <td className='text-center text-sm'>
-                        <button className="certificate">
+                        <button onClick={() => navigate(`/admin/internship/${student.id}`)} className="certificate">
                           <i className="fa-solid fa-eye"></i>
                         </button>
                       </td>
                       <td className='text-center text-sm'>
-                        <button className="certificate">
+                        <button onClick={() => navigate(`/admin/ecc/${student.id}`)} className="certificate">
                           <i className="fa-solid fa-eye"></i>
                         </button>
                       </td>
                       <td className='text-center text-sm'>
-                        <button className="certificate">
+                        <button onClick={() => navigate(`/admin/achivement/${student.id}`)} className="certificate">
                           <i className="fa-solid fa-eye"></i>
                         </button>
                       </td>
                       <td className='text-center text-sm'>
-                        <button className="certificate">
-                          <i className="fa-solid fa-eye"></i>
-
-                        </button>
-                      </td>
-                      <td className='text-center text-sm'>
-                        <button className="certificate">
+                        <button onClick={() => navigate(`/admin/hackathon/${student.id}`)} className="certificate">
                           <i className="fa-solid fa-eye"></i>
 
                         </button>
                       </td>
                       <td className='text-center text-sm'>
-                        <button className="certificate">
+                        <button onClick={() => navigate(`/admin/higher-studies/${student.id}`)} className="certificate">
+                          <i className="fa-solid fa-eye"></i>
+
+                        </button>
+                      </td>
+                      <td className='text-center text-sm'>
+                        <button onClick={() => navigate(`/admin/placement/${student.id}`)} className="certificate">
                           <i className="fa-solid fa-eye"></i>
 
                         </button>
@@ -305,15 +495,11 @@ const HomeAdmin = () => {
                       <td className='text-center text-sm '>
                         <div className='flex items-center gap-3 justify-center'>
                           <abbr title="Edit">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded " onClick={() => navigate(`/edit/student/${student.id}`)}>
-                              <i className="fa-solid fa-pen-to-square"></i>
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded " onClick={() => handleChangePassword({ name: student.name, id: student.id })}>
+                              Change Password
                             </button>
                           </abbr>
-                          <abbr title="Delete">
-                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(student.id)}>
-                              <i className="fa-solid fa-trash"></i>
-                            </button>
-                          </abbr>
+
                         </div>
                       </td>
                     </tr>
@@ -324,7 +510,7 @@ const HomeAdmin = () => {
               <h1 className='text-xl md:text-2xl mt-3 text-center font-bold text-[#262847]'>No Data Available</h1>
             )}
           </div>
-        </>
+        </AnimationWrapper>
       )}
     </section>
   );

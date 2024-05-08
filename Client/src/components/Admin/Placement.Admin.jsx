@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { checkLogin } from '../helper/checkLogin';
-import { getToken } from '../helper/getToken';
+import { useNavigate, useParams } from 'react-router-dom';
+import { checkLogin } from '../../helper/checkLogin';
+import { getToken } from '../../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import Loaders from './Loaders';
+import Loaders from '../Loaders';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
-import CertificatePopup from './Pop';
-import AnimationWrapper from './Page-Animation';
+import CertificatePopup from '../Pop';
+import AnimationWrapper from '../Page-Animation';
 
-const Placement = () => {
+const PlacementAdmin = () => {
     //pop up 
     const [certificateUrl, setCertificateUrl] = useState('');
     const [showCertificate, setShowCertificate] = useState(false);
+    const [user , setUser] = useState()
 
     const openCertificate = (certificateUrl) => {
         setCertificateUrl(certificateUrl);
@@ -77,18 +78,21 @@ const Placement = () => {
         return AllmodifiedData;
     }
 
+    const {id} = useParams()
+
     const getAllPlacement = () => {
         setLoader(true);
         const token = getToken();
 
-        axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/placement`, {
+        axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/student/placements?student_id=${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
             }
         })
             .then(response => {
-                const modifiedData = removeUnwantedFields(response.data.placements);
+                setUser(response?.data.data[0])
+                const modifiedData = removeUnwantedFields(response.data.data[0].student_placements);
                 setPlacement(modifiedData);
                 setLoader(false);
 
@@ -105,79 +109,79 @@ const Placement = () => {
     };
 
 
-    const handleDelete = (id) => {
-        try {
-            const confirmOptions = {
-                customUI: ({ onClose }) => (
-                    <Modal open={true} onClose={onClose} center>
-                        <div>
-                            <h2 className='font-bold text-xl'>Confirm Deletion</h2>
-                            <p className='my-3 text-[#262847] font-bold'>Are you sure you want to delete this placement?</p>
-                            <div className='w-full flex items-center px-4 justify-between'>
-                                <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={async () => {
-                                    onClose();
-                                    setLoader(true);
+    // const handleDelete = (id) => {
+    //     try {
+    //         const confirmOptions = {
+    //             customUI: ({ onClose }) => (
+    //                 <Modal open={true} onClose={onClose} center>
+    //                     <div>
+    //                         <h2 className='font-bold text-xl'>Confirm Deletion</h2>
+    //                         <p className='my-3 text-[#262847] font-bold'>Are you sure you want to delete this placement?</p>
+    //                         <div className='w-full flex items-center px-4 justify-between'>
+    //                             <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={async () => {
+    //                                 onClose();
+    //                                 setLoader(true);
 
-                                    let data = new FormData();
-                                    data.append('id', id);
+    //                                 let data = new FormData();
+    //                                 data.append('id', id);
 
-                                    const token = getToken();
-                                    setCheckDelete(true)
+    //                                 const token = getToken();
+    //                                 setCheckDelete(true)
 
-                                    let config = {
-                                        method: 'post',
-                                        maxBodyLength: Infinity,
-                                        url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/delete/placement`,
-                                        headers: {
-                                            'Accept': 'application/json',
-                                            'Authorization': `Bearer ${token}`,
-                                            ...data.getHeaders
-                                        },
-                                        data: data
-                                    };
+    //                                 let config = {
+    //                                     method: 'post',
+    //                                     maxBodyLength: Infinity,
+    //                                     url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/delete/placement`,
+    //                                     headers: {
+    //                                         'Accept': 'application/json',
+    //                                         'Authorization': `Bearer ${token}`,
+    //                                         ...data.getHeaders
+    //                                     },
+    //                                     data: data
+    //                                 };
 
-                                    // Send delete request
-                                    axios.request(config)
-                                        .then((response) => {
-                                            setPlacement(data => data.filter(value => value.id !== id));
-                                            setCheckDelete(false)
+    //                                 // Send delete request
+    //                                 axios.request(config)
+    //                                     .then((response) => {
+    //                                         setPlacement(data => data.filter(value => value.id !== id));
+    //                                         setCheckDelete(false)
 
-                                            setLoader(false)
-                                        })
-                                        .catch((error) => {
-                                            setCheckDelete(false)
+    //                                         setLoader(false)
+    //                                     })
+    //                                     .catch((error) => {
+    //                                         setCheckDelete(false)
 
-                                            if (error.response && error.response.status === 401) {
-                                                localStorage.clear();
-                                                return navigate('/login');
-                                            }
-                                            console.log(error);
-                                        });
+    //                                         if (error.response && error.response.status === 401) {
+    //                                             localStorage.clear();
+    //                                             return navigate('/login');
+    //                                         }
+    //                                         console.log(error);
+    //                                     });
 
-                                }}>
-                                    Yes
-                                </button>
-                                <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={() => {
-                                    onClose();
-                                    setLoader(false);
-                                }}>
-                                    No
-                                </button>
-                            </div>
-                        </div>
-                    </Modal>
-                ),
-            };
+    //                             }}>
+    //                                 Yes
+    //                             </button>
+    //                             <button className='py-2 px-4 rounded-md  bg-[#262847] text-white' onClick={() => {
+    //                                 onClose();
+    //                                 setLoader(false);
+    //                             }}>
+    //                                 No
+    //                             </button>
+    //                         </div>
+    //                     </div>
+    //                 </Modal>
+    //             ),
+    //         };
 
-            // Display responsive confirmation dialog
-            confirmAlert(confirmOptions);
-        } catch (error) {
-            setCheckDelete(false)
+    //         // Display responsive confirmation dialog
+    //         confirmAlert(confirmOptions);
+    //     } catch (error) {
+    //         setCheckDelete(false)
 
-            setLoader(false);
-            toast.error(error.message);
-        }
-    }
+    //         setLoader(false);
+    //         toast.error(error.message);
+    //     }
+    // }
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
@@ -185,12 +189,12 @@ const Placement = () => {
 
             {loader ? (
                 <Loaders
-                    className="capitalize" message={(checkDelete ? "Deleting " : "Fetching ") + "Your Placement"} />
+                    className="capitalize" message={(checkDelete ? "Deleting " : "Fetching ") + "Placement"} />
             ) : (
                 <AnimationWrapper className='w-full'>
                     <div className='w-full flex items-center justify-between px-4 mt-8 '>
-                        <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your Placement</h2>
-                        <button
+                    <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>{user && user.name}&rsquo;s Placements</h2>
+                        {/* <button
                             className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block md:hidden md:text-xl"
                             onClick={() => navigate('/dmce/add/placement')}
                         >
@@ -201,7 +205,7 @@ const Placement = () => {
                             onClick={() => navigate('/dmce/add/placement')}
                         >
                             Add Placement
-                        </button>
+                        </button> */}
                     </div>
 
                     <div className="overflow-x-auto w-full mt-8 ">
@@ -251,12 +255,12 @@ const Placement = () => {
                                                     <div className='flex items-center justify-center gap-2'>
                                                         <abbr title="Edit">
 
-                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded" onClick={() => navigate(`/dmce/add/placement/${row.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded" onClick={() => navigate(`/admin/placement/detail/${row.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
                                                         </abbr>
-                                                        <abbr title="Delete">
+                                                        {/* <abbr title="Delete">
 
                                                             <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(row.id)}><i className="fa-solid fa-trash"></i></button>
-                                                        </abbr>
+                                                        </abbr> */}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -272,4 +276,4 @@ const Placement = () => {
     );
 };
 
-export default Placement;
+export default PlacementAdmin;

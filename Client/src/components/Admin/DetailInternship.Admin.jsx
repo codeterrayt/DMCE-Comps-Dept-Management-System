@@ -6,14 +6,14 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { getToken } from '../helper/getToken';
+import { getToken } from '../../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import Loaders from './Loaders';
-import AnimationWrapper from './Page-Animation';
+import Loaders from '../Loaders';
+import AnimationWrapper from '../Page-Animation';
 
-const AddInternship = () => {
+const DetailInternshipAdmin = () => {
     const navigate = useNavigate()
     const [loader, setloader] = useState(false)
 
@@ -148,7 +148,7 @@ const AddInternship = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/internship` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/internship`,
+            url: id && `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/internship`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -161,7 +161,7 @@ const AddInternship = () => {
             .then((response) => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
-                navigate('/dmce/internship');
+                navigate(-1);
                 toast.success(response.data.message);
             })
             .catch((error) => {
@@ -183,7 +183,7 @@ const AddInternship = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/internship/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/internship/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -200,6 +200,7 @@ const AddInternship = () => {
                         duration: response.data.duration,
                         domain: response.data.domain,
                         startDate: response.data.start_date,
+                        companyName: response.data.company_name,
                         endDate: response.data.end_date,
                         year: response.data.student_year,
                     })
@@ -354,4 +355,4 @@ const AddInternship = () => {
     )
 }
 
-export default AddInternship
+export default DetailInternshipAdmin

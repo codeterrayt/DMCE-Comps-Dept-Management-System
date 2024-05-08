@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { checkLogin } from '../helper/checkLogin';
 import Loaders from './Loaders';
 import toast from 'react-hot-toast';
+import AnimationWrapper from './Page-Animation';
 
 
 const EditProfile = () => {
@@ -31,7 +32,7 @@ const EditProfile = () => {
     useEffect(() => {
         const isLogin = checkLogin()
         if (!isLogin) {
-            navigate('/dmce/login')
+            navigate('/login')
         }
         fetchUser()
     }, [])
@@ -203,7 +204,7 @@ const EditProfile = () => {
         <section className="w-full min-h-screen p-4 md:p-8">
             {
                 loader ? <Loaders  message={(checkUpdate ? 'Updating' : 'Fetching') + 'Your Profile'}  /> :
-                    <>
+                    <AnimationWrapper>
                         <div className="w-full max-md:mt-8 max-md:mb-8">
                             <h1 className="text-center text-xl md:text-6xl font-bold text-[#262847]">Edit Profile</h1>
                         </div>
@@ -322,7 +323,7 @@ const EditProfile = () => {
                             <button className='btn mx-auto' onClick={handleSubmit}>Submit</button>
 
                         </div>
-                    </>
+                    </AnimationWrapper>
             }
         </section>
     );

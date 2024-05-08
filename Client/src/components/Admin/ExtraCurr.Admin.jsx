@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { checkLogin } from '../helper/checkLogin';
-import { getToken } from '../helper/getToken';
+import { useNavigate, useParams } from 'react-router-dom';
+import { checkLogin } from '../../helper/checkLogin';
+import { getToken } from '../../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import Loaders from './Loaders';
+import Loaders from '../Loaders';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
-import CertificatePopup from './Pop';
-import { formatDate } from '../helper/getDate';
-import AnimationWrapper from './Page-Animation';
+import CertificatePopup from '../Pop';
+import { formatDate } from '../../helper/getDate';
+import AnimationWrapper from '../Page-Animation';
 
-const ExtraCurr = () => {
+const ExtraCurrAdmin = () => {
 
     //pop up 
     const [certificateUrl, setCertificateUrl] = useState('');
@@ -29,9 +29,10 @@ const ExtraCurr = () => {
         setShowCertificate(false);
     };
 
-
+const {id} = useParams()
     ////
     const [checkDelete, setCheckDelete] = useState(false)
+    const [user , setUser] = useState()
 
     const navigate = useNavigate();
     const [activity, setActivity] = useState([]);
@@ -82,14 +83,15 @@ const ExtraCurr = () => {
         setLoader(true);
         const token = getToken();
 
-        axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/extra-curricular-activities`, {
+        axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/student/ecc?student_id=${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
             }
         })
             .then(response => {
-                const modifiedData = removeUnwantedFields(response.data.ecc);
+                setUser(response?.data?.data[0])
+                const modifiedData = removeUnwantedFields(response.data?.data[0].student_extra_curr);
                 setActivity(modifiedData);
                 setLoader(false);
             })
@@ -190,8 +192,8 @@ const ExtraCurr = () => {
                 ) : (
                     <AnimationWrapper className='w-full'>
                         <div className='w-full flex items-center justify-between px-4 mt-8 '>
-                            <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>Your Activity</h2>
-                            <button
+                        <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>{user && user.name}&rsquo;s Activity</h2>
+                            {/* <button
                                 className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block md:hidden md:text-xl"
                                 onClick={() => navigate('/dmce/add/extra-curriculum')}
                             >
@@ -202,7 +204,7 @@ const ExtraCurr = () => {
                                 onClick={() => navigate('/dmce/add/extra-curriculum')}
                             >
                                 Add Activity
-                            </button>
+                            </button> */}
                         </div>
 
                         <div className="overflow-x-auto w-full mt-8 ">
@@ -237,10 +239,10 @@ const ExtraCurr = () => {
                                                     <td className='text-center text-sm'>{item.prize}</td>
                                                     <td className='text-center text-sm'>{item.student_year}</td>
                                                     <td className='text-center text-sm'>
-                                                        <td className='text-center text-sm flex item-center'>
-                                                            <abbr title="See Certificate">
+                                                        <td className='text-center text-sm flex items-center'>
+                                                            <abbr title="See Certificate ">
 
-                                                                <button onClick={() => openCertificate(item.ecc_certificate)} className="certificate">
+                                                                <button onClick={() => openCertificate(item.ecc_certificate)} className="certificate mx-auto">
                                                                     <i className="fa-solid fa-eye"></i>
                                                                 </button>
                                                             </abbr>
@@ -250,12 +252,12 @@ const ExtraCurr = () => {
                                                         <div className='flex gap-2 items-center'>
                                                             <abbr title="Edit">
 
-                                                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded" onClick={() => navigate(`/dmce/add/extra-curriculum/${item.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded" onClick={() => navigate(`/admin/ecc/detail/${item.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
                                                             </abbr>
-                                                            <abbr title="Delete">
+                                                            {/* <abbr title="Delete">
 
                                                                 <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(item.id)}><i className="fa-solid fa-trash"></i></button>
-                                                            </abbr>
+                                                            </abbr> */}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -279,4 +281,4 @@ const ExtraCurr = () => {
     );
 };
 
-export default ExtraCurr;
+export default ExtraCurrAdmin;

@@ -4,14 +4,14 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { getToken } from '../helper/getToken';
+import { getToken } from '../../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import Loaders from './Loaders';
-import AnimationWrapper from './Page-Animation';
+import Loaders from '../Loaders';
+import AnimationWrapper from '../Page-Animation';
 
-const AddExtraCurr = () => {
+const DetailExtraCurrAdmin = () => {
     const [loader, setloader] = useState(false)
     const { id } = useParams()
     useEffect(() => {
@@ -131,7 +131,7 @@ const AddExtraCurr = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/extra-curricular-activities` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/extra-curricular-activities`,
+            url: id && `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/extra-curricular-activities`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -145,7 +145,7 @@ const AddExtraCurr = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                return navigate('/dmce/extra-curriculum')
+                return navigate(-1)
             })
             .catch((error) => {
                 console.error(error);
@@ -167,7 +167,7 @@ const AddExtraCurr = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/extra-curricular-activities/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/ecc/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -334,4 +334,4 @@ const AddExtraCurr = () => {
     );
 };
 
-export default AddExtraCurr;
+export default DetailExtraCurrAdmin;

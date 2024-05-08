@@ -4,6 +4,14 @@ import Avatar from '@mui/material/Avatar';
 import { useNavigate } from 'react-router-dom';
 import { checkLogin } from "../helper/checkLogin";
 import { userContext } from "../App";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { Modal } from 'react-responsive-modal';
+import 'react-responsive-modal/styles.css';
+import { getToken } from "../helper/getToken";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { getFirstErrorMessage } from "../helper/getErrorMessage";
 
 const SideNav = () => {
     let page = window.location.pathname.split("/")[2];
@@ -22,7 +30,7 @@ const SideNav = () => {
 
     useEffect(() => {
         if (!checkLogin()) {
-            return navigate('/dmce/login')
+            return navigate('/login')
 
         } else {
             const user = localStorage.getItem('dmceuser')
@@ -51,6 +59,94 @@ const SideNav = () => {
     const handleSignOut = () => {
         localStorage.clear()
         setLogin(false)
+    }
+
+    const handleChangePassword = () => {
+        try {
+            const confirmOptions = {
+                customUI: ({ onClose }) => (
+                    <Modal classNames={"rounded-md"} open={true} onClose={onClose} center>
+                        <div className="rounded-md p-6">
+                            <h2 className="font-bold text-xl mb-4">Change Password</h2>
+                            <input
+                                id='pass'
+                                type="text"
+                                placeholder="Current Password"
+
+                                className="border rounded-md px-3 py-2 w-full mb-4"
+                            />
+                            <input
+                                id='pass2'
+                                type="text"
+                                placeholder="New Password"
+
+                                className="border rounded-md px-3 py-2 w-full mb-4"
+                            />
+                            <div className="flex items-center gap-4 justify-between">
+                                <button
+                                    id='btn'
+                                    className="py-2 px-4 rounded-md bg-[#262847] text-white"
+                                    onClick={() => {
+                                        const password = document.getElementById('pass').value
+                                        const password2 = document.getElementById('pass2').value
+                                        const btn = document.getElementById('btn')
+
+                                        const user = localStorage.getItem('dmceuser')
+                                        const { id } = JSON.parse(user)
+                                        let data = new FormData();
+                                        data.append('id', id);
+                                        data.append('new_password', password2);
+
+                                        data.append('current_password', password);
+
+                                        const token = getToken();
+
+                                        let config = {
+                                            method: 'post',
+                                            maxBodyLength: Infinity,
+                                            url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/password`,
+                                            headers: {
+                                                'Accept': 'application/json',
+                                                'Authorization': `Bearer ${token}`,
+                                                ...data.getHeaders
+                                            },
+                                            data: data
+                                        };
+                                        btn.innerText = 'Loading';
+
+                                        axios.request(config)
+                                            .then((response) => {
+                                                console.log(JSON.stringify(response.data));
+                                                toast.success('Password changed successfully');
+                                                onClose(); // Close modal on success
+                                            })
+                                            .catch((error) => {
+                                                console.log(error.response.data);
+                                                onClose();
+                                                toast.error(getFirstErrorMessage(error.response.data));
+                                            });
+                                    }}
+
+                                >
+                                    Change
+                                </button>
+                                <button
+                                    className="py-2 px-4 rounded-md bg-[#262847] text-white"
+                                    onClick={onClose}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </Modal>
+                ),
+            };
+
+            confirmAlert(confirmOptions);
+        } catch (error) {
+            setLoader(false);
+            toast.error(error.message);
+        }
     }
 
     return (
@@ -164,15 +260,20 @@ const SideNav = () => {
                         Placement
                     </NavLink>
 
+
+                    {/* <div className="w-full p-4">
+                        <button onClick={handleChangePassword} className=" border w-full bg-[#262847] text-white p-2 mx-auto rounded-md"  > Change Password </button>
+
+                    </div> */}
                     <div className="w-full px-4  mt-8 absolute bottom-2">
                         {
                             login ? <div className="w-full  p-2 flex gap-4 text-xs mx-auto justify-center items-center  flex-col ">
                                 <div className="flex flex-col w-full items-center gap-2 mt-8 ">
 
 
-                                    <h1 className="text-xl font-bold text-center">Hii {userInSession.name} <i className="fa-solid fa-pen-to-square pl-3 hover:text-xl cursor-pointer" onClick={()=>navigate('/dmce/edit-profile')}></i></h1>
+                                    <h1 className="text-xl font-bold text-center">Hii {userInSession.name} <i className="fa-solid fa-pen-to-square pl-3 hover:text-xl cursor-pointer" onClick={() => navigate('/dmce/edit-profile')}></i> <i className="fa-solid fa-lock pl-3 hover:text-xl cursor-pointer" onClick={handleChangePassword}></i></h1>
 
-                                    
+
                                     <button onClick={handleSignOut} className="btn1 mx-auto">Sign Out</button>
                                 </div>
 
@@ -181,7 +282,7 @@ const SideNav = () => {
 
                                     <div className="flex  flex-col gap-2 w-full">
                                         <button className="btn1 mx-auto"><NavLink
-                                            to={"/dmce/sign-up"}
+                                            to={"/sign-up"}
                                             onClick={(e) => setPageState(e.target.innerText)}
 
                                         >
@@ -189,7 +290,7 @@ const SideNav = () => {
                                             Sign Up
                                         </NavLink></button>
                                         <button className="btn1 mx-auto"><NavLink
-                                            to={"/dmce/login"}
+                                            to={"/login"}
                                             onClick={(e) => setPageState(e.target.innerText)}
 
                                         >

@@ -4,14 +4,14 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { getToken } from '../helper/getToken';
+import { getToken } from '../../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import Loaders from './Loaders';
-import AnimationWrapper from './Page-Animation';
+import Loaders from '../Loaders';
+import AnimationWrapper from '../Page-Animation';
 
-const AddHackathons = () => {
+const DetailHackathonAdmin = () => {
     const [loader, setloader] = useState(false)
 
     const navigate = useNavigate()
@@ -138,7 +138,7 @@ const AddHackathons = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/hackathon` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/hackathon`,
+            url: id && `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/hackathon` ,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -152,7 +152,7 @@ const AddHackathons = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                return navigate('/dmce/hackathon')
+                return navigate(-1)
             })
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
@@ -184,7 +184,7 @@ const AddHackathons = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/hackathon/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/hackathon/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -347,7 +347,7 @@ const AddHackathons = () => {
                                         <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>
-                                        Completion Letter/ Certificate
+                                        Completion Letter/ Certificate 
                                     </label>
                                     <input id="certificate" name="certificate" type="file" className="hidden" onChange={handleFileChange} />
                                     {formData.certificate && (
@@ -364,4 +364,4 @@ const AddHackathons = () => {
     );
 };
 
-export default AddHackathons;
+export default DetailHackathonAdmin;

@@ -4,14 +4,14 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { getToken } from '../helper/getToken';
+import { getToken } from '../../helper/getToken';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import Loaders from './Loaders';
-import AnimationWrapper from './Page-Animation';
+import Loaders from '../Loaders';
+import AnimationWrapper from '../Page-Animation';
 
-const AddHigherStudies = () => {
+const DetailHigherStudyAdmin = () => {
     const [loader, setloader] = useState(false)
 
     const { id } = useParams()
@@ -146,7 +146,7 @@ const AddHigherStudies = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/higher-studies` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/higher-studies`,
+            url: id && `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/higher-studies`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -160,7 +160,7 @@ const AddHigherStudies = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                return navigate('/dmce/higher-studies')
+                return navigate(-1)
             })
             .catch((error) => {
                 console.error(error);
@@ -181,7 +181,7 @@ const AddHigherStudies = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/higher-studies/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/higher-study/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -298,4 +298,4 @@ const AddHigherStudies = () => {
     );
 };
 
-export default AddHigherStudies;
+export default DetailHigherStudyAdmin;

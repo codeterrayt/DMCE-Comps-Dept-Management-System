@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { userContext } from '../App';
+import AnimationWrapper from './Page-Animation';
 
 const LoginForm = () => {
 
@@ -60,7 +61,8 @@ const LoginForm = () => {
                 const user = {
                     name: response.data.user.name,
                     token: response.data.token,
-                    role: response.data.user.role
+                    role: response.data.user.role,
+                    id : response.data.user.id
                 }
 
                 localStorage.setItem('dmceuser', JSON.stringify(user))
@@ -84,7 +86,7 @@ const LoginForm = () => {
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
-            <div className='mx-auto w-full'>
+            <AnimationWrapper className='mx-auto w-full'>
                 <div className='w-full max-md:mt-8'>
                     <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Login</h1>
                 </div>
@@ -100,10 +102,10 @@ const LoginForm = () => {
                         <div className='flex justify-center mt-4'>
                             <button type='button' className='btn' onClick={handleSubmit}>Login</button>
                         </div>
-                        <p className='font-bold text-center'>Don't have account? <p onClick={() => navigate('/dmce/sign-up')} className=' text-[13px] cursor-pointer text-blue-700 underline inline'>Sign Up</p> </p>
+                        <p className='font-bold text-center'>Don't have account? <p onClick={() => navigate('/sign-up')} className=' text-[13px] cursor-pointer text-blue-700 underline inline'>Sign Up</p> </p>
                     </form>
                 </div>
-            </div>
+            </AnimationWrapper>
         </section>
     );
 };
