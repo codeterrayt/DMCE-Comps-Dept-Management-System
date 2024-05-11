@@ -103,7 +103,7 @@ class StudentExtraCuController extends Controller
       // Save the ecc
       $ecc->save();
       // Return a response
-      return response()->json(['message' => 'Internship updated successfully', 'ecc' => $ecc]);
+      return response()->json(['message' => 'ECC updated successfully', 'ecc' => $ecc]);
   }
 
   public function fetchEccById($id){
