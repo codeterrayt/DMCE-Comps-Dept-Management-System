@@ -139,7 +139,7 @@ const EditProfile = () => {
             .catch((error) => {
                 setLoader(false)
                 setCheckUpdate(false)
-                toast.error(error.response.data.message)
+                toast.error(getFirstErrorMessage(error.response.data))
                 console.log(error);
             });
 
@@ -212,7 +212,7 @@ const EditProfile = () => {
                             <div className='w-full md:p-8 md:mt-4 '>
                                 <label className="label" htmlFor="email">Email</label>
                                 <input
-                                    disabled
+                                    
                                     className="input"
                                     id="email"
                                     name="email"

@@ -111,7 +111,7 @@ const Achivements = () => {
                     return navigate('/login')
                 }
                 setLoader(false);
-                return toast.error(error.response.data.message);
+                return toast.error(getFirstErrorMessage(error.response.data));
 
             });
     };

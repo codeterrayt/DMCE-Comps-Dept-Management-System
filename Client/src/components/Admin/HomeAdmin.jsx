@@ -206,7 +206,7 @@ const HomeAdmin = () => {
                       })
                       .catch((error) => {
                         console.log(error);
-                        toast.error(error.response.data.message);
+                        toast.error(getFirstErrorMessage(error.response.data));
                       });
                   }}
 

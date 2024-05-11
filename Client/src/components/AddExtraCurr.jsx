@@ -154,7 +154,7 @@ const AddExtraCurr = () => {
                     return navigate('/login');
                 }
                 toast.dismiss(loading);
-                toast.error(error.response.data.message);
+                toast.error(getFirstErrorMessage(error.response.data));
             });
     };
 

@@ -81,7 +81,7 @@ const SignUpForm = () => {
             .catch((error) => {
                 console.log(error);
                 toast.dismiss(loading)
-                return toast.error(error.response.data.message)
+                return toast.error(getFirstErrorMessage(error.response.data))
             });
     };
 

@@ -113,7 +113,7 @@ const InternshipAdmin = () => {
                 }
                 setLoader(false);
                 console.log(error);
-                return toast.error(error.response.data.message);
+                return toast.error(getFirstErrorMessage(error.response.data));
 
             });
     };
@@ -165,7 +165,7 @@ const InternshipAdmin = () => {
                                             }
                                             setLoader(false)
                                             console.log(error);
-                                            return toast.error(error.response.data.message);
+                                            return toast.error(getFirstErrorMessage(error.response.data));
                                         });
 
                                 }}>

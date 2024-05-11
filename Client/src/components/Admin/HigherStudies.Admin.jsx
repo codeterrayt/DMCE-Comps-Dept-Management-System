@@ -106,7 +106,7 @@ const HigherStudiesAdmin = () => {
                     localStorage.clear();
                     return navigate('/login');
                 }
-                toast.error(error.response.data.message);
+                toast.error(getFirstErrorMessage(error.response.data));
             });
     };
 
