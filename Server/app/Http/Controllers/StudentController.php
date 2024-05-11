@@ -111,13 +111,13 @@ class StudentController extends Controller
 
 
         // Get page number from request, default to 1
-        $page = $request->input('page', 1);
+        // $page = $request->input('page', 1);
 
-        // Get items per page from request, default to 10
-        $perPage = $request->input('per_page', 10);
+        // // Get items per page from request, default to 10
+        // $perPage = $request->input('per_page', 10);
 
-        // Paginate the query
-        $users = $query->paginate($perPage, ['*'], 'page', $page);
+        // // Paginate the query
+        // $users = $query->paginate($perPage, ['*'], 'page', $page);
 
         // Execute the query and return results
         $users = $query->get();
