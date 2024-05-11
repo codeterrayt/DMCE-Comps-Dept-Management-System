@@ -12,6 +12,7 @@ import { getToken } from "../helper/getToken";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { getFirstErrorMessage } from "../helper/getErrorMessage";
+import logo from '../assets/dmce.png'
 
 const SideNav = () => {
     let page = window.location.pathname.split("/")[2];
@@ -57,8 +58,40 @@ const SideNav = () => {
 
 
     const handleSignOut = () => {
-        localStorage.clear()
-        setLogin(false)
+
+        const token = getToken()
+
+        let data = new FormData();
+        const loading = toast.loading('logging out..')
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${import.meta.env.VITE_SERVER_DOMAIN}/logout`,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...data.getHeaders
+            },
+            data: data
+        };
+
+        axios.request(config)
+            .then((response) => {
+                localStorage.clear()
+                if (response?.data?.status == 'success') {
+                    setLogin(false)
+                    toast.dismiss(loading)
+                    toast.success("logout done")
+                    return navigate('/login')
+                }
+
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+
+
     }
 
     const handleChangePassword = () => {
@@ -149,6 +182,9 @@ const SideNav = () => {
         }
     }
 
+
+
+
     return (
         <section className="border relative flex py-0 m-0 max-md:flex-col w-full">
             <div className="sticky md:fixed  md:top-[20px] z-30 ">
@@ -184,7 +220,7 @@ const SideNav = () => {
                 >
 
 
-                    <div className=" mb-3 w-full "><img src="https://www.dmce.ac.in/assets/img/dmce.png" onClick={() => navigate('/dmce/home')} className="w-16 m-auto cursor-pointer" alt="logo" /> </div>
+                    <div className=" mb-3 w-full "><img src={logo} onClick={() => navigate('/dmce/home')} className="w-16 m-auto cursor-pointer" alt="logo" /> </div>
                     <hr className="border-grey mx-auto ml-6 mb-8 mr-6 " />
 
                     <NavLink
@@ -307,7 +343,7 @@ const SideNav = () => {
                 </div>
             </div>
 
-            <div className="max-md:-mt-8 mt-5 md:pl-[300px] w-full">
+            <div className="max-md:-mt-8  md:pl-[300px] w-full">
                 <Outlet />
             </div>
         </section>

@@ -11,6 +11,8 @@ import 'react-responsive-modal/styles.css';
 import toast from 'react-hot-toast';
 import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 import AnimationWrapper from '../Page-Animation';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 
 const HomeAdmin = () => {
   const [student, setStudent] = useState([]);
@@ -62,7 +64,11 @@ const HomeAdmin = () => {
     }
   }, [student]);
 
+  const [studentIds, setStudentId] = useState([])
+  console.log(studentIds);
+
   const getAllStudent = () => {
+    setStudentId([])
     const token = getToken();
     setLoading(true);
     let url = `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/students`;
@@ -93,17 +99,35 @@ const HomeAdmin = () => {
           },
         })
         .then((response) => {
+          const studentIds = response.data.map(student => student.id);
+          // Store student IDs in state
+          setStudentId(studentIds);
           setStudent(response.data);
           setLoading(false);
         })
         .catch((error) => {
-          console.log(error);
-          setLoading(false);
+          if (error.response.status == 401) {
+            setLoading(false);
+            localStorage.clear()
+            navigate('/login')
+          }
         });
     }, 500);
   };
 
+
+
+  const [selectedCheckbox, setSelectedCheckbox] = useState('');
+
   const handleCheckboxChange = (name, value) => {
+    console.log(name);
+    if (name == 'internship' || name == 'placements' || name == 'achievements' || name == 'hackathons' || name == 'higher_studies' || value == 'ecc') {
+      if (value && !selectedCheckbox) {
+        setSelectedCheckbox(name);
+      } else {
+        setSelectedCheckbox('');
+      }
+    }
     if (name === 'admitted_year') {
       setAdmittedYears((prevYears) => {
         const updatedYears = { ...prevYears };
@@ -208,10 +232,40 @@ const HomeAdmin = () => {
     }
   }
 
-  const handleSignout = () => {
-    localStorage.clear()
+  const handleSignOut = () => {
 
-    return navigate('/login')
+    const token = getToken()
+    const loding = toast.loading('logging out')
+
+    let data = new FormData();
+
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `${import.meta.env.VITE_SERVER_DOMAIN}/logout`,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        ...data.getHeaders
+      },
+      data: data
+    };
+
+    axios.request(config)
+      .then((response) => {
+        localStorage.clear()
+        if (response?.data?.status == 'success') {
+          toast.dismiss(loading)
+          toast.success("logout done")
+          return navigate('/login')
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+
+
   }
 
 
@@ -302,13 +356,298 @@ const HomeAdmin = () => {
     }
   }
 
+
+
+
+  //pdf
+
+  console.log(selectedCheckbox);
+
+
+
+  async function fetchDataForStudent(studentId) {
+    try {
+      setLoading(true)
+      const token = getToken()
+
+      const url = selectedCheckbox
+        ? `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/student/${selectedCheckbox}?student_id=${studentId}`
+        : "";
+      const response = await axios.get(url, {
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setLoading(false)
+      return response.data.data[0];
+    } catch (error) {
+      console.error(`Error fetching data for student ${studentId}:`, error);
+      setLoading(false)
+      return null;
+    }
+  }
+
+  // Example usage
+  const allResponses = [];
+
+  async function fetchAllDataForStudents() {
+    for (const studentId of studentIds) {
+      const responseData = await fetchDataForStudent(studentId);
+      if (responseData) {
+        allResponses.push(responseData);
+      }
+    }
+
+    // Once all responses are collected, you can process them as needed
+    console.log('All responses:', allResponses);
+    if (selectedCheckbox === 'internship') {
+      generatePDF(allResponses);
+    } else if (selectedCheckbox === 'placements') {
+      generatePDFInternship(allResponses);
+    } else if (selectedCheckbox === 'achievements') {
+      generatePDFAchievement(allResponses);
+    } else if (selectedCheckbox === 'hackathons') {
+      generatePDFHackathon(allResponses);
+    } else if (selectedCheckbox === 'higher_studies') {
+      generatePDFHigherStudy(allResponses);
+    } else if (selectedCheckbox === 'ecc') {
+      generatePDFEcc(allResponses);
+    }
+  }
+
+
+  //making pdf 
+
+  async function generatePDF(data) {
+    const doc = new jsPDF();
+
+    const tableColumnNames = ['ID', 'First', 'Last', 'Year', 'Name', 'Domain', 'Duration'];
+    const tableRows = [];
+
+    data.forEach(student => {
+      student.student_internship.forEach(internship => {
+        tableRows.push([
+          student.student_id,
+          student.name,
+          student.last_name,
+          student.admitted_year,
+          internship.company_name,
+          internship.domain,
+          `${internship.duration} months`,
+        ]);
+      });
+    });
+
+    // Add title before the table
+    doc.text('Internship Details', 14, 10);
+
+    doc.autoTable({
+      head: [tableColumnNames],
+      body: tableRows,
+      startY: 20, // Adjust startY to leave space for the title
+      margin: { top: 20 }, // Adjust top margin to leave space for the title
+    });
+
+    doc.save('Student Internship detail.pdf');
+    console.log('PDF generated successfully');
+  }
+
+  async function generatePDFEcc(data) {
+    const doc = new jsPDF();
+
+    const tableColumnNames = ['ID', 'First', 'Last', 'Year', 'College', 'Level', 'Domain', 'Date', 'Prize'];
+    const tableRows = [];
+
+    data.forEach(student => {
+      student.student_extra_curr.forEach(ecc => {
+        tableRows.push([
+          student.student_id,
+          student.name,
+          student.last_name,
+          ecc.student_year,
+          ecc.college_name,
+          ecc.ecc_level,
+          ecc.ecc_domain,
+          ecc.ecc_date,
+          ecc.prize,
+        ]);
+      });
+    });
+
+    // Add title before the table
+    doc.text('Extracurricular Activity Details', 14, 10);
+
+    doc.autoTable({
+      head: [tableColumnNames],
+      body: tableRows,
+      startY: 20, // Adjust startY to leave space for the title
+      margin: { top: 20 }, // Adjust top margin to leave space for the title
+    });
+
+    doc.save('extracurricular_activity_data.pdf');
+    console.log('PDF generated successfully');
+  }
+
+  async function generatePDFAchievement(data) {
+    const doc = new jsPDF();
+
+    const tableColumnNames = ['ID', 'First', 'Last', 'Year', 'College', 'Domain', 'Level', 'Duration', 'Prize'];
+    const tableRows = [];
+
+    data.forEach(student => {
+      student.student_achievements.forEach(achievement => {
+        tableRows.push([
+          student.student_id,
+          student.name,
+          student.last_name,
+          achievement.student_year,
+          achievement.college_name,
+          achievement.achievement_domain,
+          achievement.achievement_level,
+          achievement.achievement_date,
+          achievement.prize,
+        ]);
+      });
+    });
+
+    // Add title before the table
+    doc.text('Achievement Details', 14, 10);
+
+    doc.autoTable({
+      head: [tableColumnNames],
+      body: tableRows,
+      startY: 20, // Adjust startY to leave space for the title
+      margin: { top: 20 }, // Adjust top margin to leave space for the title
+    });
+
+    doc.save('achievement_data.pdf');
+    console.log('PDF generated successfully');
+  }
+
+  async function generatePDFHackathon(data) {
+    const doc = new jsPDF();
+
+    const tableColumnNames = ['ID', 'FIrst', 'Last', 'Year', 'Title', 'Level', 'Date', 'Prize', 'Position', 'College'];
+    const tableRows = [];
+
+    data.forEach(student => {
+      student.student_hackathons.forEach(hackathon => {
+        tableRows.push([
+          student.student_id,
+          student.name,
+          student.last_name,
+          hackathon.student_year,
+          hackathon.hackathon_title,
+          hackathon.hackathon_level,
+          hackathon.hackathon_from_date,
+          hackathon.hackathon_prize,
+          hackathon.hackathon_position,
+          hackathon.hackathon_college_name
+        ]);
+      });
+    });
+
+    // Add title before the table
+    doc.text('Hackathon Details', 14, 10);
+
+    doc.autoTable({
+      head: [tableColumnNames],
+      body: tableRows,
+      startY: 20, // Adjust startY to leave space for the title
+      margin: { top: 20 }, // Adjust top margin to leave space for the title
+    });
+
+    doc.save('hackathon_data.pdf');
+    console.log('PDF generated successfully');
+  }
+
+
+  async function generatePDFHigherStudy(data) {
+    const doc = new jsPDF();
+
+    const tableColumnNames = ['ID', 'First', 'Last', 'Exam', 'Score', 'City', 'State', 'Country', 'University Name', 'Course'];
+    const tableRows = [];
+
+    data.forEach(student => {
+      student.student_higher_studies.forEach(higherStudy => {
+        tableRows.push([
+          student.student_id,
+          student.name,
+          student.last_name,
+          higherStudy.student_exam_type,
+          higherStudy.student_score,
+          higherStudy.university_city,
+          higherStudy.university_state,
+          higherStudy.university_country,
+          higherStudy.university_name,
+          higherStudy.student_course,
+        ]);
+      });
+    });
+
+    // Add title before the table
+    doc.text('Student Higher Studies Details', 14, 10);
+
+    doc.autoTable({
+      head: [tableColumnNames],
+      body: tableRows,
+      startY: 20, // Adjust startY to leave space for the title
+      margin: { top: 20 }, // Adjust top margin to leave space for the title
+    });
+
+    doc.save('student_higher_studies_data.pdf');
+    console.log('PDF generated successfully');
+  }
+
+  async function generatePDFInternship(data) {
+    const doc = new jsPDF();
+
+    const tableColumnNames = ['ID', 'First', 'Last', 'Year', 'Company', 'Position', 'Country', 'City', 'State'];
+    const tableRows = [];
+
+    data.forEach(student => {
+      student.student_placements.forEach(placement => {
+        tableRows.push([
+          student.student_id,
+          student.name,
+          student.last_name,
+          student.admitted_year,
+          placement.company_name,
+          placement.position,
+          placement.country,
+          placement.city,
+          placement.state,
+        ]);
+      });
+    });
+
+    // Add title before the table
+    doc.text('Student Placement Details', 14, 10);
+
+    doc.autoTable({
+      head: [tableColumnNames],
+      body: tableRows,
+      startY: 20, // Adjust startY to leave space for the title
+      margin: { top: 20 }, // Adjust top margin to leave space for the title
+    });
+
+    doc.save('student_placement_data.pdf');
+    console.log('PDF generated successfully');
+  }
+
+
+
+
+
   return (
     <section className='min-h-screen w-full  '>
       <nav className='w-full max-md:mt-8  max-md:mb-8 bg-[#262847] py-4 px-8 flex items-center justify-between'>
         <h1 className='text-center text-xl md:text-4xl font-bold text-white'>Admin Panel</h1>
         <div className=' p-2 flex items-center gap-8 text-xl  text-black cursor-pointer rounded-md font-bold' >
           <button onClick={handleAdminChangePassword} className='bg-white p-2 rounded-md' > Change Password </button>
-          <button onClick={handleSignout} className='bg-white p-2 rounded-md' >Sign out </button>
+          <button onClick={handleSignOut} className='bg-white p-2 rounded-md' >Sign out </button>
+
 
 
         </div>
@@ -415,6 +754,9 @@ const HomeAdmin = () => {
             />
             <label htmlFor='eccChecked' className='ml-2 text-sm text-gray-700'>Extra Activity</label>
           </div>
+          {
+            selectedCheckbox && <button onClick={fetchAllDataForStudents} className='p-2 text-red-600 text-2xl rounded-md' ><i className="fa-solid fa-file-pdf"></i> </button>
+          }
         </div>
 
       </div>
@@ -494,9 +836,14 @@ const HomeAdmin = () => {
 
                       <td className='text-center text-sm '>
                         <div className='flex items-center gap-3 justify-center'>
-                          <abbr title="Edit">
+                          <abbr title="change password">
                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded " onClick={() => handleChangePassword({ name: student.name, id: student.id })}>
-                              Change Password
+                              <i className='fa-solid fa-lock'></i>
+                            </button>
+                          </abbr>
+                          <abbr title="Edit">
+                            <button className="bg-green-500 hover:bg-green-700 text-white font-bold p-2 px-3 rounded " onClick={() => navigate(`/admin/edit-profile/${student.id}`)}>
+                              <i className='fa-solid fa-pen'></i>
                             </button>
                           </abbr>
 

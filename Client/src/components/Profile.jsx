@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from './Loaders';
 import { checkLogin } from '../helper/checkLogin';
 import AnimationWrapper from './Page-Animation';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
 
 const Profile = () => {
     const [loader, setLoader] = useState(false);
@@ -182,7 +183,7 @@ const Profile = () => {
             .catch((error) => {
                 setLoader(false)
                 setCheckUpdate(false)
-                toast.error(error.response.data.message)
+                toast.error(getFirstErrorMessage(error.response.data))
                 console.log(error);
             });
 
@@ -201,23 +202,23 @@ const Profile = () => {
             toast.error('Please enter your last name.');
             return;
         }
-        if (step === 2 && (!formData.email || !formData.roll_no || !formData.student_id)) {
+        if (step === 2 && (!formData.email)) {
             toast.error('Please Enter Your Email.');
             return;
         }
-        if (step === 2 && (!formData.roll_no || !formData.roll_no || !formData.student_id)) {
+        if (step === 2 && (!formData.roll_no)) {
             toast.error('Please Enter Your Roll NO.');
             return;
         }
-        if (step === 2 && (!formData.student_id || !formData.roll_no || !formData.student_id)) {
+        if (step === 2 && (!formData.student_id)) {
             toast.error('Please Enter Your student id.');
             return;
         }
-        if (step === 3 && (!formData.admitted_year || !formData.div)) {
+        if (step === 3 && (!formData.admitted_year)) {
             toast.error('Please select admitted year');
             return;
         }
-        if (step === 3 && (!formData.admitted_year || !formData.div)) {
+        if (step === 3 && (!formData.div)) {
             toast.error('Please select division.');
             return;
         }
@@ -229,6 +230,10 @@ const Profile = () => {
     const prevStep = () => {
         setStep(step - 1);
     };
+
+    const currentYear = new Date().getFullYear(); // Get the current year
+
+    const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
@@ -287,7 +292,7 @@ const Profile = () => {
                                         onChange={handleChange}
                                     >
                                         <MenuItem value="">Select Year</MenuItem>
-                                        {Array.from({ length: 11 }, (_, i) => 2018 + i).map(year => (
+                                        {years.map(year => (
                                             <MenuItem key={year} value={year}>{year}</MenuItem>
                                         ))}
                                     </Select>

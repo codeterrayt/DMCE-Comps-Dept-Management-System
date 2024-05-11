@@ -91,7 +91,7 @@ const SignUpForm = () => {
 
     }
     return (
-        <section className='w-full min-h-screen p-4 md:p-8'>
+        <section className='w-full min-h-screen p-4 md:p-2'>
             <AnimationWrapper className='mx-auto w-full'>
                 <div className='w-full max-md:mt-8  max-md:mb-8'>
                     <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Sign Up</h1>

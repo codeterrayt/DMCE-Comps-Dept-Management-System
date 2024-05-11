@@ -217,7 +217,7 @@ const Internship = () => {
                                 <table id="example" className="table table-striped text-black" style={{ width: '100%' }}>
                                     <thead>
                                         <tr className='c capitalize'>
-                                            <th className='text-sm text-center'>Academic Year</th>
+                                            <th className='text-sm text-center'>AY</th>
 
                                             <th className='text-sm text-center'>Domain</th>
                                             <th className='text-sm text-center'>Company Name</th>

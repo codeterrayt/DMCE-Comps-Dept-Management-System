@@ -39,6 +39,7 @@ import HigherStudiesAdmin from './components/Admin/HigherStudies.Admin';
 import DetailHigherStudyAdmin from './components/Admin/DetailHigherStudy.Admin';
 import PlacementAdmin from './components/Admin/Placement.Admin';
 import DetailPlacementAdmin from './components/Admin/DetailPlacementAdmin';
+import EditProfileAdmin from './components/Admin/EditProfile.Admin';
 
 export const userContext = createContext()
 
@@ -100,6 +101,7 @@ function App() {
           <Route path="/admin/higher-studies/detail/:id" element={<DetailHigherStudyAdmin />} />
           <Route path="/admin/placement/:id" element={<PlacementAdmin />} />
           <Route path="/admin/placement/detail/:id" element={<DetailPlacementAdmin />} />
+          <Route path="/admin/edit-profile/:id" element={<EditProfileAdmin />} />
 
 
         </Routes>

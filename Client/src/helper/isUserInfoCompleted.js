@@ -31,12 +31,14 @@ export const isUserInfoCompleted = () => {
         .request(config)
         .then((response) => {
           const result = checkFieldsNotNull(response?.data);
-          console.log(result);
+          if (result == true) {
+            return resolve(response.status);
+          }
           resolve(result);
         })
         .catch((error) => {
           console.log(error);
-          reject(error);
+          reject(error.response.status);
         });
     } catch (error) {
       reject(error);

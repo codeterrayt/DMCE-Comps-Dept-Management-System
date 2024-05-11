@@ -220,7 +220,7 @@ const HigherStudiesAdmin = () => {
                                 <thead>
                                     <tr className='capitalize'>
 
-                                        <th className='text-sm text-center'>Academic Year</th>
+                                        <th className='text-sm text-center'>AY</th>
                                         <th className='text-sm text-center'>Course</th>
                                         <th className='text-sm text-center'>Exam Type</th>
                                         <th className='text-sm text-center'>Project Guide</th>

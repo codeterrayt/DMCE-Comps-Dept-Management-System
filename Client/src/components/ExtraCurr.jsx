@@ -211,7 +211,7 @@ const ExtraCurr = () => {
                                     <table id="example" className="table table-striped" style={{ width: '100%' }}>
                                         <thead>
                                             <tr>
-                                                <th className='text-sm text-center'>Academic Year</th>
+                                                <th className='text-sm text-center'>AY</th>
                                                 <th className='text-sm text-center'>College</th>
 
                                                 <th className='text-sm text-center'>Date</th>

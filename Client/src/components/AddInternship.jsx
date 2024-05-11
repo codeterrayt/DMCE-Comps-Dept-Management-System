@@ -202,6 +202,7 @@ const AddInternship = () => {
                         startDate: response.data.start_date,
                         endDate: response.data.end_date,
                         year: response.data.student_year,
+                        companyName: response.data.company_name,
                     })
                 })
                 .catch((error) => {
