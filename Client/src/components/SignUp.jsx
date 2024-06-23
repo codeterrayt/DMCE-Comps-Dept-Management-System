@@ -93,12 +93,12 @@ const SignUpForm = () => {
 
     }
     return (
-        <section className='w-full min-h-screen p-4 md:p-2'>
+        <section className='w-full min-h-screen p-4 md:p-2 mt-4 '>
             <AnimationWrapper className='mx-auto w-full'>
             <div className='w-full'>
                     <img src={logo} className='w-40 mx-auto mb-4' alt="" />
                 </div>
-                <div className='w-full max-md:mt-8  max-md:mb-8'>
+                <div className='w-full max-md:mt-8  '>
                     <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847] tracking-[3px]'>Sign Up</h1>
                 </div>
                 <div className='grid grid-cols-1 gap-4 w-full'>

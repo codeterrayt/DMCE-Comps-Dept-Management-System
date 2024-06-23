@@ -193,7 +193,7 @@ const SideNav = () => {
 
     return (
         <section className="border relative flex py-0 m-0 max-md:flex-col w-full">
-            <div className="sticky md:fixed  md:top-[20px] z-30 ">
+            <div className="fixed w-full md:fixed  md:top-[20px] z-30 ">
                 <div className="md:hidden bg-white  border-b border-grey flex flex-nowrap overflow-x-auto ">
                     <button
                         onClick={changePageState}
@@ -226,7 +226,7 @@ const SideNav = () => {
                 >
 
 
-                    <div className=" mb-3 w-full "><img src={logo} onClick={() => navigate('/dmce/home')} className="w-16 m-auto cursor-pointer" alt="logo" /> </div>
+                    <div className=" mb-3 w-full mt-3 "><img src={logo} onClick={() => navigate('/dmce/home')} className="w-16 m-auto cursor-pointer" alt="logo" /> </div>
                     <hr className="border-grey mx-auto ml-6  mr-6 " />
 
                     <NavLink

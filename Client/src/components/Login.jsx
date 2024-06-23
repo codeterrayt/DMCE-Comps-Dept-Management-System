@@ -83,7 +83,7 @@ const LoginForm = () => {
     }
 
     return (
-        <section className='relative w-full min-h-screen p-4 md:p-8 overflow-hidden'>
+        <section className='relative w-full min-h-screen p-4 mt-8 md:p-8 overflow-hidden'>
             <AnimationWrapper className='mx-auto w-full'>
                 <div className='w-full'>
                     <img src={logo} className='w-40 mx-auto mb-4' alt="" />
