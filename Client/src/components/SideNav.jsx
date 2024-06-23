@@ -123,6 +123,8 @@ const SideNav = () => {
                                         const password = document.getElementById('pass').value
                                         const password2 = document.getElementById('pass2').value
                                         const btn = document.getElementById('btn')
+                                        const msgpara = document.getElementById('msg')
+                                        msgpara.innerText = "wait..."
 
                                         const user = localStorage.getItem('dmceuser')
                                         const { id } = JSON.parse(user)
@@ -154,9 +156,10 @@ const SideNav = () => {
                                                 onClose(); // Close modal on success
                                             })
                                             .catch((error) => {
-                                                console.log(error.response.data);
-                                                onClose();
-                                                toast.error(getFirstErrorMessage(error.response.data));
+
+                                                const msg = getFirstErrorMessage(error.response.data)
+                                                msgpara.innerText = msg
+                                                btn.innerText = 'change';
                                             });
                                     }}
 
@@ -169,6 +172,9 @@ const SideNav = () => {
                                 >
                                     Cancel
                                 </button>
+                            </div>
+                            <div>
+                                <p className='text-center py-4 p-2 font-bold text-sm text-red-600 underline' id='msg'></p>
                             </div>
                         </div>
                     </Modal>
@@ -192,14 +198,14 @@ const SideNav = () => {
                     <button
                         onClick={changePageState}
                         ref={sideBarIcon}
-                        className="p-5 capitalize "
+                        className="p-4 md:p-5 capitalize "
                     >
                         <i className="fa-solid fa-bars-staggered pointer-events-none"></i>
                     </button>
                     <button
                         ref={pageStateTab}
                         onClick={changePageState}
-                        className="p-5 capitalize "
+                        className="p-4 md:p-5 capitalize text-black text-xl "
                     >
                         {pageState}
                     </button>
@@ -221,7 +227,7 @@ const SideNav = () => {
 
 
                     <div className=" mb-3 w-full "><img src={logo} onClick={() => navigate('/dmce/home')} className="w-16 m-auto cursor-pointer" alt="logo" /> </div>
-                    <hr className="border-grey mx-auto ml-6 mb-8 mr-6 " />
+                    <hr className="border-grey mx-auto ml-6  mr-6 " />
 
                     <NavLink
                         to={"/dmce/home"}
@@ -231,17 +237,6 @@ const SideNav = () => {
 
                         Home
                     </NavLink>
-
-                    {/* <NavLink
-                        to={"/dmce/about"}
-                        onClick={(e) => setPageState(e.target.innerText)}
-                        className="pl-8 text-xl font-bold sidebar-link"
-                    >
-
-                        About
-                    </NavLink>
-                    <br />
-                    <br /> */}
                     <NavLink
                         to={"/dmce/internship"}
                         onClick={(e) => setPageState(e.target.innerText)}
@@ -307,22 +302,20 @@ const SideNav = () => {
                                 <div className="flex flex-col w-full items-center gap-2 mt-8 ">
 
 
-                                    <h1 className="text-xl font-bold text-center">Hii {userInSession.name} <i className="fa-solid fa-pen-to-square pl-3 hover:text-xl cursor-pointer" onClick={() => navigate('/dmce/edit-profile')}></i> <i className="fa-solid fa-lock pl-3 hover:text-xl cursor-pointer" onClick={handleChangePassword}></i></h1>
+                                    <h1 className="text-xl font-bold text-center">Hii {userInSession.name}
+                                        <i className="fa-solid fa-pen-to-square pl-3 hover:text-xl cursor-pointer" onClick={() => { setShowSideNav(false), navigate('/dmce/edit-profile') }}></i>
+                                        <i className="fa-solid fa-lock pl-3 hover:text-xl cursor-pointer" onClick={handleChangePassword}></i></h1>
 
 
                                     <button onClick={handleSignOut} className="btn1 mx-auto">Sign Out</button>
                                 </div>
-
                             </div>
                                 : <div className="w-full flex gap-3 text-xs mx-auto">
-
                                     <div className="flex  flex-col gap-2 w-full">
                                         <button className="btn1 mx-auto"><NavLink
                                             to={"/sign-up"}
                                             onClick={(e) => setPageState(e.target.innerText)}
-
                                         >
-
                                             Sign Up
                                         </NavLink></button>
                                         <button className="btn1 mx-auto"><NavLink
@@ -334,7 +327,6 @@ const SideNav = () => {
                                             Login
                                         </NavLink></button>
                                     </div>
-
                                 </div>
 
                         }

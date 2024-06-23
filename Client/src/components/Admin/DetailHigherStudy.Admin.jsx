@@ -10,6 +10,8 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from '../Loaders';
 import AnimationWrapper from '../Page-Animation';
+import AdminNavBar from './AdminNavBar';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 
 const DetailHigherStudyAdmin = () => {
     const [loader, setloader] = useState(false)
@@ -225,6 +227,8 @@ const DetailHigherStudyAdmin = () => {
 
 
     return (
+        <>
+        <AdminNavBar/>
         <section className='w-full min-h-screen p-4 md:p-8'>
             {
                 loader ? <Loaders /> : <AnimationWrapper>
@@ -275,7 +279,7 @@ const DetailHigherStudyAdmin = () => {
                             <label className='label' htmlFor="guide">Guide Name</label>
                             <input value={formData.guide} type="text" id='guide' name='guide' className='input' onChange={handleChange} />
 
-                            <label className='label' htmlFor="admission_letter">Admission Letter <p className='example'>Max PDF Size 512KB</p></label>
+                            <label className='label' htmlFor="admission_letter">Admission Letter / Id Card / Provisional Admission Letter <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="admission_letter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -295,6 +299,8 @@ const DetailHigherStudyAdmin = () => {
                     </div></AnimationWrapper>
             }
         </section>
+        </>
+     
     );
 };
 

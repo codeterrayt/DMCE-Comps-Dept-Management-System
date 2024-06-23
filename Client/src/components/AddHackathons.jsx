@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,9 +10,12 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import { getYearOptions } from '../helper/helper';
 
 const AddHackathons = () => {
     const [loader, setloader] = useState(false)
+    const [level, setLevel] = useState('')
 
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
@@ -40,6 +43,11 @@ const AddHackathons = () => {
     // Handle input changes and update formData state
     const handleChange = (e) => {
         const { name, value } = e.target;
+        if (name == 'title' && value == 'Kavach-Hackathon' || value == 'Smart-India-Hackathon') {
+            setFormData({
+                ...formData, level: 'national-level'
+            })
+        }
         setFormData((prevData) => ({
             ...prevData,
             [name]: value
@@ -55,61 +63,58 @@ const AddHackathons = () => {
         }));
     };
 
+    const parentDivRef = useRef(null);
+
     // Handle form submission
     const handleSubmit = () => {
         // Check if all required fields are filled individually and provide error messages for each missing field
-        if (!id && !formData.academic_year) {
-            toast.error('Please select the academic year.');
-            return;
+        if (!formData.title) {
+            return handleValidationError('title', 'Please enter the hackathon title.');
         }
-        if (!id && !formData.from_date) {
-            toast.error('Please select the starting date.');
-            return;
+        if (!formData.location) {
+            return handleValidationError('location', 'Please enter the hackathon location.');
         }
-        if (!id && !formData.to_date) {
-            toast.error('Please select the ending date.');
-            return;
+        if (!formData.level) {
+            return handleValidationError('level', 'Please select the hackathon level.');
         }
-        if (!id && !formData.year) {
-            toast.error('Please select the student year.');
-            return;
+        if (!formData.prize) {
+            return handleValidationError('prize', 'Please enter the hackathon prize.');
         }
-        if (!id && !formData.title) {
-            toast.error('Please enter the hackathon title.');
-            return;
+        if (!formData.college_name) {
+            return handleValidationError('college_name', 'Please enter the college name.');
         }
-        if (!id && !formData.level) {
-            toast.error('Please select the hackathon level.');
-            return;
+
+        if (!formData.academic_year) {
+            return handleValidationError('academic_year', 'Please select the academic year.');
         }
-        if (!id && !formData.location) {
-            toast.error('Please enter the hackathon location.');
-            return;
+        if (!formData.from_date) {
+            return handleValidationError('from_date', 'Please select the starting date.');
         }
-        if (!id && !formData.college_name) {
-            toast.error('Please enter the college name.');
-            return;
+        if (!formData.to_date) {
+            return handleValidationError('to_date', 'Please select the ending date.');
         }
-        if (!id && !formData.prize) {
-            toast.error('Please enter the hackathon prize.');
-            return;
+        if (!formData.position) {
+            return handleValidationError('position', 'Please enter the hackathon position.');
         }
-        if (!id && !formData.position) {
-            toast.error('Please enter the hackathon position.');
-            return;
+        if (!formData.year) {
+            return handleValidationError('year', 'Please select the student year.');
         }
+
+
+
+
+
         if (!id && !formData.certificate) {
-            toast.error('Please upload the hackathon certificate.');
-            return;
+            return handleValidationError('certificate', 'Please upload the hackathon certificate.');
         }
 
         // Check if the file size is less than 512 KB
-        if (!id && formData.certificate.size > 512 * 1024) {
-            toast.error('Certificate file size should be less than 512 KB.');
-            return;
+        const fileSizeLimit = 512 * 1024;
+        if (!id && formData.certificate.size > fileSizeLimit) {
+            return toast.error('Certificate file size should be less than 512 KB.');
         }
 
-        const loading = toast.loading('Wait.. adding hackathon detail.');
+        const loading = toast.loading('Adding hackathon details...');
 
         const data = new FormData();
         data.append('academic_year', formData.academic_year);
@@ -123,19 +128,15 @@ const AddHackathons = () => {
         data.append('hackathon_prize', formData.prize);
         data.append('hackathon_position', formData.position);
         if (formData.certificate) {
-
             data.append('hackathon_certificate_path', formData.certificate);
         }
         if (id) {
             data.append('id', id);
         }
 
-
-
-
         const token = getToken();
 
-        let config = {
+        const config = {
             method: 'post',
             maxBodyLength: Infinity,
             url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/hackathon` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/hackathon`,
@@ -152,19 +153,36 @@ const AddHackathons = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                return navigate('/dmce/hackathon')
+                navigate('/dmce/hackathon');
             })
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
                     localStorage.clear();
-                    return navigate('/login');
+                    navigate('/login');
+                } else {
+                    console.log(error);
+                    toast.dismiss(loading);
+                    toast.error(getFirstErrorMessage(error.response.data));
                 }
-                console.log(error);
-                toast.dismiss(loading);
-                return toast.error(getFirstErrorMessage(error.response.data));
             });
     };
 
+    const handleValidationError = (fieldId, errorMessage) => {
+        const academicYearInput = parentDivRef.current.querySelector(`#${fieldId}`);
+        if (academicYearInput) {
+            academicYearInput.style.border = '3px solid red';
+
+            // Scroll to the input field
+            academicYearInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Reset border after 3 seconds
+            setTimeout(() => {
+                academicYearInput.style.border = '1px solid black';
+            }, 3000);
+        }
+
+        toast.error(errorMessage);
+    };
 
     const years = [];
     for (let year = 2021; year <= 2030; year++) {
@@ -226,6 +244,9 @@ const AddHackathons = () => {
         }
     }
 
+    const year = getYearOptions()
+
+
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
@@ -236,10 +257,24 @@ const AddHackathons = () => {
                         <div className='w-full max-md:mt-8  max-md:mb-8'>
                             <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "hackathon Detail"}</h1>
                         </div>
-                        <div className='w-full grid md:grid-cols-2 grid-cols-1'>
+                        <div ref={parentDivRef} className='w-full grid md:grid-cols-2 grid-cols-1'>
                             <div className='w-full md:p-8 md:mt-4 '>
                                 <label className='label' htmlFor="title">Hackathon Title</label>
-                                <input value={formData.title} type="text" id='title' name='title' className='input' onChange={handleChange} />
+                                <input
+                                    type="text"
+                                    id="title"
+                                    name="title"
+                                    className='input'
+                                    list="hackathonTitles"
+                                    value={formData.title}
+                                    onChange={handleChange}
+                                />
+
+                                <datalist id="hackathonTitles">
+                                    <option value="Smart-India-Hackathon" />
+                                    <option value="Kavach-Hackathon" />
+                                </datalist>
+
 
                                 <label className='label' htmlFor="location">Location <p className='example'>e.g:- Airoli, Thane</p></label>
                                 <input value={formData.location} type="text" id='location' name="location" className='input' onChange={handleChange} />
@@ -271,6 +306,8 @@ const AddHackathons = () => {
 
                                 <label className='label' htmlFor="college_name">Enter College Name</label>
                                 <input value={formData.college_name} type="text" id='college_name' name='college_name' className='input' onChange={handleChange} />
+                                <label className='label' htmlFor="desc">Description</label>
+                                <textarea type="text" id='desc' name='desc' className='input' onChange={handleChange} />
 
 
                             </div>
@@ -287,7 +324,11 @@ const AddHackathons = () => {
                                             value={formData.academic_year || ''}
                                             onChange={handleChange}
                                         >
-                                            {years}
+                                            {year.length > 0 && year.map((year) => (
+                                                <MenuItem key={year.key} value={year.value}>
+                                                    {year.value}
+                                                </MenuItem>
+                                            ))}
                                         </Select>
                                     </FormControl>
                                 </Box>

@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -12,11 +12,15 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import { domains, getYearOptions } from '../helper/helper';
 
 const AddInternship = () => {
     const navigate = useNavigate()
     const [loader, setloader] = useState(false)
+    const parentDivRef = useRef(null);
 
+    const [emptyFields, setEmptyFields] = useState([]);
 
 
     const { id } = useParams()
@@ -52,73 +56,70 @@ const AddInternship = () => {
         setData({ ...data, [name]: files[0] });
     };
 
-    const years = [];
-    for (let year = 2021; year <= 2030; year++) {
-        const academicYear = `${year}-${year + 1}`;
-        years.push(
-            <MenuItem key={academicYear} value={academicYear}>
-                {academicYear}
-            </MenuItem>
-        );
-    }
+    // const years = [];
+    // for (let year = 2021; year <= 2030; year++) {
+    //     const academicYear = `${year}-${year + 1}`;
+    //     years.push(
+    //         <MenuItem key={academicYear} value={academicYear}>
+    //             {academicYear}
+    //         </MenuItem>
+    //     );
+    // }
 
     const handleSubmit = () => {
-        // Check each individual field for whether it's filled or not
-        if (!id && !data.academicYear) {
-            return toast.error("Please enter the academic year.");
+        if ( !data.academicYear) {
+            return handleValidationError('academicYear', "Please enter the academic year.");
         }
-        if (!id && !data.duration) {
-            return toast.error("Please enter the duration.");
+        if ( !data.year) {
+            return handleValidationError('year', "Please enter the student year.");
         }
-        if (!id && !data.domain) {
-            return toast.error("Please enter the domain.");
+        if ( !data.duration) {
+            return handleValidationError('duration', "Please enter the duration.");
         }
-        if (!id && !data.startDate) {
-            return toast.error("Please enter the start date.");
+        if ( !data.startDate) {
+            return handleValidationError('startDate', "Please enter the start date.");
         }
-        if (!id && !data.endDate) {
-            return toast.error("Please enter the end date.");
+        if ( !data.endDate) {
+            return handleValidationError('endDate', "Please enter the end date.");
         }
-        if (!id && !data.completionLetter) {
-            return toast.error("Please upload the completion letter.");
+        if ( !data.companyName) {
+            return handleValidationError('companyName', "Please enter the company name.");
         }
-        if (!id && !data.certificate) {
-            return toast.error("Please upload the certificate.");
-        }
-        if (!id && !data.offerLetter) {
-            return toast.error("Please upload the offer letter.");
-        }
-        if (!id && !data.permissionLetter) {
-            return toast.error("Please upload the permission letter.");
-        }
-        if (!id && !data.year) {
-            return toast.error("Please enter the student year.");
-        }
-        if (!id && !data.companyName) {
-            return toast.error("Please enter the company name.");
+        if ( !data.domain) {
+            return handleValidationError('domain', "Please enter the domain.");
         }
 
-        // Check file size for completionLetter
-        if (!id && data.completionLetter.size > 512 * 1024) {
+        if ( !id && !data.completionLetter) {
+            return handleValidationError('completionLetter', "Please upload the completion letter.");
+        }
+        if ( !id && !data.certificate) {
+            return handleValidationError('certificate', "Please upload the certificate.");
+        }
+        if (!id && !data.offerLetter) {
+            return handleValidationError('offerLetter', "Please upload the offer letter.");
+        }
+        if (!id && !data.permissionLetter) {
+            return handleValidationError('permissionLetter', "Please upload the permission letter.");
+        }
+
+
+
+        // Check file sizes
+        const fileSizeLimit = 512 * 1024;
+        if ( !id && data.completionLetter.size > fileSizeLimit) {
             return toast.error("Completion letter size should be less than 512 KB.");
         }
-        // Check file size for certificate
-        if (!id && data.certificate.size > 512 * 1024) {
+        if (!id && data.certificate.size > fileSizeLimit) {
             return toast.error("Certificate size should be less than 512 KB.");
         }
-        // Check file size for offerLetter
-        if (!id && data.offerLetter.size > 512 * 1024) {
+        if (!id && data.offerLetter.size > fileSizeLimit) {
             return toast.error("Offer letter size should be less than 512 KB.");
         }
-        // Check file size for permissionLetter
-        if (!id && data.permissionLetter.size > 512 * 1024) {
+        if (!id && data.permissionLetter.size > fileSizeLimit) {
             return toast.error("Permission letter size should be less than 512 KB.");
         }
 
-    
         const loading = toast.loading('Wait. Internship details are being processed.');
-
-
 
         let form = new FormData();
         form.append('academic_year', data.academicYear);
@@ -174,6 +175,23 @@ const AddInternship = () => {
                 return toast.error(getFirstErrorMessage(error.response.data));
             });
     };
+    const handleValidationError = (fieldId, errorMessage) => {
+        const academicYearInput = parentDivRef.current.querySelector(`#${fieldId}`);
+        if (academicYearInput) {
+            academicYearInput.style.border = '3px solid red';
+
+            // Scroll to the input field
+            academicYearInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Reset border after 3 seconds
+            setTimeout(() => {
+                academicYearInput.style.border = '1px solid black';
+            }, 3000);
+        }
+
+        toast.error(errorMessage);
+    };
+
 
     const getDataById = (id) => {
         setloader(true)
@@ -224,6 +242,8 @@ const AddInternship = () => {
     }
 
 
+    const year = getYearOptions()
+
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
 
@@ -232,13 +252,12 @@ const AddInternship = () => {
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Internship Detail"}</h1>
                     </div>
-                    <div className='w-full grid md:grid-cols-2 grid-cols-1'>
+                    <div ref={parentDivRef} className='w-full grid md:grid-cols-2 grid-cols-1'>
                         <div className='w-full md:p-8 md:mt-4 '>
                             <label className='label' htmlFor="academicYear">Select Academic Year</label>
-                            <Box sx={{ minWidth: 120 }}>
-                                <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                                    <InputLabel
-                                        id="academic-year-label">Academic Year</InputLabel>
+                            <Box sx={{ minWidth: 120 }} >
+                                <FormControl className='form-control' required style={{ marginBottom: "12px" }} fullWidth>
+                                    <InputLabel id="academic-year-label">Academic Year</InputLabel>
                                     <Select
                                         labelId="academic-year-label"
                                         id="academicYear"
@@ -246,10 +265,18 @@ const AddInternship = () => {
                                         value={data.academicYear}
                                         onChange={handleChange}
                                     >
-                                        {years}
+                                        {year.length > 0 && year.map((year) => (
+                                            <MenuItem key={year.key} value={year.value}>
+                                                {year.value}
+                                            </MenuItem>
+                                        ))}
+
+
+
                                     </Select>
                                 </FormControl>
                             </Box>
+
 
                             <label className='label' htmlFor="year">Select Year</label>
                             <Box sx={{ minWidth: 120, }}>
@@ -280,13 +307,32 @@ const AddInternship = () => {
 
                             <label className='label' htmlFor="endDate">End Date</label>
                             <input type="Date" value={data.endDate} id='endDate' name="endDate" className='input' onChange={handleChange} />
+                            <label className='label' htmlFor="desc">Description</label>
+                            <textarea type="text" id='desc' name="desc" className='input' onChange={handleChange} />
 
                         </div>
                         <div className='w-full md:p-8 md:mt-4 '>
                             <label className='label' htmlFor="companyName">Company Name</label>
                             <input type="text" value={data.companyName} id='companyName' name="companyName" className='input' onChange={handleChange} />
-                            <label className='label' htmlFor="domain">Domain <p className='example'>e.g:- web-development , app-developement</p></label>
-                            <input value={data.domain} type="text" id='domain' name="domain" className='input' onChange={handleChange} />
+                            <label className='label' htmlFor="domain">Domain</label>
+                            <Box sx={{ minWidth: 120 }}>
+                                <FormControl style={{ marginBottom: "12px" }} fullWidth>
+                                    <InputLabel id="domain-label">Domain</InputLabel>
+                                    <Select
+                                        labelId="domain-label"
+                                        id="domain"
+                                        name="domain"
+                                        value={data.domain}
+                                        onChange={handleChange}
+                                    >
+                                        {domains.map((domain) => (
+                                            <MenuItem key={domain.value} value={domain.value}>
+                                                {domain.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
 
                             <label className='label' htmlFor="completionLetter">Completion Letter <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
@@ -302,7 +348,7 @@ const AddInternship = () => {
                                 )}
                             </div>
 
-                            <label className='label' htmlFor="certificate">Certificate <p className='example'>Max PDF Size 512KB</p></label>
+                            <label className='label' htmlFor="certificate">Certificate <p className='example'>Max PDF Size 512KB - If available</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="certificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -316,7 +362,7 @@ const AddInternship = () => {
                                 )}
                             </div>
 
-                            <label className='label' htmlFor="offerLetter">Offer Letter <p className='example'>Max PDF Size 512KB</p></label>
+                            <label className='label' htmlFor="offerLetter">Offer Letter <p className='example'>Max PDF Size 512KB - If available</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="offerLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -330,7 +376,7 @@ const AddInternship = () => {
                                 )}
                             </div>
 
-                            <label className='label' htmlFor="permissionLetter">Permission Letter <p className='example'>Max PDF Size 512KB</p></label>
+                            <label className='label' htmlFor="permissionLetter">Permission Letter <p className='example'>Max PDF Size 512KB - If available</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="permissionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
                                     <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

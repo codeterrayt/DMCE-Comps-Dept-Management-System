@@ -184,9 +184,10 @@
 }
 
 .example {
-  font-size: 16px;
+  font-size: 13px;
   display: inline;
   font-weight: bold;
+  text-decoration: underline;
 }
 
 /* /////// */
@@ -248,5 +249,96 @@
 }
 .checkBox label {
   cursor: pointer;
- 
 }
+
+/* loader 3  */
+
+/* HTML: <div class="loader"></div> */
+.loader3 {
+  width: 120px;
+  height: 60px;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  background: #fff;
+  filter: blur(5px) contrast(10) hue-rotate(60deg);
+  mix-blend-mode: darken;
+}
+.loader3:before,
+.loader3:after {
+  content: "";
+  width: 40px;
+  border-radius: 50%;
+  background: #ff00ff;
+  animation: l3 1s infinite alternate;
+}
+.loader3:after {
+  --s: -1;
+}
+@keyframes l3 {
+  90%,
+  100% {
+    transform: translate(calc(var(--s, 1) * 30px));
+  }
+}
+
+@media (max-width: 500px) {
+  div.dt-container div.dt-length,
+  div.dt-container div.dt-search,
+  div.dt-container div.dt-info,
+  div.dt-container div.dt-paging {
+    display: none;
+  }
+}
+
+
+/* styles.css */
+/* styles.css */
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .table-responsive table,
+  .table-responsive thead,
+  .table-responsive tbody,
+  .table-responsive th,
+  .table-responsive td,
+  .table-responsive tr {
+      display: block;
+  }
+  
+  .table-responsive thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+  }
+  
+  .table-responsive tr {
+      border: 1px solid #ccc;
+  }
+  
+  .table-responsive td {
+      border: none;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      padding-left: 50%;
+      text-align: left;
+  }
+  
+  .table-responsive td:before {
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      width: 45%;
+      padding-right: 10px;
+      white-space: nowrap;
+      transform: translateY(-50%);
+      content: attr(data-label);
+      font-weight: bold;
+  }
+}
+

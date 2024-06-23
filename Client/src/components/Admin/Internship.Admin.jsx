@@ -13,6 +13,8 @@ import Loaders from '../Loaders';
 import CertificatePopup from '../Pop';
 import { formatDate } from '../../helper/getDate';
 import AnimationWrapper from '../Page-Animation';
+import AdminNavBar from './AdminNavBar';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 
 const InternshipAdmin = () => {
     const navigate = useNavigate();
@@ -194,6 +196,8 @@ const InternshipAdmin = () => {
 
 
     return (
+        <>
+        <AdminNavBar/>
         <section className='w-full  min-h-screen p-4 md:p-8 '>
             {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
@@ -304,6 +308,8 @@ const InternshipAdmin = () => {
                 </AnimationWrapper>
             }
         </section>
+        </>
+       
     );
 };
 

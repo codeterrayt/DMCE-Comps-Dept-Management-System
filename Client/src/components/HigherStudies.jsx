@@ -11,6 +11,7 @@ import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
 import CertificatePopup from './Pop';
 import AnimationWrapper from './Page-Animation';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
 
 const HigherStudies = () => {
 
@@ -211,9 +212,9 @@ const HigherStudies = () => {
                         </button>
                     </div>
 
-                    <div className="overflow-x-auto w-full mt-8 ">
+                    <div className="table-responsive w-full mt-8 ">
                         {study.length ? (
-                            <table id="example" className="table table-striped" style={{ width: '100%' }}>
+                            <table id="example" className="table table-striped text-black" style={{ width: '100%' }}>
                                 <thead>
                                     <tr className='capitalize'>
 
@@ -231,42 +232,42 @@ const HigherStudies = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {study.map((study, rowIndex) => (
-                                        <tr key={rowIndex}>
+    {study.map((study, rowIndex) => (
+        <tr key={rowIndex}>
+            <td className='text-center text-sm' data-label="AY">{study.student_academic_year}</td>
+            <td className='text-center text-sm' data-label="Course">{study.student_course}</td>
+            <td className='text-center text-sm' data-label="Exam">{study.student_exam_type}</td>
+            <td className='text-center text-sm' data-label="Project">{study.student_project_guide}</td>
+            <td className='text-center text-sm' data-label="Score">{study.student_score}</td>
+            <td className='text-center text-sm' data-label="City">{study.university_city}</td>
+            <td className='text-center text-sm' data-label="Country">{study.university_country}</td>
+            <td className='text-center text-sm' data-label="University">{study.university_name}</td>
+            <td className='text-center text-sm' data-label="State">{study.university_state}</td>
+            <td className='text-center text-sm' data-label="Admission">
+                <abbr title="Admission Letter">
+                    <button onClick={() => openCertificate(study.student_admission_letter)} className="certificate">
+                        <i className="fa-solid fa-eye"></i>
+                    </button>
+                </abbr>
+            </td>
+            <td className='text-center text-sm' data-label="Actions">
+                <div className='flex items-center gap-2 justify-center'>
+                    <abbr title="Edit">
+                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/dmce/add/higher-studies/${study.id}`)}>
+                            <i className="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </abbr>
+                    <abbr title="Delete">
+                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(study.id)}>
+                            <i className="fa-solid fa-trash"></i>
+                        </button>
+                    </abbr>
+                </div>
+            </td>
+        </tr>
+    ))}
+</tbody>
 
-                                            <td className='text-center text-sm'>{study.student_academic_year}</td>
-
-                                            <td className='text-center text-sm'>{study.student_course}</td>
-                                            <td className='text-center text-sm'>{study.student_exam_type}</td>
-                                            <td className='text-center text-sm'>{study.student_project_guide}</td>
-                                            <td className='text-center text-sm'>{study.student_score}</td>
-                                            <td className='text-center text-sm'>{study.university_city}</td>
-                                            <td className='text-center text-sm'>{study.university_country}</td>
-                                            <td className='text-center text-sm'>{study.university_name}</td>
-                                            <td className='text-center text-sm'>{study.university_state}</td>
-                                            <td className='text-center text-sm'>
-                                                <abbr title="Admission Letter">
-
-                                                    <button onClick={() => openCertificate(study.student_admission_letter)} className="certificate">
-                                                        <i className="fa-solid fa-eye"></i>
-                                                    </button>
-                                                </abbr>
-                                            </td>
-                                            <td className='text-center text-sm'>
-                                                <div className='flex items-center gap-2 justify-center'>
-                                                    <abbr title="Edit">
-
-                                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/dmce/add/higher-studies/${study.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
-                                                    </abbr>
-                                                    <abbr title="Delete">
-
-                                                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(study.id)}><i className="fa-solid fa-trash"></i></button>
-                                                    </abbr>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
                             </table>
                         ) : (
                             <h1 className='text-xl md:text-2xl mt-3 text-center font-bold text-[#262847]'>No Data Available</h1>

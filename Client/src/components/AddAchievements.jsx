@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -11,10 +11,12 @@ import axios from 'axios';
 import { getToken } from '../helper/getToken';
 import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import { getYearOptions } from '../helper/helper';
 
 const AddAchievements = () => {
+    const parentDivRef = useRef(null);
 
-    
     const [loader, setloader] = useState(false);
 
     const [data, setData] = useState({
@@ -69,39 +71,48 @@ const AddAchievements = () => {
             </MenuItem>
         );
     }
-
     const handleSubmit = async () => {
         // Check if any required field is empty
-        if (!id && !data.academicYear) {
-            return toast.error("Please enter the academic year.");
+        if ( !data.academicYear) {
+            handleValidationError('academicYear', "Please enter the academic year.");
+            return;
         }
-        if (!id && !data.studentYear) {
-            return toast.error("Please enter the student year.");
+        if ( !data.studentYear) {
+            handleValidationError('studentYear', "Please enter the student year.");
+            return;
         }
-        if (!id && !data.collegeName) {
-            return toast.error("Please enter the college name.");
+        if ( !data.collegeName) {
+            handleValidationError('collegeName', "Please enter the college name.");
+            return;
         }
-        if (!id && !data.achievementDomain) {
-            return toast.error("Please enter the achievement domain.");
+        if ( !data.achievementDomain) {
+            handleValidationError('achievementDomain', "Please enter the achievement domain.");
+            return;
         }
-        if (!id && !data.achievementLevel) {
-            return toast.error("Please enter the achievement level.");
+        if ( !data.achievementLevel) {
+            handleValidationError('achievementLevel', "Please enter the achievement level.");
+            return;
         }
-        if (!id && !data.achievementLocation) {
-            return toast.error("Please enter the achievement location.");
+        if ( !data.achievementLocation) {
+            handleValidationError('achievementLocation', "Please enter the achievement location.");
+            return;
         }
-        if (!id && !data.achievementDate) {
-            return toast.error("Please enter the achievement date.");
+        if ( !data.achievementDate) {
+            handleValidationError('achievementDate', "Please enter the achievement date.");
+            return;
         }
-        if (!id && !data.prize) {
-            return toast.error("Please enter the prize.");
+        if ( !data.prize) {
+            handleValidationError('prize', "Please enter the prize.");
+            return;
         }
         if (!id && !data.achievementCertificate) {
-            return toast.error("Please upload the achievement certificate.");
+            handleValidationError('achievementCertificate', "Please upload the achievement certificate.");
+            return;
         }
 
         // Check file size for achievementCertificate
-        if (!id && data.achievementCertificate.size > 512 * 1024) {
+        const fileSizeLimit = 512 * 1024;
+        if (!id && data.achievementCertificate.size > fileSizeLimit) {
             return toast.error("Achievement certificate size should be less than 512 KB.");
         }
 
@@ -119,16 +130,14 @@ const AddAchievements = () => {
         formData.append('achievement_date', data.achievementDate);
         formData.append('prize', data.prize);
         if (data.achievementCertificate) {
-
             formData.append('achievement_certificate_path', data.achievementCertificate);
         }
         if (id) {
             formData.append('id', id);
         }
 
-
         try {
-            const url = id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/achievement` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/achievement`
+            const url = id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/achievement` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/achievement`;
             const response = await axios.post(
                 url,
                 formData,
@@ -143,7 +152,7 @@ const AddAchievements = () => {
             );
             console.log(JSON.stringify(response.data));
             toast.dismiss(loading);
-            navigate('/dmce/achivement')
+            navigate('/dmce/achivement');
             toast.success(response.data.message);
         } catch (error) {
             if (error.response && error.response.status === 401) {
@@ -153,10 +162,26 @@ const AddAchievements = () => {
             console.error(error);
             toast.dismiss(loading);
             return toast.error(getFirstErrorMessage(error.response.data));
-
         }
     };
 
+
+    const handleValidationError = (fieldId, errorMessage) => {
+        const academicYearInput = parentDivRef.current.querySelector(`#${fieldId}`);
+        if (academicYearInput) {
+            academicYearInput.style.border = '3px solid red';
+
+            // Scroll to the input field
+            academicYearInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Reset border after 3 seconds
+            setTimeout(() => {
+                academicYearInput.style.border = '1px solid black';
+            }, 3000);
+        }
+
+        toast.error(errorMessage);
+    };
 
     const getDataById = (id) => {
         setloader(true)
@@ -207,17 +232,19 @@ const AddAchievements = () => {
         }
     }
 
+    const year = getYearOptions()
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
-                    
+
+
             {
                 loader ? <Loaders /> : <AnimationWrapper>
 
                     <div className='w-full max-md:mt-8 max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Your Achievement"}</h1>
                     </div>
-                    <div className='w-full grid md:grid-cols-2 grid-cols-1'>
+                    <div ref={parentDivRef} className='w-full grid md:grid-cols-2 grid-cols-1'>
                         <div className='w-full md:p-8 md:mt-4 '>
                             <label className='label' htmlFor="academicYear">Academic Year</label>
                             <Box sx={{ minWidth: 120 }}>
@@ -230,7 +257,11 @@ const AddAchievements = () => {
                                         value={data.academicYear}
                                         onChange={handleChange}
                                     >
-                                        {years}
+                                        {year.length > 0 && year.map((year) => (
+                                            <MenuItem key={year.key} value={year.value}>
+                                                {year.value}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -259,6 +290,9 @@ const AddAchievements = () => {
 
                             <label className='label' htmlFor="achievementDomain">Domain / Title <p className='example'>e.g:- web-development , app-developement</p></label>
                             <input type="text" value={data.achievementDomain} id='achievementDomain' name="achievementDomain" className='input' onChange={handleChange} />
+                            <label className='label' htmlFor="achievementDesc">Description</label>
+                            <textarea type="text"  id='achievementDesc' name="achievementDesc" className='input' onChange={handleChange} />
+                            
                         </div>
                         <div className='w-full md:p-8 md:mt-4'>
                             <label className='label' htmlFor="achievementLevel">Achievement Level</label>

@@ -12,6 +12,8 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from '../Loaders';
 import AnimationWrapper from '../Page-Animation';
+import AdminNavBar from './AdminNavBar';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 
 const DetailInternshipAdmin = () => {
     const navigate = useNavigate()
@@ -225,133 +227,138 @@ const DetailInternshipAdmin = () => {
 
 
     return (
+
+        <>
+        <AdminNavBar/>
         <section className='w-full min-h-screen p-4 md:p-8'>
 
-            {
-                loader ? <Loaders /> : <AnimationWrapper>
-                    <div className='w-full max-md:mt-8  max-md:mb-8'>
-                        <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Internship Detail"}</h1>
-                    </div>
-                    <div className='w-full grid md:grid-cols-2 grid-cols-1'>
-                        <div className='w-full md:p-8 md:mt-4 '>
-                            <label className='label' htmlFor="academicYear">Select Academic Year</label>
-                            <Box sx={{ minWidth: 120 }}>
-                                <FormControl style={{ marginBottom: "12px" }} fullWidth>
-                                    <InputLabel
-                                        id="academic-year-label">Academic Year</InputLabel>
-                                    <Select
-                                        labelId="academic-year-label"
-                                        id="academicYear"
-                                        name="academicYear"
-                                        value={data.academicYear}
-                                        onChange={handleChange}
-                                    >
-                                        {years}
-                                    </Select>
-                                </FormControl>
-                            </Box>
+{
+    loader ? <Loaders /> : <AnimationWrapper>
+        <div className='w-full max-md:mt-8  max-md:mb-8'>
+            <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Internship Detail"}</h1>
+        </div>
+        <div className='w-full grid md:grid-cols-2 grid-cols-1'>
+            <div className='w-full md:p-8 md:mt-4 '>
+                <label className='label' htmlFor="academicYear">Select Academic Year</label>
+                <Box sx={{ minWidth: 120 }}>
+                    <FormControl style={{ marginBottom: "12px" }} fullWidth>
+                        <InputLabel
+                            id="academic-year-label">Academic Year</InputLabel>
+                        <Select
+                            labelId="academic-year-label"
+                            id="academicYear"
+                            name="academicYear"
+                            value={data.academicYear}
+                            onChange={handleChange}
+                        >
+                            {years}
+                        </Select>
+                    </FormControl>
+                </Box>
 
-                            <label className='label' htmlFor="year">Select Year</label>
-                            <Box sx={{ minWidth: 120, }}>
-                                <FormControl
-                                    style={{ marginBottom: "12px" }} fullWidth>
-                                    <InputLabel
-                                        id="year-label">Year</InputLabel>
-                                    <Select
-                                        labelId="year-label"
-                                        id="year"
-                                        name="year"
-                                        value={data.year}
-                                        onChange={handleChange}
-                                    >
-                                        <MenuItem value={'FE'}>First Year</MenuItem>
-                                        <MenuItem value={'SE'}>Second Year</MenuItem>
-                                        <MenuItem value={'TE'}>Third Year</MenuItem>
-                                        <MenuItem value={'BE'}>Fourth Year</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Box>
+                <label className='label' htmlFor="year">Select Year</label>
+                <Box sx={{ minWidth: 120, }}>
+                    <FormControl
+                        style={{ marginBottom: "12px" }} fullWidth>
+                        <InputLabel
+                            id="year-label">Year</InputLabel>
+                        <Select
+                            labelId="year-label"
+                            id="year"
+                            name="year"
+                            value={data.year}
+                            onChange={handleChange}
+                        >
+                            <MenuItem value={'FE'}>First Year</MenuItem>
+                            <MenuItem value={'SE'}>Second Year</MenuItem>
+                            <MenuItem value={'TE'}>Third Year</MenuItem>
+                            <MenuItem value={'BE'}>Fourth Year</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
 
-                            <label className='label' htmlFor="duration">Duration (in months)</label>
-                            <input type="Number" value={data.duration} id='duration' name="duration" className='input' onChange={handleChange} />
+                <label className='label' htmlFor="duration">Duration (in months)</label>
+                <input type="Number" value={data.duration} id='duration' name="duration" className='input' onChange={handleChange} />
 
-                            <label className='label' htmlFor="startDate">Start Date</label>
-                            <input type="Date" value={data.startDate} id='startDate' name="startDate" className='input' onChange={handleChange} />
+                <label className='label' htmlFor="startDate">Start Date</label>
+                <input type="Date" value={data.startDate} id='startDate' name="startDate" className='input' onChange={handleChange} />
 
-                            <label className='label' htmlFor="endDate">End Date</label>
-                            <input type="Date" value={data.endDate} id='endDate' name="endDate" className='input' onChange={handleChange} />
+                <label className='label' htmlFor="endDate">End Date</label>
+                <input type="Date" value={data.endDate} id='endDate' name="endDate" className='input' onChange={handleChange} />
 
-                        </div>
-                        <div className='w-full md:p-8 md:mt-4 '>
-                            <label className='label' htmlFor="companyName">Company Name</label>
-                            <input type="text" value={data.companyName} id='companyName' name="companyName" className='input' onChange={handleChange} />
-                            <label className='label' htmlFor="domain">Domain <p className='example'>e.g:- web-development , app-developement</p></label>
-                            <input value={data.domain} type="text" id='domain' name="domain" className='input' onChange={handleChange} />
+            </div>
+            <div className='w-full md:p-8 md:mt-4 '>
+                <label className='label' htmlFor="companyName">Company Name</label>
+                <input type="text" value={data.companyName} id='companyName' name="companyName" className='input' onChange={handleChange} />
+                <label className='label' htmlFor="domain">Domain <p className='example'>e.g:- web-development , app-developement</p></label>
+                <input value={data.domain} type="text" id='domain' name="domain" className='input' onChange={handleChange} />
 
-                            <label className='label' htmlFor="completionLetter">Completion Letter <p className='example'>Max PDF Size 512KB</p></label>
-                            <div className="bg-gray-100 mb-[12px] ">
-                                <label htmlFor="completionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                    Completion Letter/ Certificate
-                                </label>
-                                <input id="completionLetter" name="completionLetter" type="file" className="hidden" onChange={handleFileChange} />
-                                {data.completionLetter && (
-                                    <p className="mt-2 text-gray-700">Selected file: {data.completionLetter.name}</p>
-                                )}
-                            </div>
+                <label className='label' htmlFor="completionLetter">Completion Letter <p className='example'>Max PDF Size 512KB</p></label>
+                <div className="bg-gray-100 mb-[12px] ">
+                    <label htmlFor="completionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
+                        <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Completion Letter/ Certificate
+                    </label>
+                    <input id="completionLetter" name="completionLetter" type="file" className="hidden" onChange={handleFileChange} />
+                    {data.completionLetter && (
+                        <p className="mt-2 text-gray-700">Selected file: {data.completionLetter.name}</p>
+                    )}
+                </div>
 
-                            <label className='label' htmlFor="certificate">Certificate <p className='example'>Max PDF Size 512KB</p></label>
-                            <div className="bg-gray-100 mb-[12px] ">
-                                <label htmlFor="certificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                    Certificate
-                                </label>
-                                <input id="certificate" name="certificate" type="file" className="hidden" onChange={handleFileChange} />
-                                {data.certificate && (
-                                    <p className="mt-2 text-gray-700">Selected file: {data.certificate.name}</p>
-                                )}
-                            </div>
+                <label className='label' htmlFor="certificate">Certificate <p className='example'>Max PDF Size 512KB</p></label>
+                <div className="bg-gray-100 mb-[12px] ">
+                    <label htmlFor="certificate" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
+                        <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Certificate
+                    </label>
+                    <input id="certificate" name="certificate" type="file" className="hidden" onChange={handleFileChange} />
+                    {data.certificate && (
+                        <p className="mt-2 text-gray-700">Selected file: {data.certificate.name}</p>
+                    )}
+                </div>
 
-                            <label className='label' htmlFor="offerLetter">Offer Letter <p className='example'>Max PDF Size 512KB</p></label>
-                            <div className="bg-gray-100 mb-[12px] ">
-                                <label htmlFor="offerLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                    Offer Letter
-                                </label>
-                                <input id="offerLetter" name="offerLetter" type="file" className="hidden" onChange={handleFileChange} />
-                                {data.offerLetter && (
-                                    <p className="mt-2 text-gray-700">Selected file: {data.offerLetter.name}</p>
-                                )}
-                            </div>
+                <label className='label' htmlFor="offerLetter">Offer Letter <p className='example'>Max PDF Size 512KB</p></label>
+                <div className="bg-gray-100 mb-[12px] ">
+                    <label htmlFor="offerLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
+                        <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Offer Letter
+                    </label>
+                    <input id="offerLetter" name="offerLetter" type="file" className="hidden" onChange={handleFileChange} />
+                    {data.offerLetter && (
+                        <p className="mt-2 text-gray-700">Selected file: {data.offerLetter.name}</p>
+                    )}
+                </div>
 
-                            <label className='label' htmlFor="permissionLetter">Permission Letter <p className='example'>Max PDF Size 512KB</p></label>
-                            <div className="bg-gray-100 mb-[12px] ">
-                                <label htmlFor="permissionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
-                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                    Permission Letter
-                                </label>
-                                <input id="permissionLetter" name="permissionLetter" type="file" className="hidden" onChange={handleFileChange} />
-                                {data.permissionLetter && (
-                                    <p className="mt-2 text-gray-700">Selected file: {data.permissionLetter.name}</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                    <div className='flex justify-center mt-4'>
-                        <button className='btn' onClick={handleSubmit}>Submit</button>
-                    </div>
-                </AnimationWrapper>
-            }
+                <label className='label' htmlFor="permissionLetter">Permission Letter <p className='example'>Max PDF Size 512KB</p></label>
+                <div className="bg-gray-100 mb-[12px] ">
+                    <label htmlFor="permissionLetter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">
+                        <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Permission Letter
+                    </label>
+                    <input id="permissionLetter" name="permissionLetter" type="file" className="hidden" onChange={handleFileChange} />
+                    {data.permissionLetter && (
+                        <p className="mt-2 text-gray-700">Selected file: {data.permissionLetter.name}</p>
+                    )}
+                </div>
+            </div>
+        </div>
+        <div className='flex justify-center mt-4'>
+            <button className='btn' onClick={handleSubmit}>Submit</button>
+        </div>
+    </AnimationWrapper>
+}
 
-        </section>
+</section>
+            </>
+      
     )
 }
 

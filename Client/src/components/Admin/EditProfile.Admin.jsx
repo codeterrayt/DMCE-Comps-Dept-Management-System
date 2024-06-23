@@ -12,6 +12,7 @@ import Loaders from '../Loaders';
 import toast from 'react-hot-toast';
 import AnimationWrapper from '../Page-Animation';
 import { getFirstErrorMessage } from '../../helper/getErrorMessage';
+import AdminNavBar from './AdminNavBar';
 
 
 const EditProfileAdmin = () => {
@@ -204,6 +205,9 @@ const {id} = useParams()
 
 
     return (
+
+        <>
+        <AdminNavBar/>
         <section className="w-full min-h-screen p-4 md:p-8">
             {
                 loader ? <Loaders  message={(checkUpdate ? 'Updating' : 'Fetching ') + 'Profile ' }  /> :
@@ -329,6 +333,9 @@ const {id} = useParams()
                     </AnimationWrapper>
             }
         </section>
+        
+        </>
+        
     );
 };
 

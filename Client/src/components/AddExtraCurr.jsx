@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,6 +10,8 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import { getYearOptions } from '../helper/helper';
 
 const AddExtraCurr = () => {
     const [loader, setloader] = useState(false)
@@ -49,6 +51,8 @@ const AddExtraCurr = () => {
         }));
     };
 
+    const parentDivRef = useRef(null);
+
     const years = [];
     for (let year = 2021; year <= 2030; year++) {
         const academicYear = `${year}-${year + 1}`;
@@ -61,70 +65,68 @@ const AddExtraCurr = () => {
     const navigate = useNavigate()
     const handleSubmit = () => {
         // Check if all required fields are filled individually and provide error messages for each missing field
-        if (!id && !data.academic_year) {
-            toast.error('Please enter the academic year.');
+        if ( !data.academic_year) {
+            handleValidationError('academic_year', 'Please enter the academic year.');
             return;
         }
-        if (!id && !data.student_year) {
-            toast.error('Please select the student year.');
+        if ( !data.student_year) {
+            handleValidationError('studentYear', 'Please select the student year.');
             return;
         }
-        if (!id && !data.college_name) {
-            toast.error('Please enter the college name.');
+        if ( !data.college_name) {
+            handleValidationError('college_name', 'Please enter the college name.');
             return;
         }
-        if (!id && !data.domain) {
-            toast.error('Please enter the domain.');
+        if ( !data.domain) {
+            handleValidationError('domain', 'Please enter the domain.');
             return;
         }
-        if (!id && !data.level) {
-            toast.error('Please select the level.');
+        if ( !data.level) {
+            handleValidationError('level', 'Please select the level.');
             return;
         }
-        if (!id && !data.location) {
-            toast.error('Please enter the location.');
+        if ( !data.location) {
+            handleValidationError('location', 'Please enter the location.');
             return;
         }
-        if (!id && !data.date) {
-            toast.error('Please select the date.');
+        if ( !data.date) {
+            handleValidationError('date', 'Please select the date.');
+            return;
+        }
+        if ( !data.prize) {
+            handleValidationError('prize', 'Please select the prize.');
             return;
         }
         if (!id && !data.certificate) {
-            toast.error('Please upload the certificate.');
-            return;
-        }
-        if (!id && !data.prize) {
-            toast.error('Please select the prize.');
+            handleValidationError('certificate', 'Please upload the certificate.');
             return;
         }
 
+
         // Check if the file size is less than 512 KB
-        if (!id && data.certificate.size > 512 * 1024) {
-            toast.error('Certificate file size should be less than 512 KB.');
-            return;
+        const fileSizeLimit = 512 * 1024;
+        if (!id && data.certificate.size > fileSizeLimit) {
+            return toast.error('Certificate file size should be less than 512 KB.');
         }
 
         // Proceed with form submission if all checks pass
-        const loading = toast.loading("Wait. Adding your activity");
+        const loading = toast.loading('Wait. Adding your activity');
 
-        let formdata = new FormData();
-        formdata.append('academic_year', data.academic_year);
-        formdata.append('student_year', data.student_year);
-        formdata.append('college_name', data.college_name);
-        formdata.append('ecc_domain', data.domain);
-        formdata.append('ecc_level', data.level);
-        formdata.append('ecc_location', data.location);
-        formdata.append('ecc_date', data.date);
-        formdata.append('prize', data.prize);
+        let formData = new FormData();
+        formData.append('academic_year', data.academic_year);
+        formData.append('student_year', data.student_year);
+        formData.append('college_name', data.college_name);
+        formData.append('ecc_domain', data.domain);
+        formData.append('ecc_level', data.level);
+        formData.append('ecc_location', data.location);
+        formData.append('ecc_date', data.date);
+        formData.append('prize', data.prize);
         if (data.certificate) {
-
-            formdata.append('ecc_certificate_path', data.certificate);
+            formData.append('ecc_certificate_path', data.certificate);
         }
-
         if (id) {
-            formdata.append('id', id);
+            formData.append('id', id);
         }
-
 
         const token = getToken();
 
@@ -137,7 +139,7 @@ const AddExtraCurr = () => {
                 'Authorization': `Bearer ${token}`,
                 ...data.getHeaders
             },
-            data: formdata
+            data: formData
         };
 
         axios.request(config)
@@ -145,7 +147,7 @@ const AddExtraCurr = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                return navigate('/dmce/extra-curriculum')
+                navigate('/dmce/extra-curriculum');
             })
             .catch((error) => {
                 console.error(error);
@@ -157,6 +159,24 @@ const AddExtraCurr = () => {
                 toast.error(getFirstErrorMessage(error.response.data));
             });
     };
+
+    const handleValidationError = (fieldId, errorMessage) => {
+        const academicYearInput = parentDivRef.current.querySelector(`#${fieldId}`);
+        if (academicYearInput) {
+            academicYearInput.style.border = '3px solid red';
+
+            // Scroll to the input field
+            academicYearInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Reset border after 3 seconds
+            setTimeout(() => {
+                academicYearInput.style.border = '1px solid black';
+            }, 3000);
+        }
+
+        toast.error(errorMessage);
+    };
+
 
 
     const getDataById = (id) => {
@@ -208,6 +228,8 @@ const AddExtraCurr = () => {
         }
     }
 
+    const year = getYearOptions()
+
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
             {
@@ -215,7 +237,7 @@ const AddExtraCurr = () => {
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Activity Detail"}</h1>
                     </div>
-                    <div className='w-full grid md:grid-cols-2 grid-cols-1'>
+                    <div ref={parentDivRef} className='w-full grid md:grid-cols-2 grid-cols-1'>
                         <div className='w-full md:p-8 md:mt-4 '>
                             <label className='label' htmlFor="academic_year">Academic Year</label>
                             <Box sx={{ minWidth: 120 }}>
@@ -229,7 +251,11 @@ const AddExtraCurr = () => {
                                         value={data.academic_year}
                                         onChange={handleChange}
                                     >
-                                        {years}
+                                        {year.length > 0 && year.map((year) => (
+                                            <MenuItem key={year.key} value={year.value}>
+                                                {year.value}
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -256,8 +282,11 @@ const AddExtraCurr = () => {
                             <label className='label' htmlFor="college_name">College Name</label>
                             <input value={data.college_name} type="text" id='college_name' name="college_name" className='input' onChange={handleChange} />
 
-                            <label className='label' htmlFor="domain">Domain <p className='example'>e.g:- web-development , app-developement</p></label>
+                            <label className='label' htmlFor="domain">Title <p className='example'>Achievement in CSI/NSS</p></label>
                             <input value={data.domain} type="text" id='domain' name="domain" className='input' onChange={handleChange} />
+
+                            <label className='label' htmlFor="desc">Description </label>
+                            <textarea type="text" id='desc' name="desc" className='input' onChange={handleChange} />
 
 
                         </div>

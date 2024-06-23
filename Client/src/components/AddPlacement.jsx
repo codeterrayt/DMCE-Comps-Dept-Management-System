@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,11 +10,14 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import { domains } from '../helper/helper';
 
 const AddPlacementDetails = () => {
     const [loader, setloader] = useState(false)
     const { id } = useParams()
     useEffect(() => {
+
         if (id) {
             getDataById(id)
         }
@@ -29,7 +32,7 @@ const AddPlacementDetails = () => {
         company_state: '',
         company_country: '',
         company_pincode: '',
-        campus_type: null,
+        campus_type: '',
         passout_year: '',
         offer_letter: null,
         package_in_lakh: '',
@@ -56,62 +59,61 @@ const AddPlacementDetails = () => {
     };
 
     const navigate = useNavigate();
+    const parentDivRef = useRef(null);
+
+
 
     // Handle form submission
     const handleSubmit = () => {
+        console.log(formData.campus_type);
         // Check if all required fields are filled individually and provide error messages for each missing field
-        if (!id && !formData.academic_year) {
-            toast.error('Please select the academic year.');
-            return;
+        if (!formData.academic_year) {
+            return handleValidationError('academic_year', 'Please select the academic year.');
+
         }
-        if (!id && !formData.position) {
-            toast.error('Please enter the position.');
-            return;
+        if (!formData.company_name) {
+            return handleValidationError('company_name', 'Please enter the company name.');
         }
-        if (!id && !formData.company_name) {
-            toast.error('Please enter the company name.');
-            return;
-        }
-        if (!id && !formData.company_city) {
-            toast.error('Please enter the company city.');
-            return;
-        }
-        if (!id && !formData.company_state) {
-            toast.error('Please enter the company state.');
-            return;
-        }
-        if (!id && !formData.company_country) {
-            toast.error('Please enter the company country.');
-            return;
-        }
-        if (!id && !formData.company_pincode) {
-            toast.error('Please enter the company pincode.');
-            return;
-        }
-        if (!id && !formData.campus_type) {
-            toast.error('Please select the campus type.');
-            return;
-        }
-        if (!id && !formData.passout_year) {
-            toast.error('Please enter the passout year.');
-            return;
-        }
-        if (!id && !formData.offer_letter) {
-            toast.error('Please upload the offer letter.');
-            return;
-        }
-        if (!id && !formData.package_in_lakh) {
-            toast.error('Please enter the package in lakh.');
-            return;
-        }
-        if (!id && !formData.domain) {
-            toast.error('Please enter the domain.');
-            return;
+        if (!formData.position) {
+            return handleValidationError('position', 'Please enter the position.');
         }
 
-        if (!id && formData.offer_letter.size > 512 * 1024) {
-            toast.error('Offer letter file size should be less than 512 KB.');
-            return;
+        if (!formData.company_city) {
+            return handleValidationError('company_city', 'Please enter the company city.');
+        }
+        if (!formData.company_pincode) {
+            return handleValidationError('company_pincode', 'Please enter the company pincode.');
+        }
+        if (!formData.campus_type) {
+            return handleValidationError('campus_type', 'Please select the campus type.');
+        }
+        if (!formData.company_state) {
+            return handleValidationError('company_state', 'Please enter the company state.');
+        }
+        if (!formData.company_country) {
+            return handleValidationError('company_country', 'Please enter the company country.');
+        }
+
+
+        if (!formData.passout_year) {
+            return handleValidationError('passout_year', 'Please enter the passout year.');
+        }
+        if (!formData.package_in_lakh) {
+            return handleValidationError('package_in_lakh', 'Please enter the package in lakh.');
+        }
+        if (!formData.domain) {
+            return handleValidationError('domain', 'Please enter the domain.');
+        }
+        if (!id && !formData.offer_letter) {
+            return handleValidationError('offer_letter', 'Please upload the offer letter.');
+        }
+
+
+
+        // Check if the file size is less than 512 KB
+        const fileSizeLimit = 512 * 1024;
+        if (!id && formData.offer_letter.size > fileSizeLimit) {
+            return toast.error('Offer letter file size should be less than 512 KB.');
         }
 
         // Proceed with form submission if all checks pass
@@ -130,12 +132,12 @@ const AddPlacementDetails = () => {
         data.append('package', formData.package_in_lakh);
         data.append('domain', formData.domain);
         if (formData.offer_letter) {
-
             data.append('offer_letter', formData.offer_letter);
         }
         if (id) {
             data.append('id', id);
         }
+
         const token = getToken();
 
         let config = {
@@ -155,19 +157,36 @@ const AddPlacementDetails = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                return navigate('/dmce/placement');
+                navigate('/dmce/placement');
             })
             .catch((error) => {
                 console.error(error);
                 toast.dismiss(loading);
                 if (error.response && error.response.status === 401) {
                     localStorage.clear();
-                    return navigate('/login');
+                    navigate('/login');
+                } else {
+                    toast.error(getFirstErrorMessage(error.response.data));
                 }
-                toast.error(getFirstErrorMessage(error.response.data));
             });
     };
 
+    const handleValidationError = (fieldId, errorMessage) => {
+        const academicYearInput = parentDivRef.current.querySelector(`#${fieldId}`);
+        if (academicYearInput) {
+            academicYearInput.style.border = '3px solid red';
+
+            // Scroll to the input field
+            academicYearInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Reset border after 3 seconds
+            setTimeout(() => {
+                academicYearInput.style.border = '1px solid black';
+            }, 3000);
+        }
+
+        toast.error(errorMessage);
+    };
 
     // Generate academic years for the select dropdown
     const years = [];
@@ -239,7 +258,7 @@ const AddPlacementDetails = () => {
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "placement Detail"}</h1>
                     </div>
-                    <div className='w-full grid md:grid-cols-2 grid-cols-1'>
+                    <div ref={parentDivRef} className='w-full grid md:grid-cols-2 grid-cols-1'>
                         <div className='w-full md:p-8 md:mt-4 '>
                             <label className='label' htmlFor="academic_year">Select Academic Year</label>
                             <Box sx={{ minWidth: 120 }}>
@@ -280,8 +299,8 @@ const AddPlacementDetails = () => {
                                         value={formData.campus_type}
                                         onChange={handleChange}
                                     >
-                                        <MenuItem value={0}>On Campus</MenuItem>
-                                        <MenuItem value={1}>Off Campus</MenuItem>
+                                        <MenuItem value={'0'}>On Campus</MenuItem>
+                                        <MenuItem value={'1'}>Off Campus</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -309,7 +328,24 @@ const AddPlacementDetails = () => {
                             <input value={formData.package_in_lakh} type="text" id='package_in_lakh' name='package_in_lakh' className='input' onChange={handleChange} />
 
                             <label className='label' htmlFor="domain">Domain <p className='example'>e.g:- web-development , app-developement</p></label>
-                            <input value={formData.domain} type="text" id='domain' name='domain' className='input' onChange={handleChange} />
+                            <Box sx={{ minWidth: 120 }}>
+                                <FormControl style={{ marginBottom: "12px" }} fullWidth>
+                                    <InputLabel id="domain-label">Domain</InputLabel>
+                                    <Select
+                                        labelId="domain-label"
+                                        id="domain"
+                                        name="domain"
+                                        value={formData.domain}
+                                        onChange={handleChange}
+                                    >
+                                        {domains.map((domain) => (
+                                            <MenuItem key={domain.value} value={domain.value}>
+                                                {domain.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
                             <label className='label' htmlFor="offer_letter">Offer Letter <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
                                 <label htmlFor="offer_letter" className="flex items-center justify-center px-4 py-2 bg-[#262847] text-white rounded-md cursor-pointer hover:bg-[#1e4f8f] transition duration-300 ease-in-out">

@@ -14,13 +14,15 @@ import CertificatePopup from '../Pop';
 import Loaders from '../Loaders';
 import { formatDate } from '../../helper/getDate';
 import AnimationWrapper from '../Page-Animation';
+import AdminNavBar from './AdminNavBar';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 
 const AchievementAdmin = () => {
 
     //pop up 
     const [certificateUrl, setCertificateUrl] = useState('');
     const [showCertificate, setShowCertificate] = useState(false);
-    const [user , setUser]= useState()
+    const [user, setUser] = useState()
 
     const openCertificate = (certificateUrl) => {
         setCertificateUrl(certificateUrl);
@@ -67,7 +69,7 @@ const AchievementAdmin = () => {
         return modifiedAchievementsArray;
     }
 
-    const {id} = useParams()
+    const { id } = useParams()
 
     useEffect(() => {
         if (!checkLogin()) {
@@ -193,14 +195,17 @@ const AchievementAdmin = () => {
     // }
 
 
-    return (
+    return (<>
+
+        <AdminNavBar />
+
         <section className='w-full  min-h-screen p-4 md:p-8 '>
             {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
             {loader ? <Loaders message={(checkDelete ? "Deleting " : "Fetching ") + "Achievement"} /> :
                 <AnimationWrapper className='w-full'>
                     <div className='w-full flex items-center justify-between px-4 mt-8 '>
-                    <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>{user && user.name}&rsquo;s Achievement</h2>
+                        <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847] '>{user && user.name}&rsquo;s Achievement</h2>
                         {/* <button
                             className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit  block md:hidden md:text-xl"
                             onClick={() => navigate('/dmce/add/achivement')}
@@ -279,6 +284,8 @@ const AchievementAdmin = () => {
                 </AnimationWrapper>
             }
         </section>
+    </>
+
     );
 };
 

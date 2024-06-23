@@ -9,7 +9,6 @@ import {
 import Home from './components/Home';
 import SideNav from './components/SideNav';
 import Start from './components/Start';
-import About from './components/About';
 import Internship from './components/Internship';
 import Achivements from './components/Achivements';
 import ExtraCurr from './components/ExtraCurr';
@@ -17,7 +16,6 @@ import Hackathon from './components/Hackathon';
 import HigherStudies from './components/HigherStudies';
 import SignUpForm from './components/SignUp';
 import LoginForm from './components/Login';
-import UploadForm from './components/UploadForm';
 import AddInternship from './components/AddInternship';
 import AddAchievements from './components/AddAchievements';
 import AddExtraCurr from './components/AddExtraCurr';
@@ -40,6 +38,7 @@ import DetailHigherStudyAdmin from './components/Admin/DetailHigherStudy.Admin';
 import PlacementAdmin from './components/Admin/Placement.Admin';
 import DetailPlacementAdmin from './components/Admin/DetailPlacementAdmin';
 import EditProfileAdmin from './components/Admin/EditProfile.Admin';
+import DetailAchievementAdmin from './components/Admin/DetailAchievement.Admin';
 
 export const userContext = createContext()
 
@@ -58,7 +57,6 @@ function App() {
           <Route path="/" element={<Start />} />
           <Route path="/dmce" element={<SideNav />}>
             <Route path="home" element={<Home />} />
-            <Route path="about" element={<About />} />
             <Route path="internship" element={<Internship />} />
             <Route path="add/internship" element={<AddInternship />} />
             <Route path="add/internship/:id" element={<AddInternship />} />
@@ -94,7 +92,7 @@ function App() {
           <Route path="/admin/ecc/:id" element={<ExtraCurrAdmin />} />
           <Route path="/admin/ecc/detail/:id" element={<DetailExtraCurrAdmin />} />
           <Route path="/admin/achivement/:id" element={<AchievementAdmin />} />
-          <Route path="/admin/achivement/detail/:id" element={<DetailExtraCurrAdmin />} />
+          <Route path="/admin/achivement/detail/:id" element={<DetailAchievementAdmin />} />
           <Route path="/admin/hackathon/:id" element={<HackathonAdmin />} />
           <Route path="/admin/hackathon/detail/:id" element={<DetailHackathonAdmin />} />
           <Route path="/admin/higher-studies/:id" element={<HigherStudiesAdmin />} />

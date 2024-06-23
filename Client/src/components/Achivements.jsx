@@ -15,6 +15,7 @@ import AnimationWrapper from './Page-Animation';
 
 import Loaders from './Loaders';
 import { formatDate } from '../helper/getDate';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
 
 const Achivements = () => {
 
@@ -193,7 +194,7 @@ const Achivements = () => {
 
     return (
         <section className='w-full  min-h-screen p-4 md:p-8 '>
-            
+
             {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
             {loader ? <Loaders message={(checkDelete ? "Deleting " : "Fetching") + "Your Achievement"} /> :
@@ -214,10 +215,10 @@ const Achivements = () => {
                         </button>
                     </div>
 
-                    <div className="overflow-x-auto w-full mt-8 ">
+                    <div className="table-responsive w-full mt-8 ">
                         {
                             achivement.length ? (
-                                <table id="example" className="table table-striped" style={{ width: '100%' }}>
+                                <table id="example" className="table table-striped text-black" style={{ width: '100%' }}>
                                     <thead>
                                         <tr className='capitalize'>
                                             <th className='text-sm text-center'>AY</th>
@@ -236,37 +237,39 @@ const Achivements = () => {
                                     <tbody>
                                         {achivement.map(achievement => (
                                             <tr key={achievement.id}>
-                                                <td className='text-center text-sm'>{achievement.academic_year}</td>
-
-                                                <td className='text-center text-sm whitespace-nowrap'>{formatDate(achievement.achievement_date)}</td>
-                                                <td className='text-center text-sm'>{achievement.achievement_domain}</td>
-                                                <td className='text-center text-sm'>{achievement.achievement_level}</td>
-                                                <td className='text-center text-sm'>{achievement.achievement_location}</td>
-                                                <td className='text-center text-sm'>{achievement.college_name}</td>
-                                                <td className='text-center text-sm'>{achievement.prize}</td>
-                                                <td className='text-center text-sm'>{achievement.student_year}</td>
-                                                <td className='text-center text-sm'>
+                                                <td className='text-center text-sm' data-label="AY">{achievement.academic_year}</td>
+                                                <td className='text-center text-sm whitespace-nowrap' data-label="Date">{formatDate(achievement.achievement_date)}</td>
+                                                <td className='text-center text-sm' data-label="Title">{achievement.achievement_domain}</td>
+                                                <td className='text-center text-sm' data-label="Level">{achievement.achievement_level}</td>
+                                                <td className='text-center text-sm' data-label="Location">{achievement.achievement_location}</td>
+                                                <td className='text-center text-sm' data-label="College">{achievement.college_name}</td>
+                                                <td className='text-center text-sm' data-label="Prize">{achievement.prize}</td>
+                                                <td className='text-center text-sm' data-label="Year">{achievement.student_year}</td>
+                                                <td className='text-center text-sm' data-label="Certificate">
                                                     <abbr title="See Certificate">
-
                                                         <button onClick={() => openCertificate(achievement.achievement_certificate)} className="certificate">
                                                             <i className="fa-solid fa-eye"></i>
                                                         </button>
                                                     </abbr>
                                                 </td>
-                                                <td className='text-center text-sm '>
+                                                <td className='text-center text-sm' data-label="Actions">
                                                     <div className='flex items-center gap-3 justify-center'>
                                                         <abbr title="Edit">
-                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/dmce/add/achivement/${achievement.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
+                                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/dmce/add/achivement/${achievement.id}`)}>
+                                                                <i className="fa-solid fa-pen-to-square"></i>
+                                                            </button>
                                                         </abbr>
                                                         <abbr title="Delete">
-
-                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(achievement.id)}><i className="fa-solid fa-trash"></i></button>
+                                                            <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(achievement.id)}>
+                                                                <i className="fa-solid fa-trash"></i>
+                                                            </button>
                                                         </abbr>
                                                     </div>
                                                 </td>
                                             </tr>
                                         ))}
                                     </tbody>
+
                                 </table>
                             ) : (
                                 <h1 className='text-xl md:text-2xl mt-3 text-center font-bold text-[#262847]'>No Data Available</h1>

@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { userContext } from '../App';
 import AnimationWrapper from './Page-Animation';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import logo from '../assets/dmce.png';
 
 const SignUpForm = () => {
     const { user, setUser } = useContext(userContext)
@@ -93,10 +95,13 @@ const SignUpForm = () => {
     return (
         <section className='w-full min-h-screen p-4 md:p-2'>
             <AnimationWrapper className='mx-auto w-full'>
-                <div className='w-full max-md:mt-8  max-md:mb-8'>
-                    <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Sign Up</h1>
+            <div className='w-full'>
+                    <img src={logo} className='w-40 mx-auto mb-4' alt="" />
                 </div>
-                <div className='grid grid-cols-1  mt-4 gap-4 w-full'>
+                <div className='w-full max-md:mt-8  max-md:mb-8'>
+                    <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847] tracking-[3px]'>Sign Up</h1>
+                </div>
+                <div className='grid grid-cols-1 gap-4 w-full'>
                     <div className=' w-full lg:w-[60%] mx-auto md:w-[80%] p-2 md:p-8 mt-4'>
                         <label className='label' htmlFor="firstName">First Name</label>
                         <input type="text" id='firstName' name="firstName" className='input' onChange={handleChange} />

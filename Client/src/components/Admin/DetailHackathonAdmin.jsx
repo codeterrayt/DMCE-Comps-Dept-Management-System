@@ -10,6 +10,8 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from '../Loaders';
 import AnimationWrapper from '../Page-Animation';
+import AdminNavBar from './AdminNavBar';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 
 const DetailHackathonAdmin = () => {
     const [loader, setloader] = useState(false)
@@ -228,6 +230,8 @@ const DetailHackathonAdmin = () => {
 
 
     return (
+        <>
+        <AdminNavBar/>
         <section className='w-full min-h-screen p-4 md:p-8'>
             {
                 loader ? <Loaders />
@@ -361,6 +365,9 @@ const DetailHackathonAdmin = () => {
                         </div></AnimationWrapper>
             }
         </section>
+        
+        </>
+      
     );
 };
 

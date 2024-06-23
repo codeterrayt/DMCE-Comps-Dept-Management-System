@@ -3,6 +3,7 @@ import { getToken } from '../../helper/getToken';
 import axios from 'axios';
 import { checkLogin } from '../../helper/checkLogin';
 import { useNavigate } from 'react-router-dom';
+import Loaders3 from '../Loader3';
 import Loaders from '../Loaders';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -13,6 +14,7 @@ import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 import AnimationWrapper from '../Page-Animation';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import AdminNavBar from './AdminNavBar';
 
 const HomeAdmin = () => {
   const [student, setStudent] = useState([]);
@@ -118,10 +120,26 @@ const HomeAdmin = () => {
 
 
   const [selectedCheckbox, setSelectedCheckbox] = useState('');
+  const [cats, setCats] = useState([]);
+
+  const [pdfLoading, setPdfLoading] = useState(false)
 
   const handleCheckboxChange = (name, value) => {
-    console.log(name);
-    if (name == 'internship' || name == 'placements' || name == 'achievements' || name == 'hackathons' || name == 'higher_studies' || value == 'ecc') {
+    console.log(name, value);
+    if (name == 'internship' || name == 'placements' || name == 'achievements' || name == 'hackathons' || name == 'higher_studies' || name == 'ecc') {
+      // Add a new name to the cats array
+
+      if (cats.includes(name)) {
+        // If it exists, filter it out and update the state
+        const updatedCats = cats.filter(cat => cat !== name);
+        setCats(updatedCats);
+      } else {
+        // If it doesn't exist, add it to the state
+        setCats(prevCats => [...prevCats, name]);
+      }
+
+      console.log("varad", cats);
+
       if (value && !selectedCheckbox) {
         setSelectedCheckbox(name);
       } else {
@@ -161,7 +179,7 @@ const HomeAdmin = () => {
       const confirmOptions = {
         customUI: ({ onClose }) => (
           <Modal classNames={"rounded-md"} open={true} onClose={onClose} center>
-            <div className="rounded-md p-6">
+            <div className="rounded-md p-6 -z-50 min-w-[200px]">
               <h2 className="font-bold text-xl mb-4">{'Change Password for ' + info.name}</h2>
               <input
                 id='pass'
@@ -176,6 +194,8 @@ const HomeAdmin = () => {
                   className="py-2 px-4 rounded-md bg-[#262847] text-white"
                   onClick={() => {
                     const newPassword = document.getElementById('pass').value
+                    const msgpara = document.getElementById('msg')
+
                     console.log(newPassword);
                     const btn = document.getElementById('btn')
 
@@ -205,132 +225,9 @@ const HomeAdmin = () => {
                         onClose(); // Close modal on success
                       })
                       .catch((error) => {
-                        console.log(error);
-                        toast.error(getFirstErrorMessage(error.response.data));
-                      });
-                  }}
-
-                >
-                  Change
-                </button>
-                <button
-                  className="py-2 px-4 rounded-md bg-[#262847] text-white"
-                  onClick={onClose}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </Modal>
-        ),
-      };
-
-      confirmAlert(confirmOptions);
-    } catch (error) {
-      setLoader(false);
-      toast.error(error.message);
-    }
-  }
-
-  const handleSignOut = () => {
-
-    const token = getToken()
-    const loding = toast.loading('logging out')
-
-    let data = new FormData();
-
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: `${import.meta.env.VITE_SERVER_DOMAIN}/logout`,
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...data.getHeaders
-      },
-      data: data
-    };
-
-    axios.request(config)
-      .then((response) => {
-        localStorage.clear()
-        if (response?.data?.status == 'success') {
-          toast.dismiss(loading)
-          toast.success("logout done")
-          return navigate('/login')
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-
-
-  }
-
-
-  const handleAdminChangePassword = () => {
-    try {
-      const confirmOptions = {
-        customUI: ({ onClose }) => (
-          <Modal classNames={"rounded-md"} open={true} onClose={onClose} center>
-            <div className="rounded-md p-6">
-              <h2 className="font-bold text-xl mb-4">Change Password</h2>
-              <input
-                id='pass'
-                type="text"
-                placeholder="Current Password"
-
-                className="border rounded-md px-3 py-2 w-full mb-4"
-              />
-              <input
-                id='pass2'
-                type="text"
-                placeholder="New Password"
-
-                className="border rounded-md px-3 py-2 w-full mb-4"
-              />
-              <div className="flex items-center gap-4 justify-between">
-                <button
-                  id='btn'
-                  className="py-2 px-4 rounded-md bg-[#262847] text-white"
-                  onClick={() => {
-                    const password = document.getElementById('pass').value
-                    const password2 = document.getElementById('pass2').value
-                    const btn = document.getElementById('btn')
-
-                    const user = localStorage.getItem('dmceuser')
-                    const { id } = JSON.parse(user)
-                    let data = new FormData();
-                    data.append('id', id);
-                    data.append('new_password', password2);
-
-                    data.append('current_password', password);
-
-                    const token = getToken();
-
-                    let config = {
-                      method: 'post',
-                      maxBodyLength: Infinity,
-                      url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/password`,
-                      headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                        ...data.getHeaders
-                      },
-                      data: data
-                    };
-                    btn.innerText = 'Loading';
-
-                    axios.request(config)
-                      .then((response) => {
-                        console.log(JSON.stringify(response.data));
-                        toast.success('Password changed successfully');
-                        onClose(); // Close modal on success
-                      })
-                      .catch((error) => {
                         console.log(error.response.data);
-                        toast.error(getFirstErrorMessage(error.response.data));
+                        const msg = getFirstErrorMessage(error.response.data)
+                        msgpara.innerText = msg
                       });
                   }}
 
@@ -344,6 +241,9 @@ const HomeAdmin = () => {
                   Cancel
                 </button>
               </div>
+              <div>
+                <p className='text-center py-4 p-2 font-bold text-sm text-red-600 underline' id='msg'></p>
+              </div>
             </div>
           </Modal>
         ),
@@ -351,27 +251,30 @@ const HomeAdmin = () => {
 
       confirmAlert(confirmOptions);
     } catch (error) {
-      setLoader(false);
       toast.error(error.message);
     }
   }
+
+
+
+
 
 
 
 
   //pdf
 
-  console.log(selectedCheckbox);
 
 
 
   async function fetchDataForStudent(studentId) {
     try {
-      setLoading(true)
       const token = getToken()
 
-      const url = selectedCheckbox
-        ? `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/student/${selectedCheckbox}?student_id=${studentId}`
+      const category = cats.length == 1 && cats[0]
+
+      const url = category
+        ? `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/student/${category}?student_id=${studentId}`
         : "";
       const response = await axios.get(url, {
         headers: {
@@ -379,11 +282,10 @@ const HomeAdmin = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      setLoading(false)
       return response.data.data[0];
     } catch (error) {
       console.error(`Error fetching data for student ${studentId}:`, error);
-      setLoading(false)
+      setPdfLoading(false)
       return null;
     }
   }
@@ -392,6 +294,8 @@ const HomeAdmin = () => {
   const allResponses = [];
 
   async function fetchAllDataForStudents() {
+    setPdfLoading(true)
+
     for (const studentId of studentIds) {
       const responseData = await fetchDataForStudent(studentId);
       if (responseData) {
@@ -401,17 +305,17 @@ const HomeAdmin = () => {
 
     // Once all responses are collected, you can process them as needed
     console.log('All responses:', allResponses);
-    if (selectedCheckbox === 'internship') {
+    if (cats[0] === 'internship') {
       generatePDF(allResponses);
-    } else if (selectedCheckbox === 'placements') {
+    } else if (cats[0] === 'placements') {
       generatePDFInternship(allResponses);
-    } else if (selectedCheckbox === 'achievements') {
+    } else if (cats[0] === 'achievements') {
       generatePDFAchievement(allResponses);
-    } else if (selectedCheckbox === 'hackathons') {
+    } else if (cats[0] === 'hackathons') {
       generatePDFHackathon(allResponses);
-    } else if (selectedCheckbox === 'higher_studies') {
+    } else if (cats[0] === 'higher_studies') {
       generatePDFHigherStudy(allResponses);
-    } else if (selectedCheckbox === 'ecc') {
+    } else if (cats[0] === 'ecc') {
       generatePDFEcc(allResponses);
     }
   }
@@ -448,7 +352,7 @@ const HomeAdmin = () => {
       startY: 20, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
     });
-
+    setPdfLoading(false)
     doc.save('Student Internship detail.pdf');
     console.log('PDF generated successfully');
   }
@@ -483,7 +387,7 @@ const HomeAdmin = () => {
       body: tableRows,
       startY: 20, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
-    });
+    }); setPdfLoading(false)
 
     doc.save('extracurricular_activity_data.pdf');
     console.log('PDF generated successfully');
@@ -519,7 +423,7 @@ const HomeAdmin = () => {
       body: tableRows,
       startY: 20, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
-    });
+    }); setPdfLoading(false)
 
     doc.save('achievement_data.pdf');
     console.log('PDF generated successfully');
@@ -556,7 +460,7 @@ const HomeAdmin = () => {
       body: tableRows,
       startY: 20, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
-    });
+    }); setPdfLoading(false)
 
     doc.save('hackathon_data.pdf');
     console.log('PDF generated successfully');
@@ -594,7 +498,7 @@ const HomeAdmin = () => {
       body: tableRows,
       startY: 20, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
-    });
+    }); setPdfLoading(false)
 
     doc.save('student_higher_studies_data.pdf');
     console.log('PDF generated successfully');
@@ -630,7 +534,7 @@ const HomeAdmin = () => {
       body: tableRows,
       startY: 20, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
-    });
+    }); setPdfLoading(false)
 
     doc.save('student_placement_data.pdf');
     console.log('PDF generated successfully');
@@ -642,18 +546,8 @@ const HomeAdmin = () => {
 
   return (
     <section className='min-h-screen w-full  '>
-      <nav className='w-full max-md:mt-8  max-md:mb-8 bg-[#262847] py-4 px-8 flex items-center justify-between'>
-        <h1 className='text-center text-xl md:text-4xl font-bold text-white'>Admin Panel</h1>
-        <div className=' p-2 flex items-center gap-8 text-xl  text-black cursor-pointer rounded-md font-bold' >
-          <button onClick={handleAdminChangePassword} className='bg-white p-2 rounded-md' > Change Password </button>
-          <button onClick={handleSignOut} className='bg-white p-2 rounded-md' >Sign out </button>
 
-
-
-        </div>
-      </nav>
-
-      {/* filters  */}
+      <AdminNavBar />
       <div className='w-full p-4 flex items-center gap-4 max-md:gap-3 border-b-2 '>
         <div className='font-bold'>
           <label htmlFor='divSelect' className='block text-sm font-medium text-gray-700'>Select Division:</label>
@@ -755,14 +649,14 @@ const HomeAdmin = () => {
             <label htmlFor='eccChecked' className='ml-2 text-sm text-gray-700'>Extra Activity</label>
           </div>
           {
-            selectedCheckbox && <button onClick={fetchAllDataForStudents} className='p-2 text-red-600 text-2xl rounded-md' ><i className="fa-solid fa-file-pdf"></i> </button>
+            cats.length == 1 && <button onClick={fetchAllDataForStudents} className='p-2 text-red-600 text-2xl rounded-md' ><i className="fa-solid fa-file-pdf"></i> </button>
           }
         </div>
 
       </div>
-      {loading ? (
-        <Loaders message={'Fetching Student'} />
-      ) : (
+      {pdfLoading ? (
+        <Loaders3 />
+      ) : loading ? <Loaders message={'Fetching student'} /> : (
         <AnimationWrapper>
 
 

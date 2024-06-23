@@ -11,6 +11,9 @@ import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
 import CertificatePopup from '../Pop';
 import AnimationWrapper from '../Page-Animation';
+import AdminNavBar from './AdminNavBar';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
+
 
 const PlacementAdmin = () => {
     //pop up 
@@ -184,6 +187,8 @@ const PlacementAdmin = () => {
     // }
 
     return (
+        <>
+        <AdminNavBar/>
         <section className='w-full min-h-screen p-4 md:p-8'>
             {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
@@ -273,6 +278,8 @@ const PlacementAdmin = () => {
                 </AnimationWrapper>
             )}
         </section>
+        </>
+       
     );
 };
 

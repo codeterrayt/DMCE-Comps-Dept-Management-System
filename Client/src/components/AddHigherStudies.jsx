@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -10,6 +10,8 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
+import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import { getYearOptions } from '../helper/helper';
 
 const AddHigherStudies = () => {
     const [loader, setloader] = useState(false)
@@ -70,60 +72,52 @@ const AddHigherStudies = () => {
     }
 
     const navigate = useNavigate()
+    const parentDivRef = useRef(null);
 
     // Handle form submission
     const handleSubmit = () => {
         // Check if all required fields are filled individually and provide error messages for each missing field
-        if (!id && !formData.academic_year) {
-            toast.error('Please select the academic year.');
-            return;
+        if ( !formData.academic_year) {
+            return handleValidationError('academic_year', 'Please select the academic year.');
         }
-        if (!id && !formData.exam_type) {
-            toast.error('Please enter the exam type.');
-            return;
+        if ( !formData.exam_type) {
+            return handleValidationError('exam_type', 'Please enter the exam type.');
         }
-        if (!id && !formData.score) {
-            toast.error('Please enter the score.');
-            return;
+        if ( !formData.score) {
+            return handleValidationError('score', 'Please enter the score.');
         }
-        if (!id && !formData.city) {
-            toast.error('Please enter the city.');
-            return;
+        if ( !formData.city) {
+            return handleValidationError('city', 'Please enter the city.');
         }
-        if (!id && !formData.state) {
-            toast.error('Please enter the state.');
-            return;
+        if ( !formData.state) {
+            return handleValidationError('state', 'Please enter the state.');
         }
-        if (!id && !formData.country) {
-            toast.error('Please enter the country.');
-            return;
+        if ( !formData.country) {
+            return handleValidationError('country', 'Please enter the country.');
         }
-        if (!id && !formData.university_name) {
-            toast.error('Please enter the university name.');
-            return;
+        if ( !formData.university_name) {
+            return handleValidationError('university_name', 'Please enter the university name.');
         }
-        if (!id && !formData.course) {
-            toast.error('Please enter the course.');
-            return;
+        if ( !formData.course) {
+            return handleValidationError('course', 'Please enter the course.');
         }
-        if (!id && !formData.guide) {
-            toast.error('Please enter the project guide.');
-            return;
+        if ( !formData.guide) {
+            return handleValidationError('guide', 'Please enter the project guide.');
         }
         if (!id && !formData.admission_letter) {
-            toast.error('Please upload the admission letter.');
-            return;
+            return handleValidationError('admission_letter', 'Please upload the admission letter.');
         }
 
-        if (!id && formData.admission_letter.size > 512 * 1024) {
-            toast.error('Admission letter file size should be less than 512 KB.');
-            return;
+        // Check if the file size is less than 512 KB
+        const fileSizeLimit = 512 * 1024;
+        if (!id && formData.admission_letter.size > fileSizeLimit) {
+            return toast.error('Admission letter file size should be less than 512 KB.');
         }
 
         // Proceed with form submission if all checks pass
-        const loading = toast.loading('Wait.. adding your details');
+        const loading = toast.loading('Adding your details...');
 
-        let data = new FormData();
+        const data = new FormData();
         data.append('student_academic_year', formData.academic_year);
         data.append('student_exam_type', formData.exam_type);
         data.append('student_score', formData.score);
@@ -134,7 +128,6 @@ const AddHigherStudies = () => {
         data.append('student_course', formData.course);
         data.append('student_project_guide', formData.guide);
         if (formData.admission_letter) {
-
             data.append('student_admission_letter', formData.admission_letter);
         }
         if (id) {
@@ -143,7 +136,7 @@ const AddHigherStudies = () => {
 
         const token = getToken();
 
-        let config = {
+        const config = {
             method: 'post',
             maxBodyLength: Infinity,
             url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/higher-studies` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/higher-studies`,
@@ -160,18 +153,40 @@ const AddHigherStudies = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                return navigate('/dmce/higher-studies')
+                navigate('/dmce/higher-studies');
             })
             .catch((error) => {
                 console.error(error);
                 toast.dismiss(loading);
                 if (error.response && error.response.status === 401) {
                     localStorage.clear();
-                    return navigate('/login');
+                    navigate('/login');
+                } else {
+                    toast.error(getFirstErrorMessage(error.response.data));
                 }
-                toast.error(getFirstErrorMessage(error.response.data));
             });
     };
+
+
+
+
+    const handleValidationError = (fieldId, errorMessage) => {
+        const academicYearInput = parentDivRef.current.querySelector(`#${fieldId}`);
+        if (academicYearInput) {
+            academicYearInput.style.border = '3px solid red';
+
+            // Scroll to the input field
+            academicYearInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Reset border after 3 seconds
+            setTimeout(() => {
+                academicYearInput.style.border = '1px solid black';
+            }, 3000);
+        }
+
+        toast.error(errorMessage);
+    };
+
 
     const getDataById = (id) => {
         setloader(true)
@@ -223,6 +238,7 @@ const AddHigherStudies = () => {
         }
     }
 
+    const year = getYearOptions()
 
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
@@ -231,7 +247,7 @@ const AddHigherStudies = () => {
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Higher Study Detail"}</h1>
                     </div>
-                    <div className='w-full grid md:grid-cols-2 grid-cols-1'>
+                    <div ref={parentDivRef} className='w-full grid md:grid-cols-2 grid-cols-1'>
                         <div className='w-full md:p-8 md:mt-4 '>
                             <label className='label' htmlFor="academic_year">Select Academic Year</label>
                             <Box sx={{ minWidth: 120 }}>
@@ -245,7 +261,12 @@ const AddHigherStudies = () => {
                                         value={formData.academic_year || ''}
                                         onChange={handleChange}
                                     >
-                                        {years}
+                                        {year.length > 0 && year.map((year) => (
+                                            <MenuItem key={year.key} value={year.value}>
+                                                {year.value}
+                                            </MenuItem>
+                                        ))}
+
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -254,7 +275,7 @@ const AddHigherStudies = () => {
                             <input value={formData.exam_type} type="text" id='exam_type' name='exam_type' className='input' onChange={handleChange} />
 
                             <label className='label' htmlFor="score">Score <p className='example'>e.g:- 60/100</p></label>
-                            <input value={formData.score} type="number" id='score' name='score' className='input' onChange={handleChange} />
+                            <input value={formData.score} type="text" id='score' name='score' className='input' onChange={handleChange} />
 
                             <label className='label' htmlFor="city">City <p className='example'>e.g:- Los Angelous</p></label>
                             <input value={formData.city} type="text" id='city' name='city' className='input' onChange={handleChange} />
@@ -274,6 +295,8 @@ const AddHigherStudies = () => {
 
                             <label className='label' htmlFor="guide">Guide Name</label>
                             <input value={formData.guide} type="text" id='guide' name='guide' className='input' onChange={handleChange} />
+                            <label className='label' htmlFor="desc">Description</label>
+                            <textarea type="text" id='desc' name='desc' className='input' onChange={handleChange} />
 
                             <label className='label' htmlFor="admission_letter">Admission Letter <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">
