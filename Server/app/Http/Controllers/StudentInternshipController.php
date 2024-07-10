@@ -28,6 +28,7 @@ class StudentInternshipController extends Controller
             'company_name' => 'required|string|max:255',
             'duration' => 'required|integer|max:255',
             'domain' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'completion_letter_path' => 'required|file|mimes:jpeg,jpg,png,pdf|max:512',
@@ -98,6 +99,7 @@ class StudentInternshipController extends Controller
             'offer_letter_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
             'permission_letter_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
             'student_year' => 'required|string|max:255',
+            'description' => 'nullable|string',
             // Add validation rules for other internship attributes here
         ]);
 

@@ -48,6 +48,7 @@ class StudentAchivementsController extends Controller
             'achievement_location' => 'required|string|max:255',
             'achievement_date' => 'required|date',
             'prize' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
         // Create a new Achievement instance
@@ -94,6 +95,7 @@ class StudentAchivementsController extends Controller
             'achievement_location' => 'required|string|max:255',
             'achievement_date' => 'required|date',
             'prize' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
             // Add validation rules for other internship attributes here
         ]);
 

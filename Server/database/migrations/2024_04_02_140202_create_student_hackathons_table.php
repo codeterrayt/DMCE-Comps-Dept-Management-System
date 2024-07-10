@@ -23,6 +23,7 @@ return new class extends Migration
             $table->date('hackathon_to_date');
             $table->string('hackathon_prize')->nullable();
             $table->string('hackathon_position')->nullable();
+            $table->string('description')->nullable();
             $table->string('hackathon_college_name');
             $table->string('hackathon_certificate_path')->nullable();
             $table->timestamps();

@@ -34,6 +34,7 @@ class StudentExtraCuController extends Controller
           'ecc_location' => 'required|string|max:255',
           'ecc_date' => 'required|date',
           'prize' => 'nullable|string|max:255',
+          'description' => 'nullable|string',
       ]);
 
       // Create a new ecc instance
@@ -80,6 +81,7 @@ class StudentExtraCuController extends Controller
           'ecc_location' => 'required|string|max:255',
           'ecc_date' => 'required|date',
           'prize' => 'nullable|string|max:255',
+          'description' => 'nullable|string',
           // Add validation rules for other internship attributes here
       ]);
 

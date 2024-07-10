@@ -25,6 +25,7 @@ class StudentHackathonsController extends Controller
             'hackathon_position' => 'nullable|string|max:255',
             'hackathon_college_name' => 'required|string|max:255',
             'hackathon_certificate_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'description' => 'nullable|string',
         ]);
 
         // Create a new StudentHackathons instance
@@ -98,6 +99,7 @@ class StudentHackathonsController extends Controller
             'hackathon_position' => 'nullable|string|max:255',
             'hackathon_college_name' => 'required|string|max:255',
             'hackathon_certificate_path' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
+            'description' => 'nullable|string',
         ]);
 
         // Find the StudentHackathons by ID

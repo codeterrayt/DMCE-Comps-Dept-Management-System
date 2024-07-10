@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('student_course');
             $table->string('student_admission_letter')->nullable();
             $table->string('student_project_guide');
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }

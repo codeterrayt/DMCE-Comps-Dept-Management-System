@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('company_name')->nullable();
             $table->integer('duration')->nullable();
             $table->string('domain')->nullable();
+            $table->string('description')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->string('completion_letter_path')->nullable();

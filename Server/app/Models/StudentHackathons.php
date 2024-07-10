@@ -21,6 +21,7 @@ class StudentHackathons extends Model
         'hackathon_position',
         'hackathon_college_name',
         'hackathon_certificate_path',
+        'description'
     ];
 
 }

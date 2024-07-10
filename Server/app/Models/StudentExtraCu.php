@@ -19,6 +19,7 @@ class StudentExtraCu extends Model
         'ecc_location',
         'ecc_date',
         'prize',
+        'description',
     ];
 
     public function user()
