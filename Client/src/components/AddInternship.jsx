@@ -42,7 +42,8 @@ const AddInternship = () => {
         offerLetter: null,
         permissionLetter: null,
         year: '',
-        companyName: ''
+        companyName: '',
+        desc: ''
     });
 
     const handleChange = (e) => {
@@ -67,32 +68,35 @@ const AddInternship = () => {
     // }
 
     const handleSubmit = () => {
-        if ( !data.academicYear) {
+        if (!data.academicYear) {
             return handleValidationError('academicYear', "Please enter the academic year.");
         }
-        if ( !data.year) {
+        if (!data.year) {
             return handleValidationError('year', "Please enter the student year.");
         }
-        if ( !data.duration) {
+        if (!data.duration) {
             return handleValidationError('duration', "Please enter the duration.");
         }
-        if ( !data.startDate) {
+        if (!data.startDate) {
             return handleValidationError('startDate', "Please enter the start date.");
         }
-        if ( !data.endDate) {
+        if (!data.endDate) {
             return handleValidationError('endDate', "Please enter the end date.");
         }
-        if ( !data.companyName) {
+        if (!data.desc || data.desc.length > 400) {
+            return handleValidationError('desc', "Please enter the description of 400 characters.");
+        }
+        if (!data.companyName) {
             return handleValidationError('companyName', "Please enter the company name.");
         }
-        if ( !data.domain) {
+        if (!data.domain) {
             return handleValidationError('domain', "Please enter the domain.");
         }
-
-        if ( !id && !data.completionLetter) {
+    
+        if (!id && !data.completionLetter) {
             return handleValidationError('completionLetter', "Please upload the completion letter.");
         }
-        if ( !id && !data.certificate) {
+        if (!id && !data.certificate) {
             return handleValidationError('certificate', "Please upload the certificate.");
         }
         if (!id && !data.offerLetter) {
@@ -101,12 +105,10 @@ const AddInternship = () => {
         if (!id && !data.permissionLetter) {
             return handleValidationError('permissionLetter', "Please upload the permission letter.");
         }
-
-
-
+    
         // Check file sizes
         const fileSizeLimit = 512 * 1024;
-        if ( !id && data.completionLetter.size > fileSizeLimit) {
+        if (!id && data.completionLetter.size > fileSizeLimit) {
             return toast.error("Completion letter size should be less than 512 KB.");
         }
         if (!id && data.certificate.size > fileSizeLimit) {
@@ -118,9 +120,9 @@ const AddInternship = () => {
         if (!id && data.permissionLetter.size > fileSizeLimit) {
             return toast.error("Permission letter size should be less than 512 KB.");
         }
-
+    
         const loading = toast.loading('Wait. Internship details are being processed.');
-
+    
         let form = new FormData();
         form.append('academic_year', data.academicYear);
         form.append('duration', data.duration);
@@ -129,6 +131,7 @@ const AddInternship = () => {
         form.append('end_date', data.endDate);
         form.append('student_year', data.year);
         form.append('company_name', data.companyName);
+        form.append('description', data.desc);
         if (data.completionLetter) {
             form.append('completion_letter_path', data.completionLetter);
         }
@@ -144,7 +147,12 @@ const AddInternship = () => {
         if (id) {
             form.append('id', id);
         }
-
+    
+        // Log the FormData contents
+        for (let [key, value] of form.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+    
         const token = getToken();
         let config = {
             method: 'post',
@@ -157,7 +165,7 @@ const AddInternship = () => {
             },
             data: form
         };
-
+    
         axios.request(config)
             .then((response) => {
                 console.log(JSON.stringify(response.data));
@@ -175,6 +183,7 @@ const AddInternship = () => {
                 return toast.error(getFirstErrorMessage(error.response.data));
             });
     };
+    
     const handleValidationError = (fieldId, errorMessage) => {
         const academicYearInput = parentDivRef.current.querySelector(`#${fieldId}`);
         if (academicYearInput) {
@@ -221,6 +230,7 @@ const AddInternship = () => {
                         endDate: response.data.end_date,
                         year: response.data.student_year,
                         companyName: response.data.company_name,
+                        desc: response.data.description,
                     })
                 })
                 .catch((error) => {
@@ -307,8 +317,9 @@ const AddInternship = () => {
 
                             <label className='label' htmlFor="endDate">End Date</label>
                             <input type="Date" value={data.endDate} id='endDate' name="endDate" className='input' onChange={handleChange} />
-                            <label className='label' htmlFor="desc">Description</label>
+                            <label className='label' htmlFor="desc">Description </label>
                             <textarea type="text" id='desc' name="desc" className='input' onChange={handleChange} />
+                            <p className='text-right text-sm font-bold '><span className='text-green-600'>{data.desc.length}</span>/400</p>
 
                         </div>
                         <div className='w-full md:p-8 md:mt-4 '>

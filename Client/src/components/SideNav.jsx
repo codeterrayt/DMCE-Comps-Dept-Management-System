@@ -193,7 +193,7 @@ const SideNav = () => {
 
     return (
         <section className="border relative flex py-0 m-0 max-md:flex-col w-full">
-            <div className="fixed w-full md:fixed  md:top-[20px] z-30 ">
+            <div className="sticky md:fixed  md:top-[20px] z-30 ">
                 <div className="md:hidden bg-white  border-b border-grey flex flex-nowrap overflow-x-auto ">
                     <button
                         onClick={changePageState}
