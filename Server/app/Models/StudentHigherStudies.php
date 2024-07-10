@@ -20,6 +20,7 @@ class StudentHigherStudies extends Model
         'student_course',
         'student_admission_letter',
         'student_project_guide',
+        'description'
     ];
 
 }

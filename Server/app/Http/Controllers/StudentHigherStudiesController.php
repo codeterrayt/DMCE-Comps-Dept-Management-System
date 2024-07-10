@@ -24,6 +24,7 @@ class StudentHigherStudiesController extends Controller
             'student_course' => 'required|string|max:255',
             'student_admission_letter' => 'required|file|mimes:jpeg,jpg,png,pdf|max:512',
             'student_project_guide' => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
 
         // Create a new StudentHigherStudies instance
@@ -69,6 +70,7 @@ class StudentHigherStudiesController extends Controller
             'student_course' => 'required|string|max:255',
             'student_admission_letter' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:512',
             'student_project_guide' => 'required|string|max:255',
+            'description' => 'nullable|string',
         ]);
         // Find the StudentHigherStudies by ID
         $StudentHigherStudies = StudentHigherStudies::findOrFail($request->id);

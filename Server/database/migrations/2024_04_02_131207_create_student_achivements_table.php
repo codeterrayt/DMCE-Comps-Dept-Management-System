@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('academic_year');
             $table->string('student_year');
             $table->string('achievement_certificate_path')->nullable();
+            $table->string('description')->nullable();
             $table->string('achievement_domain');
             $table->string('college_name');
             $table->string('achievement_level');

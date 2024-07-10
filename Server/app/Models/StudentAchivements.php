@@ -21,6 +21,7 @@ class StudentAchivements extends Model
         'achievement_location',
         'achievement_date',
         'prize',
+        "description"
     ];
 
     public function user()

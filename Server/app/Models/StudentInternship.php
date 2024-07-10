@@ -22,6 +22,7 @@ class StudentInternship extends Model
         'offer_letter_path',
         'permission_letter_path',
         'student_year',
+        'description'
     ];
 
     public function user()
