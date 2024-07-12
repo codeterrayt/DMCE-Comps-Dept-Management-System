@@ -229,26 +229,26 @@ const Placement = () => {
                                     <tbody>
                                         {placement.map((row, rowIndex) => (
                                             <tr key={rowIndex}>
-                                                <td className='text-center text-sm' data-label="AY">{row.academic_year}</td>
-                                                <td className='text-center text-sm' data-label="Campus/Off campus">{row.campus_or_off_campus === 0 ? 'Campus' : 'Off Campus'}</td>
-                                                <td className='text-center text-sm' data-label="City">{row.city}</td>
-                                                <td className='text-center text-sm' data-label="Company Name">{row.company_name}</td>
-                                                <td className='text-center text-sm' data-label="Country">{row.country}</td>
-                                                <td className='text-center text-sm' data-label="Domain">{row.domain}</td>
-                                                <td className='text-center text-sm' data-label="Package">{row.package} Lac</td>
-                                                <td className='text-center text-sm' data-label="Passout Year">{row.passout_year}</td>
-                                                <td className='text-center text-sm' data-label="Pincode">{row.pincode}</td>
-                                                <td className='text-center text-sm' data-label="Position">{row.position}</td>
-                                                <td className='text-center text-sm' data-label="State">{row.state}</td>
-                                                <td className='text-center text-sm' data-label="Offer Letter">
+                                                <td className='md:text-center text-sm' data-label="AY">{row.academic_year}</td>
+                                                <td className='md:text-center text-sm' data-label="Campus/Off campus">{row.campus_or_off_campus === 0 ? 'Campus' : 'Off Campus'}</td>
+                                                <td className='md:text-center text-sm' data-label="City">{row.city}</td>
+                                                <td className='md:text-center text-sm' data-label="Company Name">{row.company_name}</td>
+                                                <td className='md:text-center text-sm' data-label="Country">{row.country}</td>
+                                                <td className='md:text-center text-sm' data-label="Domain">{row.domain}</td>
+                                                <td className='md:text-center text-sm' data-label="Package">{row.package} Lac</td>
+                                                <td className='md:text-center text-sm' data-label="Passout Year">{row.passout_year}</td>
+                                                <td className='md:text-center text-sm' data-label="Pincode">{row.pincode}</td>
+                                                <td className='md:text-center text-sm' data-label="Position">{row.position}</td>
+                                                <td className='md:text-center text-sm' data-label="State">{row.state}</td>
+                                                <td className='md:text-center text-sm' data-label="Offer Letter">
                                                     <abbr title="See Offer Letter">
                                                         <button onClick={() => openCertificate(row.offer_letter)} className="certificate">
                                                             <i className="fa-solid fa-eye"></i>
                                                         </button>
                                                     </abbr>
                                                 </td>
-                                                <td className='text-center text-sm' data-label="Actions">
-                                                    <div className='flex items-center justify-center gap-2'>
+                                                <td className='md:text-center text-sm' data-label="Actions">
+                                                    <div className='flex items-center md:justify-center gap-2'>
                                                         <abbr title="Edit">
                                                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded" onClick={() => navigate(`/dmce/add/placement/${row.id}`)}>
                                                                 <i className="fa-solid fa-pen-to-square"></i>

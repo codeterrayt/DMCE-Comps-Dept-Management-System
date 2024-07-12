@@ -15,8 +15,10 @@ import AnimationWrapper from '../Page-Animation';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import AdminNavBar from './AdminNavBar';
+import { img } from '../../helper/pdfBackGround';
 
 const HomeAdmin = () => {
+
   const [student, setStudent] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
@@ -273,8 +275,11 @@ const HomeAdmin = () => {
 
       const category = cats.length == 1 && cats[0]
 
+
+
+
       const url = category
-        ? `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/student/${category}?student_id=${studentId}`
+        ? `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/student/${category == 'higher_studies' ? 'higher-studies' : category}?student_id=${studentId}`
         : "";
       const response = await axios.get(url, {
         headers: {
@@ -342,15 +347,30 @@ const HomeAdmin = () => {
         ]);
       });
     });
-
-    // Add title before the table
-    doc.text('Internship Details', 14, 10);
+      // Calculate position for the logo
+      const imgWidth = 15; 
+      const imgHeight = 15; 
+      const imgX = doc.internal.pageSize.getWidth() - imgWidth - 15; 
+      const imgY = 5; 
+    
+     
+    
+      doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
+    
+    
+      doc.setFontSize(14);
+      doc.text('Internship Details', 14, 10);
+      doc.setFontSize(9);
+      doc.text('This Data Is From Official DMCE-Computer Data Management System', 14, 18);
 
     doc.autoTable({
       head: [tableColumnNames],
       body: tableRows,
-      startY: 20, // Adjust startY to leave space for the title
+      startY: 22, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
+      styles: {
+        fontSize: 8 // Set the font size for the table data
+      }
     });
     setPdfLoading(false)
     doc.save('Student Internship detail.pdf');
@@ -379,14 +399,29 @@ const HomeAdmin = () => {
       });
     });
 
-    // Add title before the table
+    const imgWidth = 15; 
+    const imgHeight = 15; 
+    const imgX = doc.internal.pageSize.getWidth() - imgWidth - 15; 
+    const imgY = 5; 
+  
+   
+  
+    doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
+  
+  
+    doc.setFontSize(14);
     doc.text('Extracurricular Activity Details', 14, 10);
+    doc.setFontSize(9);
+    doc.text('This Data Is From Official DMCE-Computer Data Management System', 14, 18);
 
     doc.autoTable({
       head: [tableColumnNames],
       body: tableRows,
-      startY: 20, // Adjust startY to leave space for the title
+      startY: 22, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
+      styles: {
+        fontSize: 8 // Set the font size for the table data
+      }
     }); setPdfLoading(false)
 
     doc.save('extracurricular_activity_data.pdf');
@@ -415,14 +450,29 @@ const HomeAdmin = () => {
       });
     });
 
-    // Add title before the table
+    const imgWidth = 15; 
+    const imgHeight = 15; 
+    const imgX = doc.internal.pageSize.getWidth() - imgWidth - 15; 
+    const imgY = 5; 
+  
+   
+  
+    doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
+  
+  
+    doc.setFontSize(14);
     doc.text('Achievement Details', 14, 10);
+    doc.setFontSize(9);
+    doc.text('This Data Is From Official DMCE-Computer Data Management System', 14, 18);
 
     doc.autoTable({
       head: [tableColumnNames],
       body: tableRows,
-      startY: 20, // Adjust startY to leave space for the title
+      startY: 22, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
+      styles: {
+        fontSize: 8 // Set the font size for the table data
+      }
     }); setPdfLoading(false)
 
     doc.save('achievement_data.pdf');
@@ -452,15 +502,31 @@ const HomeAdmin = () => {
       });
     });
 
-    // Add title before the table
-    doc.text('Hackathon Details', 14, 10);
+    const imgWidth = 15; 
+    const imgHeight = 15; 
+    const imgX = doc.internal.pageSize.getWidth() - imgWidth - 15; 
+    const imgY = 5; 
+  
+   
+  
+    doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
+  
+  
+    doc.setFontSize(14);
+    doc.text('Hackathons Details', 14, 10);
+    doc.setFontSize(9);
+    doc.text('This Data Is From Official DMCE-Computer Data Management System', 14, 18);
 
     doc.autoTable({
       head: [tableColumnNames],
       body: tableRows,
-      startY: 20, // Adjust startY to leave space for the title
+      startY: 22, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
-    }); setPdfLoading(false)
+      styles: {
+        fontSize: 8 // Set the font size for the table data
+      }
+    });
+    setPdfLoading(false);
 
     doc.save('hackathon_data.pdf');
     console.log('PDF generated successfully');
@@ -470,9 +536,15 @@ const HomeAdmin = () => {
   async function generatePDFHigherStudy(data) {
     const doc = new jsPDF();
 
-    const tableColumnNames = ['ID', 'First', 'Last', 'Exam', 'Score', 'City', 'State', 'Country', 'University Name', 'Course'];
+    const tableColumnNames = [
+      'ID', 'First', 'Last', 'Exam', 'Score', 'City', 'State', 'Country', 'University Name', 'Course'
+    ];
     const tableRows = [];
 
+
+
+    
+  
     data.forEach(student => {
       student.student_higher_studies.forEach(higherStudy => {
         tableRows.push([
@@ -490,20 +562,44 @@ const HomeAdmin = () => {
       });
     });
 
-    // Add title before the table
+  
+  
+  
+    const imgWidth = 15; 
+    const imgHeight = 15; 
+    const imgX = doc.internal.pageSize.getWidth() - imgWidth - 15; 
+    const imgY = 5; 
+  
+   
+  
+    doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
+  
+  
+    doc.setFontSize(14);
     doc.text('Student Higher Studies Details', 14, 10);
-
+    doc.setFontSize(9);
+    doc.text('This Data Is From Official DMCE-Computer Data Management System', 14, 18);
+  
     doc.autoTable({
       head: [tableColumnNames],
       body: tableRows,
-      startY: 20, // Adjust startY to leave space for the title
-      margin: { top: 20 }, // Adjust top margin to leave space for the title
-    }); setPdfLoading(false)
-
+      startY: 22, 
+      margin: { top: 20 }, 
+      styles: {
+        fontSize: 8 
+      }
+    });
+  
+    setPdfLoading(false);
+  
+    // Save the PDF file
     doc.save('student_higher_studies_data.pdf');
     console.log('PDF generated successfully');
   }
 
+ 
+
+//placemnet wala function
   async function generatePDFInternship(data) {
     const doc = new jsPDF();
 
@@ -526,14 +622,34 @@ const HomeAdmin = () => {
       });
     });
 
-    // Add title before the table
+      // Calculate position for the logo
+      const imgWidth = 15; 
+    const imgHeight = 15; 
+    const imgX = doc.internal.pageSize.getWidth() - imgWidth - 15; 
+    const imgY = 5; 
+  
+   
+  
+    doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
+  
+  
+    doc.setFontSize(14);
     doc.text('Student Placement Details', 14, 10);
+    doc.setFontSize(9);
+    doc.text('This Data Is From Official DMCE-Computer Data Management System', 14, 18);
+    
+
+    // Add title before the table
+
 
     doc.autoTable({
       head: [tableColumnNames],
       body: tableRows,
-      startY: 20, // Adjust startY to leave space for the title
+      startY: 22, // Adjust startY to leave space for the title
       margin: { top: 20 }, // Adjust top margin to leave space for the title
+      styles: {
+        fontSize: 8 // Set the font size for the table data
+      }
     }); setPdfLoading(false)
 
     doc.save('student_placement_data.pdf');

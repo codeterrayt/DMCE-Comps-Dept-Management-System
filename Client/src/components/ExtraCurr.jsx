@@ -195,20 +195,20 @@ const ExtraCurr = () => {
                                 <tbody>
                                     {activity.map((item, index) => (
                                         <tr key={index}>
-                                            <td className='text-center text-sm' data-label="AY">{item.academic_year}</td>
-                                            <td className='text-center text-sm' data-label="College">{item.college_name}</td>
-                                            <td className='text-center text-sm' data-label="Date">{formatDate(item.ecc_date)}</td>
-                                            <td className='text-center text-sm' data-label="Domain">{item.ecc_domain}</td>
-                                            <td className='text-center text-sm' data-label="Level">{item.ecc_level}</td>
-                                            <td className='text-center text-sm' data-label="Location">{item.ecc_location}</td>
-                                            <td className='text-center text-sm' data-label="Prize">{item.prize}</td>
-                                            <td className='text-center text-sm' data-label="Year">{item.student_year}</td>
-                                            <td className='text-center text-sm' data-label="Certificate">
+                                            <td className='md:text-center text-sm' data-label="AY">{item.academic_year}</td>
+                                            <td className='md:text-center text-sm' data-label="College">{item.college_name}</td>
+                                            <td className='md:text-center text-sm' data-label="Date">{formatDate(item.ecc_date)}</td>
+                                            <td className='md:text-center text-sm' data-label="Domain">{item.ecc_domain}</td>
+                                            <td className='md:text-center text-sm' data-label="Level">{item.ecc_level}</td>
+                                            <td className='md:text-center text-sm' data-label="Location">{item.ecc_location}</td>
+                                            <td className='md:text-center text-sm' data-label="Prize">{item.prize}</td>
+                                            <td className='md:text-center text-sm' data-label="Year">{item.student_year}</td>
+                                            <td className='md:text-center text-sm' data-label="Certificate">
                                                 <button onClick={() => openCertificate(item.ecc_certificate)} className="certificate">
                                                     <i className="fa-solid fa-eye"></i>
                                                 </button>
                                             </td>
-                                            <td className='text-center text-sm' data-label="Actions">
+                                            <td className='md:text-center text-sm' data-label="Actions">
                                                 <div className='flex gap-2 items-center'>
                                                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded" onClick={() => navigate(`/dmce/add/extra-curriculum/${item.id}`)}>
                                                         <i className="fa-solid fa-pen-to-square"></i>

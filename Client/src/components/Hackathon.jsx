@@ -193,23 +193,23 @@ const Hackathon = () => {
                                 <tbody>
                                     {hackathon.map(item => (
                                         <tr key={item.id}>
-                                            <td className='text-center text-sm' data-label="AY">{item.academic_year}</td>
-                                            <td className='text-center text-sm' data-label="College">{item.hackathon_college_name}</td>
-                                            <td className='text-center text-sm whitespace-nowrap' data-label="From Date">{formatDate(item.hackathon_from_date)}</td>
-                                            <td className='text-center text-sm whitespace-nowrap' data-label="To Date">{formatDate(item.hackathon_to_date)}</td>
-                                            <td className='text-center text-sm' data-label="Level">{item.hackathon_level}</td>
-                                            <td className='text-center text-sm' data-label="Location">{item.hackathon_location}</td>
-                                            <td className='text-center text-sm' data-label="Position">{item.hackathon_position}</td>
-                                            <td className='text-center text-sm' data-label="Prize">{item.hackathon_prize}</td>
-                                            <td className='text-center text-sm' data-label="Title">{item.hackathon_title}</td>
-                                            <td className='text-center text-sm' data-label="Year">{item.student_year}</td>
-                                            <td className='text-center text-sm' data-label="Certificate">
+                                            <td className='md:text-center text-sm' data-label="AY">{item.academic_year}</td>
+                                            <td className='md:text-center text-sm' data-label="College">{item.hackathon_college_name}</td>
+                                            <td className='md:text-center text-sm whitespace-nowrap' data-label="From Date">{formatDate(item.hackathon_from_date)}</td>
+                                            <td className='md:text-center text-sm whitespace-nowrap' data-label="To Date">{formatDate(item.hackathon_to_date)}</td>
+                                            <td className='md:text-center text-sm' data-label="Level">{item.hackathon_level}</td>
+                                            <td className='md:text-center text-sm' data-label="Location">{item.hackathon_location}</td>
+                                            <td className='md:text-center text-sm' data-label="Position">{item.hackathon_position}</td>
+                                            <td className='md:text-center text-sm' data-label="Prize">{item.hackathon_prize}</td>
+                                            <td className='md:text-center text-sm' data-label="Title">{item.hackathon_title}</td>
+                                            <td className='md:text-center text-sm' data-label="Year">{item.student_year}</td>
+                                            <td className='md:text-center text-sm' data-label="Certificate">
                                                 <button onClick={() => openCertificate(item.hackathon_certificate)} className="certificate">
                                                     <i className="fa-solid fa-eye"></i>
                                                 </button>
                                             </td>
-                                            <td className='text-center text-sm' data-label="Actions">
-                                                <div className='flex items-center gap-2 justify-center'>
+                                            <td className='md:text-center text-sm' data-label="Actions">
+                                                <div className='flex items-center gap-2 md:justify-center'>
                                                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/dmce/add/hackathon/${item.id}`)}>
                                                         <i className="fa-solid fa-pen-to-square"></i>
                                                     </button>

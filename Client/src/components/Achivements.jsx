@@ -237,23 +237,23 @@ const Achivements = () => {
                                     <tbody>
                                         {achivement.map(achievement => (
                                             <tr key={achievement.id}>
-                                                <td className='text-center text-sm' data-label="AY">{achievement.academic_year}</td>
-                                                <td className='text-center text-sm whitespace-nowrap' data-label="Date">{formatDate(achievement.achievement_date)}</td>
-                                                <td className='text-center text-sm' data-label="Title">{achievement.achievement_domain}</td>
-                                                <td className='text-center text-sm' data-label="Level">{achievement.achievement_level}</td>
-                                                <td className='text-center text-sm' data-label="Location">{achievement.achievement_location}</td>
-                                                <td className='text-center text-sm' data-label="College">{achievement.college_name}</td>
-                                                <td className='text-center text-sm' data-label="Prize">{achievement.prize}</td>
-                                                <td className='text-center text-sm' data-label="Year">{achievement.student_year}</td>
-                                                <td className='text-center text-sm' data-label="Certificate">
+                                                <td className='md:text-center text-sm' data-label="AY">{achievement.academic_year}</td>
+                                                <td className='md:text-center text-sm whitespace-nowrap' data-label="Date">{formatDate(achievement.achievement_date)}</td>
+                                                <td className='md:text-center text-sm' data-label="Title">{achievement.achievement_domain}</td>
+                                                <td className='md:text-center text-sm' data-label="Level">{achievement.achievement_level}</td>
+                                                <td className='md:text-center text-sm' data-label="Location">{achievement.achievement_location}</td>
+                                                <td className='md:text-center text-sm' data-label="College">{achievement.college_name}</td>
+                                                <td className='md:text-center text-sm' data-label="Prize">{achievement.prize}</td>
+                                                <td className='md:text-center text-sm' data-label="Year">{achievement.student_year}</td>
+                                                <td className='md:text-center text-sm' data-label="Certificate">
                                                     <abbr title="See Certificate">
                                                         <button onClick={() => openCertificate(achievement.achievement_certificate)} className="certificate">
                                                             <i className="fa-solid fa-eye"></i>
                                                         </button>
                                                     </abbr>
                                                 </td>
-                                                <td className='text-center text-sm' data-label="Actions">
-                                                    <div className='flex items-center gap-3 justify-center'>
+                                                <td className='md:text-center text-sm' data-label="Actions">
+                                                    <div className='flex items-center gap-3 md:justify-center'>
                                                         <abbr title="Edit">
                                                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/dmce/add/achivement/${achievement.id}`)}>
                                                                 <i className="fa-solid fa-pen-to-square"></i>

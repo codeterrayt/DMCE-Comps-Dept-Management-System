@@ -13,7 +13,7 @@ const Start = () => {
     },[])
 
   return (
-    <div>Start</div>
+    <div className='loading'></div>
   )
 }
 

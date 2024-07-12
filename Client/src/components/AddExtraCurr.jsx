@@ -12,16 +12,27 @@ import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
 import { getYearOptions } from '../helper/helper';
+import { getRole } from '../helper/getRole';
 
 const AddExtraCurr = () => {
     const [loader, setloader] = useState(false)
     const { id } = useParams()
+
+    const [role, setRole] = useState('')
+    const [roleLoading, setRoleLoading] = useState(true);  // New state for role loading
+
+    useEffect(()=>{
+        const roleInsession = getRole();
+        setRole(roleInsession)
+        setRoleLoading(false)
+    },[])
     useEffect(() => {
-        if (id) {
+        console.log("the role is " , role);
+        if (id && role) {
             getDataById(id)
         }
 
-    }, [])
+    }, [id, role])
 
     const [data, setData] = useState({
         student_year: '',
@@ -33,6 +44,7 @@ const AddExtraCurr = () => {
         date: '',
         certificate: null,
         prize: '',
+        desc:''
     });
 
     const handleChange = (e) => {
@@ -81,6 +93,10 @@ const AddExtraCurr = () => {
             handleValidationError('domain', 'Please enter the domain.');
             return;
         }
+        if ( !data.desc || data.desc.length > 400) {
+            handleValidationError('desc', 'Please enter the description in 400 character.');
+            return;
+        }
         if ( !data.level) {
             handleValidationError('level', 'Please select the level.');
             return;
@@ -121,6 +137,7 @@ const AddExtraCurr = () => {
         formData.append('ecc_location', data.location);
         formData.append('ecc_date', data.date);
         formData.append('prize', data.prize);
+        formData.append('description', data.desc);
         if (data.certificate) {
             formData.append('ecc_certificate_path', data.certificate);
         }
@@ -133,7 +150,7 @@ const AddExtraCurr = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/extra-curricular-activities` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/extra-curricular-activities`,
+            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/update/extra-curricular-activities` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/extra-curricular-activities`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -147,7 +164,7 @@ const AddExtraCurr = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                navigate('/dmce/extra-curriculum');
+                role == 'admin' ? navigate(-1) : navigate('/dmce/extra-curriculum');
             })
             .catch((error) => {
                 console.error(error);
@@ -187,7 +204,7 @@ const AddExtraCurr = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/extra-curricular-activities/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/fetch/${ role =='admin' ? 'ecc' : 'extra-curricular-activities'}/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -207,7 +224,8 @@ const AddExtraCurr = () => {
                         level: response.data.ecc_level,
                         location: response.data.ecc_location,
                         date: response.data.ecc_date,
-                        prize: response.data.prize
+                        prize: response.data.prize,
+                        desc: response.data.description
                     })
                 })
                 .catch((error) => {
@@ -233,7 +251,7 @@ const AddExtraCurr = () => {
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
             {
-                loader ? <Loaders /> : <AnimationWrapper>
+                loader || roleLoading ? <Loaders /> : <AnimationWrapper>
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Activity Detail"}</h1>
                     </div>
@@ -286,7 +304,9 @@ const AddExtraCurr = () => {
                             <input value={data.domain} type="text" id='domain' name="domain" className='input' onChange={handleChange} />
 
                             <label className='label' htmlFor="desc">Description </label>
-                            <textarea type="text" id='desc' name="desc" className='input' onChange={handleChange} />
+                            <textarea type="text" id='desc' value={data.desc} name="desc" className='input' onChange={handleChange} />
+                            <p className='text-right text-sm font-bold '><span className='text-green-600'>{data.desc.length}</span>/400</p>
+
 
 
                         </div>

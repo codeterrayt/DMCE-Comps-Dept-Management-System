@@ -203,43 +203,43 @@ const Internship = () => {
                                 <tbody>
                                     {internships.map(internship => (
                                         <tr key={internship.id}>
-                                            <td className='text-center text-sm' data-label="AY">{internship.academic_year}</td>
-                                            <td className='text-center text-sm' data-label="Domain">{internship.domain}</td>
-                                            <td className='text-center text-sm' data-label="Company Name">{internship.company_name}</td>
-                                            <td className='text-center text-sm' data-label="Duration in months">{internship.duration}</td>
-                                            <td className='text-center text-sm' data-label="Start">{formatDate(internship.start_date)}</td>
-                                            <td className='text-center text-sm' data-label="End">{formatDate(internship.end_date)}</td>
-                                            <td className='text-center text-sm' data-label="Year">{internship.student_year}</td>
-                                            <td className='text-center text-sm' data-label="Certificate">
+                                            <td className='md:text-center text-sm' data-label="AY">{internship.academic_year}</td>
+                                            <td className='md:text-center text-sm' data-label="Domain">{internship.domain}</td>
+                                            <td className='md:text-center text-sm' data-label="Company Name">{internship.company_name}</td>
+                                            <td className='md:text-center text-sm' data-label="Duration in months">{internship.duration}</td>
+                                            <td className='md:text-center text-sm' data-label="Start">{formatDate(internship.start_date)}</td>
+                                            <td className='md:text-center text-sm' data-label="End">{formatDate(internship.end_date)}</td>
+                                            <td className='md:text-center text-sm' data-label="Year">{internship.student_year}</td>
+                                            <td className='md:text-center text-sm' data-label="Certificate">
                                                 <abbr title="See Certificate">
                                                     <button onClick={() => openCertificate(internship.certificate)} className="certificate">
                                                         <i className="fa-solid fa-eye"></i>
                                                     </button>
                                                 </abbr>
                                             </td>
-                                            <td className='text-center text-sm' data-label="Completion Letter">
+                                            <td className='md:text-center text-sm' data-label="Completion Letter">
                                                 <abbr title="See Completion Letter">
                                                     <button onClick={() => openCertificate(internship.completion_letter)} className="certificate">
                                                         <i className="fa-solid fa-eye"></i>
                                                     </button>
                                                 </abbr>
                                             </td>
-                                            <td className='text-center text-sm' data-label="Offer Letter">
+                                            <td className='md:text-center text-sm' data-label="Offer Letter">
                                                 <abbr title="See Offer Letter">
                                                     <button onClick={() => openCertificate(internship.offer_letter)} className="certificate">
                                                         <i className="fa-solid fa-eye"></i>
                                                     </button>
                                                 </abbr>
                                             </td>
-                                            <td className='text-center text-sm' data-label="Permission Letter">
+                                            <td className='md:text-center text-sm' data-label="Permission Letter">
                                                 <abbr title="See Permission Letter">
                                                     <button onClick={() => openCertificate(internship.permission_letter)} className="certificate">
                                                         <i className="fa-solid fa-eye"></i>
                                                     </button>
                                                 </abbr>
                                             </td>
-                                            <td className='text-center text-sm' data-label="Actions">
-                                                <div className='flex items-center gap-3 justify-center'>
+                                            <td className='md:text-center text-sm' data-label="Actions">
+                                                <div className='flex items-center gap-3 md:justify-center'>
                                                     <abbr title="Edit">
                                                         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded" onClick={() => navigate(`/dmce/add/internship/${internship.id}`)}><i className="fa-solid fa-pen-to-square"></i></button>
                                                     </abbr>

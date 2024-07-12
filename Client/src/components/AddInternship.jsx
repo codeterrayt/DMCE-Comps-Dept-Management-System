@@ -14,6 +14,7 @@ import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
 import { domains, getYearOptions } from '../helper/helper';
+import { getRole } from '../helper/getRole';
 
 const AddInternship = () => {
     const navigate = useNavigate()
@@ -22,14 +23,26 @@ const AddInternship = () => {
 
     const [emptyFields, setEmptyFields] = useState([]);
 
-
+    const dmceuser = localStorage.getItem("dmceuser");
+    
+    
     const { id } = useParams()
+    
+    const [role, setRole] = useState('')
+    const [roleLoading, setRoleLoading] = useState(true);  // New state for role loading
+
+    useEffect(()=>{
+        const roleInsession = getRole();
+        setRole(roleInsession)
+        setRoleLoading(false)
+    },[])
     useEffect(() => {
-        if (id) {
+     
+        if (id && role) {
             getDataById(id)
         }
 
-    }, [])
+    }, [id , role])
 
     const [data, setData] = useState({
         academicYear: '',
@@ -92,7 +105,7 @@ const AddInternship = () => {
         if (!data.domain) {
             return handleValidationError('domain', "Please enter the domain.");
         }
-    
+
         if (!id && !data.completionLetter) {
             return handleValidationError('completionLetter', "Please upload the completion letter.");
         }
@@ -105,7 +118,7 @@ const AddInternship = () => {
         if (!id && !data.permissionLetter) {
             return handleValidationError('permissionLetter', "Please upload the permission letter.");
         }
-    
+
         // Check file sizes
         const fileSizeLimit = 512 * 1024;
         if (!id && data.completionLetter.size > fileSizeLimit) {
@@ -120,9 +133,9 @@ const AddInternship = () => {
         if (!id && data.permissionLetter.size > fileSizeLimit) {
             return toast.error("Permission letter size should be less than 512 KB.");
         }
-    
+
         const loading = toast.loading('Wait. Internship details are being processed.');
-    
+
         let form = new FormData();
         form.append('academic_year', data.academicYear);
         form.append('duration', data.duration);
@@ -147,17 +160,17 @@ const AddInternship = () => {
         if (id) {
             form.append('id', id);
         }
-    
+
         // Log the FormData contents
         for (let [key, value] of form.entries()) {
             console.log(`${key}: ${value}`);
         }
-    
+
         const token = getToken();
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/internship` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/internship`,
+            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/update/internship` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/internship`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -165,12 +178,12 @@ const AddInternship = () => {
             },
             data: form
         };
-    
+
         axios.request(config)
             .then((response) => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
-                navigate('/dmce/internship');
+                role == 'admin' ? navigate(-1) : navigate('/dmce/internship')
                 toast.success(response.data.message);
             })
             .catch((error) => {
@@ -183,7 +196,7 @@ const AddInternship = () => {
                 return toast.error(getFirstErrorMessage(error.response.data));
             });
     };
-    
+
     const handleValidationError = (fieldId, errorMessage) => {
         const academicYearInput = parentDivRef.current.querySelector(`#${fieldId}`);
         if (academicYearInput) {
@@ -203,6 +216,7 @@ const AddInternship = () => {
 
 
     const getDataById = (id) => {
+     
         setloader(true)
         try {
             const token = getToken()
@@ -210,7 +224,7 @@ const AddInternship = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/internship/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/fetch/internship/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -258,7 +272,7 @@ const AddInternship = () => {
         <section className='w-full min-h-screen p-4 md:p-8'>
 
             {
-                loader ? <Loaders /> : <AnimationWrapper>
+                loader || roleLoading ? <Loaders /> : <AnimationWrapper>
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Internship Detail"}</h1>
                     </div>
@@ -318,7 +332,7 @@ const AddInternship = () => {
                             <label className='label' htmlFor="endDate">End Date</label>
                             <input type="Date" value={data.endDate} id='endDate' name="endDate" className='input' onChange={handleChange} />
                             <label className='label' htmlFor="desc">Description </label>
-                            <textarea type="text" id='desc' name="desc" className='input' onChange={handleChange} />
+                            <textarea type="text" id='desc' value={data.desc} name="desc" className='input' onChange={handleChange} />
                             <p className='text-right text-sm font-bold '><span className='text-green-600'>{data.desc.length}</span>/400</p>
 
                         </div>

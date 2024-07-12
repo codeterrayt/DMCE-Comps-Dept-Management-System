@@ -12,17 +12,27 @@ import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
 import { domains } from '../helper/helper';
+import { getRole } from '../helper/getRole';
 
 const AddPlacementDetails = () => {
     const [loader, setloader] = useState(false)
     const { id } = useParams()
+
+    const [role, setRole] = useState('')
+    const [roleLoading, setRoleLoading] = useState(true);  // New state for role loading
+
+    useEffect(()=>{
+        const roleInsession = getRole();
+        setRole(roleInsession)
+        setRoleLoading(false)
+    },[])
     useEffect(() => {
 
-        if (id) {
+        if (id && role) {
             getDataById(id)
         }
 
-    }, [])
+    }, [id , role])
 
     const [formData, setFormData] = useState({
         academic_year: '',
@@ -143,7 +153,7 @@ const AddPlacementDetails = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/placement` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/placement`,
+            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/update/placement` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/placement`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -157,7 +167,7 @@ const AddPlacementDetails = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                navigate('/dmce/placement');
+              role =='admin' ? navigate(-1):  navigate('/dmce/placement');
             })
             .catch((error) => {
                 console.error(error);
@@ -208,7 +218,7 @@ const AddPlacementDetails = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/placement/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/fetch/placement/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -254,7 +264,7 @@ const AddPlacementDetails = () => {
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
             {
-                loader ? <Loaders /> : <AnimationWrapper>
+                loader || roleLoading? <Loaders /> : <AnimationWrapper>
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "placement Detail"}</h1>
                     </div>

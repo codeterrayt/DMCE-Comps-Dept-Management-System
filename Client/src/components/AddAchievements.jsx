@@ -13,6 +13,7 @@ import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
 import { getYearOptions } from '../helper/helper';
+import { getRole } from '../helper/getRole';
 
 const AddAchievements = () => {
     const parentDivRef = useRef(null);
@@ -28,17 +29,27 @@ const AddAchievements = () => {
         achievementLocation: '',
         achievementDate: '',
         achievementCertificate: null,
-        prize: ''
+        prize: '',
+        achievementDesc: ''
     });
 
     const navigate = useNavigate();
     const { id } = useParams()
+
+    const [role, setRole] = useState('')
+    const [roleLoading, setRoleLoading] = useState(true);  // New state for role loading
+
     useEffect(() => {
-        if (id) {
+        const roleInsession = getRole();
+        setRole(roleInsession)
+        setRoleLoading(false)
+    }, [])
+    useEffect(() => {
+        if (id && role) {
             getDataById(id)
         }
 
-    }, [])
+    }, [id, role])
 
     useEffect(() => {
         if (!checkLogin()) {
@@ -73,35 +84,39 @@ const AddAchievements = () => {
     }
     const handleSubmit = async () => {
         // Check if any required field is empty
-        if ( !data.academicYear) {
+        if (!data.academicYear) {
             handleValidationError('academicYear', "Please enter the academic year.");
             return;
         }
-        if ( !data.studentYear) {
+        if (!data.studentYear) {
             handleValidationError('studentYear', "Please enter the student year.");
             return;
         }
-        if ( !data.collegeName) {
+        if (!data.collegeName) {
             handleValidationError('collegeName', "Please enter the college name.");
             return;
         }
-        if ( !data.achievementDomain) {
+        if (!data.achievementDesc || data.achievementDesc.length > 400) {
+            handleValidationError('achievementDesc', "Please enter the description in 400 character ");
+            return;
+        }
+        if (!data.achievementDomain) {
             handleValidationError('achievementDomain', "Please enter the achievement domain.");
             return;
         }
-        if ( !data.achievementLevel) {
+        if (!data.achievementLevel) {
             handleValidationError('achievementLevel', "Please enter the achievement level.");
             return;
         }
-        if ( !data.achievementLocation) {
+        if (!data.achievementLocation) {
             handleValidationError('achievementLocation', "Please enter the achievement location.");
             return;
         }
-        if ( !data.achievementDate) {
+        if (!data.achievementDate) {
             handleValidationError('achievementDate', "Please enter the achievement date.");
             return;
         }
-        if ( !data.prize) {
+        if (!data.prize) {
             handleValidationError('prize', "Please enter the prize.");
             return;
         }
@@ -129,6 +144,7 @@ const AddAchievements = () => {
         formData.append('achievement_location', data.achievementLocation);
         formData.append('achievement_date', data.achievementDate);
         formData.append('prize', data.prize);
+        formData.append('description', data.achievementDesc);
         if (data.achievementCertificate) {
             formData.append('achievement_certificate_path', data.achievementCertificate);
         }
@@ -137,7 +153,7 @@ const AddAchievements = () => {
         }
 
         try {
-            const url = id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/achievement` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/achievement`;
+            const url = id ? `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/update/achievement` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/achievement`;
             const response = await axios.post(
                 url,
                 formData,
@@ -152,7 +168,7 @@ const AddAchievements = () => {
             );
             console.log(JSON.stringify(response.data));
             toast.dismiss(loading);
-            navigate('/dmce/achivement');
+            role == 'admin' ? navigate(-1) : navigate('/dmce/achivement');
             toast.success(response.data.message);
         } catch (error) {
             if (error.response && error.response.status === 401) {
@@ -191,7 +207,7 @@ const AddAchievements = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/achievement/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/fetch/achievement/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -211,7 +227,8 @@ const AddAchievements = () => {
                         achievementLevel: response.data.achievement_level,
                         achievementLocation: response.data.achievement_location,
                         achievementDate: response.data.achievement_date,
-                        prize: response.data.prize
+                        prize: response.data.prize,
+                        achievementDesc: response.data.description
                     })
                 })
                 .catch((error) => {
@@ -239,7 +256,7 @@ const AddAchievements = () => {
 
 
             {
-                loader ? <Loaders /> : <AnimationWrapper>
+                loader || roleLoading ? <Loaders /> : <AnimationWrapper>
 
                     <div className='w-full max-md:mt-8 max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Your Achievement"}</h1>
@@ -291,8 +308,9 @@ const AddAchievements = () => {
                             <label className='label' htmlFor="achievementDomain">Domain / Title <p className='example'>e.g:- web-development , app-developement</p></label>
                             <input type="text" value={data.achievementDomain} id='achievementDomain' name="achievementDomain" className='input' onChange={handleChange} />
                             <label className='label' htmlFor="achievementDesc">Description</label>
-                            <textarea type="text"  id='achievementDesc' name="achievementDesc" className='input' onChange={handleChange} />
-                            
+                            <textarea type="text" value={data.achievementDesc} id='achievementDesc' name="achievementDesc" className='input' onChange={handleChange} />
+                            <p className='text-right text-sm font-bold '><span className='text-green-600'>{data.achievementDesc.length}</span>/400</p>
+
                         </div>
                         <div className='w-full md:p-8 md:mt-4'>
                             <label className='label' htmlFor="achievementLevel">Achievement Level</label>

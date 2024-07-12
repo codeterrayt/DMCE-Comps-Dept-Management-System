@@ -12,17 +12,27 @@ import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
 import { getYearOptions } from '../helper/helper';
+import { getRole } from '../helper/getRole';
 
 const AddHigherStudies = () => {
     const [loader, setloader] = useState(false)
 
     const { id } = useParams()
+
+    const [role, setRole] = useState('')
+    const [roleLoading, setRoleLoading] = useState(true);  // New state for role loading
+
     useEffect(() => {
-        if (id) {
+        const roleInsession = getRole();
+        setRole(roleInsession)
+        setRoleLoading(false)
+    }, [])
+    useEffect(() => {
+        if (id && role) {
             getDataById(id)
         }
 
-    }, [])
+    }, [id, role])
     const [formData, setFormData] = useState({
         academic_year: '',
         exam_type: '',
@@ -34,6 +44,7 @@ const AddHigherStudies = () => {
         course: '',
         guide: '',
         admission_letter: null,
+        desc: ''
     });
 
     // Handle input changes and update formData state
@@ -77,32 +88,35 @@ const AddHigherStudies = () => {
     // Handle form submission
     const handleSubmit = () => {
         // Check if all required fields are filled individually and provide error messages for each missing field
-        if ( !formData.academic_year) {
+        if (!formData.academic_year) {
             return handleValidationError('academic_year', 'Please select the academic year.');
         }
-        if ( !formData.exam_type) {
+        if (!formData.exam_type) {
             return handleValidationError('exam_type', 'Please enter the exam type.');
         }
-        if ( !formData.score) {
+        if (!formData.score) {
             return handleValidationError('score', 'Please enter the score.');
         }
-        if ( !formData.city) {
+        if (!formData.city) {
             return handleValidationError('city', 'Please enter the city.');
         }
-        if ( !formData.state) {
+        if (!formData.state) {
             return handleValidationError('state', 'Please enter the state.');
         }
-        if ( !formData.country) {
+        if (!formData.country) {
             return handleValidationError('country', 'Please enter the country.');
         }
-        if ( !formData.university_name) {
+        if (!formData.university_name) {
             return handleValidationError('university_name', 'Please enter the university name.');
         }
-        if ( !formData.course) {
+        if (!formData.course) {
             return handleValidationError('course', 'Please enter the course.');
         }
-        if ( !formData.guide) {
+        if (!formData.guide) {
             return handleValidationError('guide', 'Please enter the project guide.');
+        }
+        if (!formData.desc || formData.desc.length > 400) {
+            return handleValidationError('desc', 'Please enter the description in 400 character.');
         }
         if (!id && !formData.admission_letter) {
             return handleValidationError('admission_letter', 'Please upload the admission letter.');
@@ -127,6 +141,7 @@ const AddHigherStudies = () => {
         data.append('university_name', formData.university_name);
         data.append('student_course', formData.course);
         data.append('student_project_guide', formData.guide);
+        data.append('description', formData.desc);
         if (formData.admission_letter) {
             data.append('student_admission_letter', formData.admission_letter);
         }
@@ -139,7 +154,7 @@ const AddHigherStudies = () => {
         const config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/higher-studies` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/higher-studies`,
+            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/update/higher-studies` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/higher-studies`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -153,7 +168,7 @@ const AddHigherStudies = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                navigate('/dmce/higher-studies');
+                role == 'admin' ? navigate(-1) : navigate('/dmce/higher-studies');
             })
             .catch((error) => {
                 console.error(error);
@@ -196,7 +211,7 @@ const AddHigherStudies = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/higher-studies/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/fetch/${role == 'admin' ? 'higher-study' : 'higher-studies'}/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -217,6 +232,7 @@ const AddHigherStudies = () => {
                         university_name: response.data.university_name,
                         course: response.data.student_course,
                         guide: response.data.student_project_guide,
+                        desc: response.data.description,
 
                     })
                 })
@@ -243,7 +259,7 @@ const AddHigherStudies = () => {
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
             {
-                loader ? <Loaders /> : <AnimationWrapper>
+                loader || roleLoading ? <Loaders /> : <AnimationWrapper>
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>{(id ? "Update " : "Fill ") + "Higher Study Detail"}</h1>
                     </div>
@@ -296,7 +312,9 @@ const AddHigherStudies = () => {
                             <label className='label' htmlFor="guide">Guide Name</label>
                             <input value={formData.guide} type="text" id='guide' name='guide' className='input' onChange={handleChange} />
                             <label className='label' htmlFor="desc">Description</label>
-                            <textarea type="text" id='desc' name='desc' className='input' onChange={handleChange} />
+                            <textarea type="text" id='desc' value={formData.desc} name='desc' className='input' onChange={handleChange} />
+                            <p className='text-right text-sm font-bold '><span className='text-green-600'>{formData.desc.length}</span>/400</p>
+
 
                             <label className='label' htmlFor="admission_letter">Admission Letter <p className='example'>Max PDF Size 512KB</p></label>
                             <div className="bg-gray-100 mb-[12px] ">

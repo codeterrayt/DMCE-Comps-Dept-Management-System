@@ -232,41 +232,41 @@ const HigherStudies = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-    {study.map((study, rowIndex) => (
-        <tr key={rowIndex}>
-            <td className='text-center text-sm' data-label="AY">{study.student_academic_year}</td>
-            <td className='text-center text-sm' data-label="Course">{study.student_course}</td>
-            <td className='text-center text-sm' data-label="Exam">{study.student_exam_type}</td>
-            <td className='text-center text-sm' data-label="Project">{study.student_project_guide}</td>
-            <td className='text-center text-sm' data-label="Score">{study.student_score}</td>
-            <td className='text-center text-sm' data-label="City">{study.university_city}</td>
-            <td className='text-center text-sm' data-label="Country">{study.university_country}</td>
-            <td className='text-center text-sm' data-label="University">{study.university_name}</td>
-            <td className='text-center text-sm' data-label="State">{study.university_state}</td>
-            <td className='text-center text-sm' data-label="Admission">
-                <abbr title="Admission Letter">
-                    <button onClick={() => openCertificate(study.student_admission_letter)} className="certificate">
-                        <i className="fa-solid fa-eye"></i>
-                    </button>
-                </abbr>
-            </td>
-            <td className='text-center text-sm' data-label="Actions">
-                <div className='flex items-center gap-2 justify-center'>
-                    <abbr title="Edit">
-                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/dmce/add/higher-studies/${study.id}`)}>
-                            <i className="fa-solid fa-pen-to-square"></i>
-                        </button>
-                    </abbr>
-                    <abbr title="Delete">
-                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(study.id)}>
-                            <i className="fa-solid fa-trash"></i>
-                        </button>
-                    </abbr>
-                </div>
-            </td>
-        </tr>
-    ))}
-</tbody>
+                                    {study.map((study, rowIndex) => (
+                                        <tr key={rowIndex}>
+                                            <td className='md:text-center text-sm' data-label="AY">{study.student_academic_year}</td>
+                                            <td className='md:text-center text-sm' data-label="Course">{study.student_course}</td>
+                                            <td className='md:text-center text-sm' data-label="Exam">{study.student_exam_type}</td>
+                                            <td className='md:text-center text-sm' data-label="Project">{study.student_project_guide}</td>
+                                            <td className='md:text-center text-sm' data-label="Score">{study.student_score}</td>
+                                            <td className='md:text-center text-sm' data-label="City">{study.university_city}</td>
+                                            <td className='md:text-center text-sm' data-label="Country">{study.university_country}</td>
+                                            <td className='md:text-center text-sm' data-label="University">{study.university_name}</td>
+                                            <td className='md:text-center text-sm' data-label="State">{study.university_state}</td>
+                                            <td className='md:text-center text-sm' data-label="Admission">
+                                                <abbr title="Admission Letter">
+                                                    <button onClick={() => openCertificate(study.student_admission_letter)} className="certificate">
+                                                        <i className="fa-solid fa-eye"></i>
+                                                    </button>
+                                                </abbr>
+                                            </td>
+                                            <td className='md:text-center text-sm' data-label="Actions">
+                                                <div className='flex items-center gap-2 md:justify-center'>
+                                                    <abbr title="Edit">
+                                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 px-3 rounded mr-2" onClick={() => navigate(`/dmce/add/higher-studies/${study.id}`)}>
+                                                            <i className="fa-solid fa-pen-to-square"></i>
+                                                        </button>
+                                                    </abbr>
+                                                    <abbr title="Delete">
+                                                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold p-2 px-3 rounded" onClick={() => handleDelete(study.id)}>
+                                                            <i className="fa-solid fa-trash"></i>
+                                                        </button>
+                                                    </abbr>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
 
                             </table>
                         ) : (

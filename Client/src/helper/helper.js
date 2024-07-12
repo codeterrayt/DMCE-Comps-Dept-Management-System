@@ -30,3 +30,5 @@ export const getYearOptions = () => {
 
 
 
+// pdf bg opacity reduction 
+

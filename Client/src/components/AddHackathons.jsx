@@ -12,6 +12,7 @@ import Loaders from './Loaders';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
 import { getYearOptions } from '../helper/helper';
+import { getRole } from '../helper/getRole';
 
 const AddHackathons = () => {
     const [loader, setloader] = useState(false)
@@ -30,15 +31,25 @@ const AddHackathons = () => {
         prize: '',
         position: '',
         certificate: null,
+        desc :''
     });
 
     const { id } = useParams()
+
+    const [role, setRole] = useState('')
+    const [roleLoading, setRoleLoading] = useState(true);  // New state for role loading
+
+    useEffect(()=>{
+        const roleInsession = getRole();
+        setRole(roleInsession)
+        setRoleLoading(false)
+    },[])
     useEffect(() => {
-        if (id) {
+        if (id && role) {
             getDataById(id)
         }
 
-    }, [])
+    }, [id , role])
 
     // Handle input changes and update formData state
     const handleChange = (e) => {
@@ -82,6 +93,9 @@ const AddHackathons = () => {
         }
         if (!formData.college_name) {
             return handleValidationError('college_name', 'Please enter the college name.');
+        }
+        if (!formData.desc || formData.desc.length > 400) {
+            return handleValidationError('desc', 'Please enter the description in 400 character.');
         }
 
         if (!formData.academic_year) {
@@ -127,6 +141,7 @@ const AddHackathons = () => {
         data.append('hackathon_college_name', formData.college_name);
         data.append('hackathon_prize', formData.prize);
         data.append('hackathon_position', formData.position);
+        data.append('description', formData.desc);
         if (formData.certificate) {
             data.append('hackathon_certificate_path', formData.certificate);
         }
@@ -139,7 +154,7 @@ const AddHackathons = () => {
         const config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/student/update/hackathon` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/hackathon`,
+            url: id ? `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/update/hackathon` : `${import.meta.env.VITE_SERVER_DOMAIN}/student/add/hackathon`,
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -153,7 +168,7 @@ const AddHackathons = () => {
                 console.log(JSON.stringify(response.data));
                 toast.dismiss(loading);
                 toast.success(response.data.message);
-                navigate('/dmce/hackathon');
+              role == 'admin' ? navigate(-1):  navigate('/dmce/hackathon') ;
             })
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
@@ -202,7 +217,7 @@ const AddHackathons = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/hackathon/${id}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/${role == 'admin' ? 'admin' : 'student'}/fetch/hackathon/${id}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -224,6 +239,7 @@ const AddHackathons = () => {
                         college_name: response.data.hackathon_college_name,
                         prize: response.data.hackathon_prize,
                         position: response.data.hackathon_position,
+                        desc: response.data.description,
                     })
                 })
                 .catch((error) => {
@@ -251,7 +267,7 @@ const AddHackathons = () => {
     return (
         <section className='w-full min-h-screen p-4 md:p-8'>
             {
-                loader ? <Loaders />
+                loader || roleLoading ? <Loaders />
                     :
                     <AnimationWrapper>
                         <div className='w-full max-md:mt-8  max-md:mb-8'>
@@ -307,7 +323,9 @@ const AddHackathons = () => {
                                 <label className='label' htmlFor="college_name">Enter College Name</label>
                                 <input value={formData.college_name} type="text" id='college_name' name='college_name' className='input' onChange={handleChange} />
                                 <label className='label' htmlFor="desc">Description</label>
-                                <textarea type="text" id='desc' name='desc' className='input' onChange={handleChange} />
+                                <textarea type="text" value={formData.desc} id='desc' name='desc' className='input' onChange={handleChange} />
+                                <p className='text-right text-sm font-bold '><span className='text-green-600'>{formData.desc.length}</span>/400</p>
+
 
 
                             </div>
