@@ -16,7 +16,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import AdminNavBar from './AdminNavBar';
 import { img } from '../../helper/pdfBackGround';
-
+import { useQuery } from 'react-query';
 const HomeAdmin = () => {
 
   const [student, setStudent] = useState([]);

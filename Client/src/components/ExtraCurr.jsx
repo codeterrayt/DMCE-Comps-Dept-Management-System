@@ -14,10 +14,11 @@ import CertificatePopup from './Pop';
 import { formatDate } from '../helper/getDate';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import { useQuery } from 'react-query';
 
 const ExtraCurr = () => {
     const navigate = useNavigate();
-    const [activity, setActivity] = useState([]);
+    // const [activity, setActivity] = useState([]);
     const [loader, setLoader] = useState(false);
     const [checkDelete, setCheckDelete] = useState(false);
     const [certificateUrl, setCertificateUrl] = useState('');
@@ -29,9 +30,9 @@ const ExtraCurr = () => {
         }
     }, [navigate]);
 
-    useEffect(() => {
-        getAllActivities();
-    }, []);
+    // useEffect(() => {
+    //     getAllActivities();
+    // }, []);
 
     function removeUnwantedFields(data) {
         let AllmodifiedData = [];
@@ -48,32 +49,32 @@ const ExtraCurr = () => {
         return AllmodifiedData;
     }
 
-    const getAllActivities = () => {
+    const getAllActivities = async () => {
         setLoader(true);
         const token = getToken();
 
-        axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/extra-curricular-activities`, {
+        const response = await axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/extra-curricular-activities`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
             }
         })
-            .then(response => {
-                const modifiedData = removeUnwantedFields(response.data.ecc);
-                setActivity(modifiedData);
-                setLoader(false);
-            })
-            .catch(error => {
-                console.error(error);
-                setLoader(false);
-                if (error.response && error.response.status === 401) {
-                    localStorage.clear();
-                    return navigate('/login');
-                }
-                toast.error(getFirstErrorMessage(error.response.data));
-            });
+
+        return response.data.ecc;
+
     };
 
+    const { data: activity, isLoading, isError, error, refetch } = useQuery('ecc', getAllActivities, {
+        retry: 1, // Number of retries befor e triggering an error
+        onError: (error) => {
+            if (error.response && error.response.status === 401) {
+                localStorage.clear();
+                navigate('/login');
+            } else {
+                toast.error(getFirstErrorMessage(error.response?.data || error.message));
+            }
+        },
+    });
     const handleDelete = (id) => {
         try {
             const confirmOptions = {
@@ -108,6 +109,7 @@ const ExtraCurr = () => {
                                     // Send delete request
                                     axios.request(config)
                                         .then((response) => {
+                                             refetch();
                                             setActivity(data => data.filter(value => value.id !== id));
                                             setCheckDelete(false);
                                             setLoader(false);
@@ -159,7 +161,7 @@ const ExtraCurr = () => {
         <section className='w-full min-h-screen p-4 md:p-8'>
             {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
-            {loader ? (
+            {isLoading ? (
                 <Loaders className="capitalize" message={checkDelete ? "Deleting Your Activity" : "Fetching Your Activity"} />
             ) : (
                 <AnimationWrapper className='w-full'>
