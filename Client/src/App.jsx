@@ -33,6 +33,8 @@ import HackathonAdmin from './components/Admin/Hackathon.Admin';
 import HigherStudiesAdmin from './components/Admin/HigherStudies.Admin';
 import PlacementAdmin from './components/Admin/Placement.Admin';
 import EditProfileAdmin from './components/Admin/EditProfile.Admin';
+import AddProfessor from './components/Admin/AddProfessor';
+import AddSubject from './components/Admin/AddSubject';
 
 export const userContext = createContext()
 
@@ -79,7 +81,9 @@ function App() {
           <Route path="/sign-up" element={<SignUpForm />} />
           <Route path="/login" element={<LoginForm />} />
 
-          <Route path="/Admin" element={<HomeAdmin />} />
+          <Route path="/admin" element={<HomeAdmin />} />
+          <Route path="/admin/add-professor" element={<AddProfessor />} />
+          <Route path="/admin/add-subject" element={<AddSubject />} />
 
           <Route path="/admin/internship/:id" element={<InternshipAdmin />} />
           <Route path="/admin/internship/detail/:id" element={<AddInternship />} />

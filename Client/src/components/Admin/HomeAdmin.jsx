@@ -778,7 +778,7 @@ const HomeAdmin = () => {
 
 
 
-          <div className="overflow-x-auto w-full mt-8 p-8 ">
+          <div className="overflow-x-auto w-full mt-4 px-4 ">
             {student.length > 0 ? (
               <table id="example" className="table table-striped text-black" style={{ width: '100%' }}>
                 <thead>

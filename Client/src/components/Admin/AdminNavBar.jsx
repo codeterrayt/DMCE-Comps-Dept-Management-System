@@ -114,7 +114,7 @@ const AdminNavBar = () => {
                                                 onClose(); // Close modal on success
                                             })
                                             .catch((error) => {
-                                           
+
                                                 const msg = getFirstErrorMessage(error.response.data)
                                                 msgpara.innerText = msg
                                                 btn.innerText = 'change';
@@ -148,17 +148,21 @@ const AdminNavBar = () => {
     }
 
     return (
-        <nav className='w-full max-md:mt-8  max-md:mb-8 bg-[#262847] py-3 px-8 flex items-center justify-between'>
-            <h1 className='text-center text-xl md:text-4xl font-bold text-white'>Admin Panel</h1>
-            <div className=' p-2 flex items-center gap-8 text-xl  text-black cursor-pointer rounded-md font-bold' >
-                <button onClick={handleAdminChangePassword} className='bg-white p-2 rounded-md' > Change Password </button>
-                <button onClick={handleSignOut} className='bg-white p-2 rounded-md' >Sign out </button>
+        <nav className='w-full bg-[#262847] py-3 px-8 flex items-center justify-between'>
+            <h1 onClick={() => navigate('/admin')} className='cursor-pointer text-4xl font-bold text-white'>Admin Panel</h1>
+
+            <div className='flex items-center gap-4'>
+
+                <p onClick={() => navigate('/admin/add-professor')} className='px-4 py-2 bg-white text-black font-bold cursor-pointer rounded-md'>Add Professor</p>
+                <p onClick={() => navigate('/admin/add-subject')} className='px-4 py-2 bg-white text-black font-bold cursor-pointer rounded-md'>Add Subject</p>
 
 
-
+                <button onClick={handleAdminChangePassword} className='px-4 py-2 bg-white text-black font-bold rounded-md'>Change Password</button>
+                <button onClick={handleSignOut} className='px-4 py-2 bg-white text-black font-bold rounded-md'>Sign out</button>
             </div>
         </nav>
-    )
+    );
+
 }
 
 export default AdminNavBar
