@@ -242,7 +242,7 @@ const Profile = () => {
                 <AnimationWrapper className='md:w-[80%] mx-auto w-[98%]'>
                     {/* Form Title */}
                     <div className='w-full max-md:mt-8  max-md:mb-8'>
-                        {/* <i onClick={()=>navigate()} class="fa-solid fa-right-from-bracket cursor-pointer rotate-180 text-3xl "></i> */}
+                        <i onClick={()=>navigate()} class="fa-solid fa-right-from-bracket cursor-pointer rotate-180 text-3xl "></i>
                         <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847]'>Add Student Detail</h1>
                     </div>
                 
