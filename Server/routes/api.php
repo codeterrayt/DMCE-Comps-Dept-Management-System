@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\ProfessorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,6 +116,12 @@ Route::middleware(['auth:sanctum', 'verified', 'ability:token-admin'])->group(fu
     Route::post('/admin/update/subject/{id}', [SubjectController::class, 'update']);
     Route::post('/admin/delete/subject/{id}', [SubjectController::class, 'destroy']);
 
+
+    Route::get('/admin/fetch/professors', [ProfessorController::class, 'index']);
+    Route::post('/admin/add/professor', [ProfessorController::class, 'store']);
+    Route::get('/admin/fetch/professor/{id}', [ProfessorController::class, 'show']);
+    Route::post('/admin/update/professor/{id}', [ProfessorController::class, 'update']);
+    Route::post('/admin/delete/professor/{id}', [ProfessorController::class, 'destroy']);
 });
 
 Route::middleware(['auth:sanctum', 'verified', 'ability:token-student,token-admin'])->group(function () {

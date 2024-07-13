@@ -115,4 +115,15 @@ class User extends Authenticatable
         return $this->hasMany(StudentPlacements::class);
     }
 
+
+    // public function professor()
+    // {
+    //     return $this->belongsTo(Professor::class, 'id', 'user_id');
+    // }
+
+    public function professor()
+    {
+        return $this->hasOne(Professor::class);
+    }
+
 }
