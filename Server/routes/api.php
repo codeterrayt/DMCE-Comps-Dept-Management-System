@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AssignedSubjectController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentAchivementsController;
 use App\Http\Controllers\StudentController;
@@ -122,6 +123,12 @@ Route::middleware(['auth:sanctum', 'verified', 'ability:token-admin'])->group(fu
     Route::get('/admin/fetch/professor/{id}', [ProfessorController::class, 'show']);
     Route::post('/admin/update/professor/{id}', [ProfessorController::class, 'update']);
     Route::post('/admin/delete/professor/{id}', [ProfessorController::class, 'destroy']);
+
+    Route::get('/admin/fetch/assigned-subjects', [AssignedSubjectController::class, 'index']);
+    Route::post('/admin/add/assigned-subject', [AssignedSubjectController::class, 'store']);
+    Route::get('/admin/fetch/assigned-subject/{id}', [AssignedSubjectController::class, 'show']);
+    Route::post('/admin/update/assigned-subject/{id}', [AssignedSubjectController::class, 'update']);
+    Route::post('/admin/delete/assigned-subject/{id}', [AssignedSubjectController::class, 'destroy']);
 });
 
 Route::middleware(['auth:sanctum', 'verified', 'ability:token-student,token-admin'])->group(function () {
