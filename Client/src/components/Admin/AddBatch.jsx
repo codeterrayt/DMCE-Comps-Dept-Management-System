@@ -6,6 +6,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { getToken } from '../../helper/getToken';
 import Loaders from '../Loaders';
+import { checkLogin } from '../../helper/checkLogin';
 
 const AddBatch = () => {
     const [batches, setBatches] = useState([]);
@@ -26,15 +27,16 @@ const AddBatch = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch batches when the component mounts
+        if (!checkLogin()) {
+            return navigate('/login');
+          }
+      
         fetchBatches();
-    }, []);
-    useEffect(() => {
-        // Fetch batches when the component mounts
         fetchSubBatches()
     }, []);
-    // http://127.0.0.1:8000/api/admin/fetch/sub_batches
-    // http://127.0.0.1:8000/api/admin/fetch/sub_batches
+ 
+    // ${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/sub_batches
+    // ${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/sub_batches
 
     const fetchBatches = async () => {
         setLoading(true)
@@ -43,7 +45,7 @@ const AddBatch = () => {
             const config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: 'http://127.0.0.1:8000/api/admin/fetch/batches',
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/batches`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -68,7 +70,7 @@ const AddBatch = () => {
             const config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `http://127.0.0.1:8000/api/admin/fetch/sub_batches`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/sub_batches`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -129,7 +131,7 @@ const AddBatch = () => {
                 const config = {
                     method: 'post',
                     maxBodyLength: Infinity,
-                    url: `http://127.0.0.1:8000/api/admin/add/batch?batch=${formData.batch}`,
+                    url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/add/batch?batch=${formData.batch}`,
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
@@ -158,7 +160,7 @@ const AddBatch = () => {
             const config = {
                 method: 'post', // Adjust method as per your API endpoint (could be PUT or PATCH depending on your backend API)
                 maxBodyLength: Infinity,
-                url: `http://127.0.0.1:8000/api/admin/update/batch/${updateId}?batch=${formData.batch}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/batch/${updateId}?batch=${formData.batch}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -185,7 +187,7 @@ const AddBatch = () => {
             const config = {
                 method: 'post', // Adjust method as per your API endpoint (could be DELETE depending on your backend API)
                 maxBodyLength: Infinity,
-                url: `http://127.0.0.1:8000/api/admin/delete/batch/${batchId}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/delete/batch/${batchId}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -248,7 +250,7 @@ const AddBatch = () => {
                 const config = {
                     method: 'post',
                     maxBodyLength: Infinity,
-                    url: `http://127.0.0.1:8000/api/admin/add/sub_batch?batch_id=${batchId}&sub_batch=${subBatch}`,
+                    url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/add/sub_batch?batch_id=${batchId}&sub_batch=${subBatch}`,
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
@@ -270,8 +272,8 @@ const AddBatch = () => {
     };
 
 
-    // http://127.0.0.1:8000/api/admin/add/sub-batch?batch_id=7&sub_batch=A1
-    // http://127.0.0.1:8000/api/admin/add/sub_batch?batch_id=3&sub_batch=B1
+    // ${import.meta.env.VITE_SERVER_DOMAIN}/admin/add/sub-batch?batch_id=7&sub_batch=A1
+    // ${import.meta.env.VITE_SERVER_DOMAIN}/admin/add/sub_batch?batch_id=3&sub_batch=B1
 
     const handleSubUpdate = async () => {
         try {
@@ -285,7 +287,7 @@ const AddBatch = () => {
             const config = {
                 method: 'post', // Adjust method as per your API endpoint (could be PUT or PATCH depending on your backend API)
                 maxBodyLength: Infinity,
-                url: `http://127.0.0.1:8000/api/admin/update/sub_batch/${updateSubId}?batch_id=${batchId}&sub_batch=${subBatch}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/sub_batch/${updateSubId}?batch_id=${batchId}&sub_batch=${subBatch}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -314,7 +316,7 @@ const AddBatch = () => {
             const config = {
                 method: 'post', // Adjust method as per your API endpoint (could be DELETE depending on your backend API)
                 maxBodyLength: Infinity,
-                url: `http://127.0.0.1:8000/api/admin/delete/sub_batch/${subBatchId}`,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/delete/sub_batch/${subBatchId}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -334,17 +336,17 @@ const AddBatch = () => {
     };
 
     return (
-        <div>
+        <div className=' w-full bg-gray-200 min-h-screen h-auto'>
             <AdminNavBar />
             {
                 loading ? <Loaders message={"Loading"} />
-                    : <div className="container mx-auto p-4">
-                        <h1 className="text-3xl font-semibold mb-4">Manage Batches</h1>
+                    : <div className="container mx-auto p-4 max-w-6xl bg-white rounded-md m-4">
 
-                        <div className="flex justify-end mb-4">
+                        <div className="flex justify-between items-center ">
+                            <h1 className="text-3xl font-semibold mb-4">Manage Batches</h1>
                             <button
                                 onClick={() => setOpenModal(true)}
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                className="bg-[#262847] text-white font-bold py-2 px-4 rounded"
                             >
                                 Add Batch
                             </button>
@@ -401,10 +403,10 @@ const AddBatch = () => {
                         {isLoading && <Loaders />}
 
                         <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white border-collapse border border-gray-800">
+                            <table className="min-w-full border-collapse border border-gray-800">
                                 <thead>
                                     <tr className="bg-gray-200">
-                                        <th className="border border-gray-800 px-4 py-2 text-left">Batch</th>
+                                        <th className="border  border-gray-800 px-4 py-2 text-center">Batch</th>
                                         <th className="border border-gray-800 px-4 py-2 text-left">Sub Batches</th>
                                         <th className="border border-gray-800 px-4 py-2 text-left">Actions</th>
                                     </tr>
@@ -412,29 +414,31 @@ const AddBatch = () => {
                                 <tbody>
                                     {batches.map((batch) => (
                                         <tr key={batch.id}>
-                                            <td className="border border-gray-800 px-4 py-2">{batch.batch}</td>
-                                            <td className="border border-gray-800 px-4 py-2">
+                                            <td className="border text-center border-gray-800 px-4 py-2">{batch.batch}</td>
+                                            <td className="border text-center border-gray-800 px-4 py-2">
                                                 {subBatches.length > 0 ? (
-                                                    <div>
+                                                    <div className="flex gap-4 text-center">
                                                         {subBatches
                                                             .filter((subBatch) => subBatch.batch_id === batch.id)
                                                             .map((subBatch) => (
-                                                                <div key={subBatch.id} className="flex items-center mb-1">
-                                                                    <span className="bg-gray-200 text-gray-700 px-3 py-1 text-sm font-semibold rounded-full mr-2">
+                                                                <div key={subBatch.id} className="flex flex-col items-center justify-center gap-2 bg-slate-200 p-2 rounded-md">
+                                                                    <span className="bg-gray-200 text-gray-700 px-3 py-1 text-sm font-semibold rounded-full">
                                                                         {subBatch.sub_batch}
                                                                     </span>
-                                                                    <button
-                                                                        onClick={() => openSubBatchModal(subBatch)}
-                                                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-2"
-                                                                    >
-                                                                        Edit
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleSubDelete(subBatch.id, batch.id)}
-                                                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2"
-                                                                    >
-                                                                        Delete
-                                                                    </button>
+                                                                    <div className="space-x-2">
+                                                                        <button
+                                                                            onClick={() => openSubBatchModal(subBatch)}
+                                                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                                                                        >
+                                                                            <i className="fa-solid fa-pen-to-square"></i>
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => handleSubDelete(subBatch.id, batch.id)}
+                                                                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                                                                        >
+                                                                            <i className="fa-solid fa-trash"></i>
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             ))}
                                                     </div>
@@ -442,6 +446,7 @@ const AddBatch = () => {
                                                     <span className="text-gray-600">No sub-batches created</span>
                                                 )}
                                             </td>
+
                                             <td className="border border-gray-800 px-4 py-2">
                                                 <button
                                                     onClick={() => openUpdateModal(batch)}

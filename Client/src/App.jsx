@@ -36,7 +36,7 @@ import EditProfileAdmin from './components/Admin/EditProfile.Admin';
 import AddProfessor from './components/Admin/AddProfessor';
 import AddSubject from './components/Admin/AddSubject';
 import AddBatch from './components/Admin/AddBatch';
-import ManageSubBatches from './components/Admin/AddSubBatch';
+import ProfessorHome from './components/Professor/ProfessorHome';
 
 export const userContext = createContext()
 
@@ -85,7 +85,6 @@ function App() {
 
           <Route path="/admin" element={<HomeAdmin />} />
           <Route path="/admin/add-batch" element={<AddBatch />} />
-          <Route path="/admin/add-sub-batch" element={<ManageSubBatches />} />
           <Route path="/admin/add-professor" element={<AddProfessor />} />
           <Route path="/admin/add-subject" element={<AddSubject />} />
 
@@ -102,6 +101,11 @@ function App() {
           <Route path="/admin/placement/:id" element={<PlacementAdmin />} />
           <Route path="/admin/placement/detail/:id" element={<AddPlacementDetails />} />
           <Route path="/admin/edit-profile/:id" element={<EditProfileAdmin />} />
+
+          {/* //professor  */}
+
+          <Route path="/professor" element={<ProfessorHome />} />
+
 
 
         </Routes>

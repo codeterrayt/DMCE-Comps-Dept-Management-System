@@ -1,50 +1,183 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminNavBar from './AdminNavBar';
 import { Modal } from 'react-responsive-modal';
+import axios from 'axios';
+import { getToken } from '../../helper/getToken';
+import { checkLogin } from '../../helper/checkLogin';
 
 const AddProfessor = () => {
-    const [professors, setProfessors] = useState([
-        { name: 'John Doe', phone: '1234567890', alias: 'JD', email: 'john.doe@example.com', password: '1234567890' },
-        { name: 'Jane Smith', phone: '0987654321', alias: 'JS', email: 'jane.smith@example.com', password: '0987654321' },
-        { name: 'Alice Johnson', phone: '5551234567', alias: 'AJ', email: 'alice.johnson@example.com', password: '5551234567' },
-        { name: 'Bob Brown', phone: '4449876543', alias: 'BB', email: 'bob.brown@example.com', password: '4449876543' },
-        { name: 'John Doe', phone: '1234567890', alias: 'JD', email: 'john.doe@example.com', password: '1234567890' },
-        { name: 'Jane Smith', phone: '0987654321', alias: 'JS', email: 'jane.smith@example.com', password: '0987654321' },
-    ]);
-
+    const [professors, setProfessors] = useState([]);
     const [formData, setFormData] = useState({
-        name: '',
-        phone: '',
-        alias: '',
-        email: '',
-        password: ''
+        professor_name: '',
+        professor_phone_no: '',
+        professor_gender: '',
+        professor_email: '',
+        password: '',
+        professor_name_alias: ''
     });
-
-    const [openModal, setOpenModal] = useState(false); // State for controlling modal open/close
+    const [openModal, setOpenModal] = useState(false);
+    const [editMode, setEditMode] = useState(false); // State to determine if modal is in edit mode
+    const [editProfessorId, setEditProfessorId] = useState(null); // State to store the ID of the professor being edited
     const navigate = useNavigate();
+
+    // Fetch all professors on component mount
+    useEffect(() => {
+        if (!checkLogin()) {
+            return navigate('/login');
+          }
+      
+        fetchProfessors();
+    }, []);
+
+    // Fetch all professors
+    const fetchProfessors = () => {
+        const token = getToken();
+        axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/professors`, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}` // Replace with actual auth token
+            }
+        })
+            .then(response => {
+                console.log('Fetched professors:', response.data);
+                setProfessors(response.data); // Update professors state
+            })
+            .catch(error => {
+                console.error('Error fetching professors:', error);
+            });
+    };
+
+    // Add or update a professor based on editMode
+    const handleAddOrUpdateProfessor = () => {
+        if (editMode) {
+            handleUpdateProfessor(editProfessorId);
+        } else {
+            handleAddProfessor();
+        }
+    };
+
+    // Add a professor
+    const handleAddProfessor = () => {
+        const token = getToken();
+        const { professor_name, professor_phone_no, professor_gender, professor_email, password, professor_name_alias } = formData;
+        axios.post(`${import.meta.env.VITE_SERVER_DOMAIN}/admin/add/professor`, null, {
+            params: {
+                professor_name,
+                professor_phone_no,
+                professor_gender,
+                professor_email,
+                password,
+                professor_name_alias
+            },
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                console.log('Professor added successfully:', response.data);
+                fetchProfessors(); // Fetch updated list after adding
+                setFormData({
+                    professor_name: '',
+                    professor_phone_no: '',
+                    professor_gender: '',
+                    professor_email: '',
+                    password: '',
+                    professor_name_alias: ''
+                });
+                setOpenModal(false);
+            })
+            .catch(error => {
+                console.error('Error adding professor:', error);
+            });
+    };
+
+    // Update a professor
+    const handleUpdateProfessor = (professorId) => {
+        const token = getToken();
+        const { professor_name, professor_phone_no, professor_gender, professor_email, password, professor_name_alias } = formData;
+        axios.post(`${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/professor/${professorId}`, {
+            professor_name,
+            professor_phone_no,
+            professor_gender,
+            professor_email,
+            password,
+            professor_name_alias
+        }, {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                console.log('Professor updated successfully:', response.data);
+                fetchProfessors(); // Fetch updated list after updating
+                setEditMode(false); // Exit edit mode
+                setEditProfessorId(null); // Clear edit professor ID
+            })
+            .catch(error => {
+                console.error('Error updating professor:', error);
+            });
+    };
+
+    // Delete a professor
+    const handleDeleteProfessor = (professorId) => {
+        const token = getToken();
+        console.log(token);
+        try {
+
+            let config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: `${import.meta.env.VITE_SERVER_DOMAIN}/admin/delete/professor/${professorId}`,
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+
+                },
+            };
+
+            axios.request(config)
+                .then((response) => {
+                    console.log(JSON.stringify(response.data));
+                    fetchProfessors();
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    // Handle edit click - populate form data and open modal
+    const handleEditClick = (professor) => {
+        setFormData({
+            professor_name: professor.user.name,
+            professor_phone_no: professor.professor_phone_no,
+            professor_gender: professor.professor_gender,
+            professor_email: professor.user.email,
+            password: '', // Password should not be pre-filled for security reasons
+            professor_name_alias: professor.professor_name_alias
+        });
+        setEditMode(true); // Set edit mode to true
+        setEditProfessorId(professor.id); // Set the ID of the professor being edited
+        setOpenModal(true); // Open the modal
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
+        setFormData(prevData => ({
             ...prevData,
-            [name]: value,
-            password: name === 'phone' ? value : prevData.password
+            [name]: value
         }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setProfessors((prevProfessors) => [...prevProfessors, formData]);
-        setFormData({
-            name: '',
-            phone: '',
-            alias: '',
-            email: '',
-            password: ''
-        });
-        setOpenModal(false); // Close the modal after submitting
-        navigate('/professor-list');
+        handleAddOrUpdateProfessor();
     };
 
     return (
@@ -52,16 +185,19 @@ const AddProfessor = () => {
             <AdminNavBar />
             <div className="bg-gray-100 flex justify-center min-h-screen h-auto p-4">
                 <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
-                  <div className='flex items-center justify-between '>
-                  <h2 className="text-2xl font-bold mb-4">Professor List</h2>
-                    <button
-                        type="button"
-                        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mb-2"
-                        onClick={() => setOpenModal(true)}
-                    >
-                        Add Professor
-                    </button>
-                  </div>
+                    <div className='flex items-center justify-between'>
+                        <h2 className="text-2xl font-bold mb-4">Professor List</h2>
+                        <button
+                            type="button"
+                            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mb-2"
+                            onClick={() => {
+                                setEditMode(false); // Ensure edit mode is false when adding new professor
+                                setOpenModal(true);
+                            }}
+                        >
+                            Add Professor
+                        </button>
+                    </div>
                     <table className="min-w-full bg-white">
                         <thead>
                             <tr className="bg-gray-200">
@@ -69,24 +205,30 @@ const AddProfessor = () => {
                                 <th className="py-2 px-4">Phone</th>
                                 <th className="py-2 px-4">Alias</th>
                                 <th className="py-2 px-4">Email</th>
-                                <th className="py-2 px-4">Password</th>
+                                <th className="py-2 px-4">Gender</th>
                                 <th className="py-2 px-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {professors.map((professor, index) => (
                                 <tr key={index} className="text-center border-b">
-                                    <td className="py-2 px-4">{professor.name}</td>
-                                    <td className="py-2 px-4">{professor.phone}</td>
-                                    <td className="py-2 px-4">{professor.alias}</td>
-                                    <td className="py-2 px-4">{professor.email}</td>
-                                    <td className="py-2 px-4">{professor.password}</td>
+                                    <td className="py-2 px-4">{professor.user.name}</td>
+                                    <td className="py-2 px-4">{professor.professor_phone_no}</td>
+                                    <td className="py-2 px-4">{professor.professor_name_alias}</td>
+                                    <td className="py-2 px-4">{professor.user.email}</td>
+                                    <td className="py-2 px-4">{professor.professor_gender}</td>
                                     <td className="py-2 px-4">
-                                        <button className="text-blue-500 hover:text-blue-700 mr-2">
-                                            <i className="fa-solid fa-pen-to-square"></i>
+                                        <button
+                                            className="text-blue-500 hover:text-blue-700 mr-2"
+                                            onClick={() => handleEditClick(professor)}
+                                        >
+                                            Edit
                                         </button>
-                                        <button className="text-red-500 hover:text-red-700">
-                                            <i className="fa-solid fa-trash"></i>
+                                        <button
+                                            className="text-red-500 hover:text-red-700"
+                                            onClick={() => handleDeleteProfessor(professor.id)}
+                                        >
+                                            Delete
                                         </button>
                                     </td>
                                 </tr>
@@ -97,69 +239,103 @@ const AddProfessor = () => {
             </div>
 
             {/* Modal Component */}
-            <Modal open={openModal} onClose={() => setOpenModal(false)} center>
-                <form onSubmit={handleSubmit} className='p-8 px-16 '>
-                    <div className="mb-2 ">
-                        <label className="block text-gray-700 mb-2" htmlFor="name">Name</label>
+            <Modal open={openModal} onClose={() => {
+                setOpenModal(false);
+                setEditMode(false); // Reset edit mode when closing modal
+                setEditProfessorId(null); // Reset edit professor ID when closing modal
+                setFormData({
+                    professor_name: '',
+                    professor_phone_no: '',
+                    professor_gender: '',
+                    professor_email: '',
+                    password: '',
+                    professor_name_alias: ''
+                });
+            }} center>
+                <form onSubmit={handleSubmit} className='p-8 px-16'>
+                    <div className="mb-2">
+                        <label className="block text-gray-700 mb-2" htmlFor="professor_name">Name</label>
                         <input
                             type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
+                            id="professor_name"
+                            name="professor_name"
+                            value={formData.professor_name}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
+                            required
                         />
                     </div>
                     <div className="mb-2">
-                        <label className="block text-gray-700 mb-2" htmlFor="phone">Phone Number</label>
+                        <label className="block text-gray-700 mb-2" htmlFor="professor_phone_no">Phone Number</label>
                         <input
                             type="text"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
+                            id="professor_phone_no"
+                            name="professor_phone_no"
+                            value={formData.professor_phone_no}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
+                            required
                         />
                     </div>
                     <div className="mb-2">
-                        <label className="block text-gray-700 mb-2" htmlFor="alias">Name Alias</label>
+                        <label className="block text-gray-700 mb-2" htmlFor="professor_name_alias">Name Alias</label>
                         <input
                             type="text"
-                            id="alias"
-                            name="alias"
-                            value={formData.alias}
+                            id="professor_name_alias"
+                            name="professor_name_alias"
+                            value={formData.professor_name_alias}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
+                            required
                         />
                     </div>
                     <div className="mb-2">
-                        <label className="block text-gray-700 mb-2" htmlFor="email">Email</label>
+                        <label className="block text-gray-700 mb-2" htmlFor="professor_email">Email</label>
                         <input
                             type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
+                            id="professor_email"
+                            name="professor_email"
+                            value={formData.professor_email}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
+                            required
                         />
                     </div>
+                    {!editMode && ( // Render password field only in add mode
+                        <div className="mb-2">
+                            <label className="block text-gray-700 mb-2" htmlFor="password">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded"
+                                required
+                            />
+                        </div>
+                    )}
                     <div className="mb-2">
-                        <label className="block text-gray-700 mb-2" htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
+                        <label className="block text-gray-700 mb-2" htmlFor="professor_gender">Gender</label>
+                        <select
+                            id="professor_gender"
+                            name="professor_gender"
+                            value={formData.professor_gender}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
-                            readOnly
-                        />
+                            required
+                        >
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
                     </div>
                     <button
                         type="submit"
                         className="w-full mt-4 bg-[#262847] text-white py-2 rounded hover:bg-[#262847]"
                     >
-                        Add Professor
+                        {editMode ? 'Update Professor' : 'Add Professor'}
                     </button>
                 </form>
             </Modal>

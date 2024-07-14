@@ -68,6 +68,8 @@ const LoginForm = () => {
                 toast.success("login successful");
                 if (response.data.user.role === 'admin') {
                     return navigate('/admin');
+                }else if(response.data.user.role === 'professor'){
+                    return navigate('/professor')
                 }
                 return navigate('/dmce/home');
             })
@@ -109,7 +111,7 @@ const LoginForm = () => {
                     </form>
                 </div>
             </AnimationWrapper>
-        
+
         </section>
     );
 };
