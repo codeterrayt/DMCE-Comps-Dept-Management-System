@@ -7,7 +7,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'; // Import QueryC
 const queryClient = new QueryClient(); // Create a new instance of QueryClient
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  <>
      <QueryClientProvider client={queryClient}>
     <Toaster
       position="top-right"
@@ -16,5 +16,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
     
     </QueryClientProvider>
-  </React.StrictMode>,
+  </>,
 )
