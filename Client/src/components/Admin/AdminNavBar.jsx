@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Modal } from 'react-responsive-modal';
@@ -10,6 +10,10 @@ import axios from 'axios';
 import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 
 const AdminNavBar = () => {
+    const location = useLocation();
+    const pathname = location.pathname;
+    const segments = pathname.split("/");
+    const lastSegment = segments.pop();
 
     const navigate = useNavigate();
     const handleSignOut = () => {
@@ -49,6 +53,7 @@ const AdminNavBar = () => {
 
     }
 
+    console.log(lastSegment);
 
 
     const handleAdminChangePassword = () => {
@@ -149,7 +154,14 @@ const AdminNavBar = () => {
 
     return (
         <nav className='w-full bg-[#262847] py-3 px-8 flex items-center justify-between'>
-            <h1 onClick={() => navigate('/admin')} className='cursor-pointer text-4xl font-bold text-white'>Admin Panel</h1>
+            <div className='text-white flex gap-4 items-center '>
+                <h1 onClick={() => navigate('/admin')} className='cursor-pointer text-4xl font-bold text-white'>Admin Panel </h1>
+                {lastSegment != 'admin' && <div onClick={() => navigate('/admin')} className='flex flex-col justify-center items-center cursor-pointer hover:scale-150 duration-100'>
+                    <span><i className="fa-solid fa-house "></i></span>
+                    <p className='text-sm'>Go to Home</p>
+                </div>}
+            </div>
+
 
             <div className='flex items-center gap-4'>
 
