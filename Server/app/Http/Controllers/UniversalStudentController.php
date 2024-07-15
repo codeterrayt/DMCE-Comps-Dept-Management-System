@@ -163,7 +163,7 @@ class UniversalStudentController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:csv,txt',
+            'file' => 'required|mimes:csv',
             'academic_year' => 'required|string',
             'course_year' => 'required|string',
             'sem' => 'required|string',
