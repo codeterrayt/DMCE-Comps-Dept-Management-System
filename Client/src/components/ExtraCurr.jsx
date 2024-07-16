@@ -172,7 +172,7 @@ const ExtraCurr = () => {
                                 className="bg-[#262847] hover:bg-[#1e4f8f] p-2 px-4 text-white rounded-md w-fit block md:text-xl"
                                 onClick={() => navigate('/dmce/add/extra-curriculum')}
                             >
-                                <i className="fa-solid fa-plus"></i> Add
+                                <i className="fa-solid fa-plus"></i> Add Activity
                             </button>
                         </div>
                     </div>

@@ -13,7 +13,8 @@ import CertificatePopup from './Pop';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
 import { useQuery } from 'react-query';
-// import DataTable from 'datatables.net';
+// import $ from 'jquery';
+// import 'datatables.net';
 
 const Placement = () => {
     const [certificateUrl, setCertificateUrl] = useState('');
@@ -50,15 +51,14 @@ const Placement = () => {
         },
     });
 
-    useEffect(() => {
-        if (placement && placement.length > 0) {
-            // Initialize DataTable after the table has been rendered
-            const table = new DataTable('#example');
-            return () => {
-                table.destroy(); // Clean up on component unmount
-            };
-        }
-    }, [placement]);
+    // useEffect(() => {
+    //     if (placement && placement.length > 0) {
+    //         const table = $('#example').DataTable();
+    //         return () => {
+    //             table.destroy();
+    //         };
+    //     }
+    // }, [placement]);
 
     const openCertificate = (certificateUrl) => {
         setCertificateUrl(certificateUrl);

@@ -64,14 +64,14 @@ const HigherStudies = () => {
         },
     });
 
-    useEffect(() => {
-        if (study && study.length > 0) {
-            const table = new DataTable('#example');
-            return () => {
-                table.destroy();
-            };
-        }
-    }, [study]);
+    // useEffect(() => {
+    //     if (study && study.length > 0) {
+    //         const table = new DataTable('#example');
+    //         return () => {
+    //             table.destroy();
+    //         };
+    //     }
+    // }, [study]);
 
     const handleDelete = (id) => {
         const confirmOptions = {
