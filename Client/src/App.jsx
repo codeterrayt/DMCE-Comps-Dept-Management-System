@@ -37,6 +37,7 @@ import AddProfessor from './components/Admin/AddProfessor';
 import AddSubject from './components/Admin/AddSubject';
 import AddBatch from './components/Admin/AddBatch';
 import ProfessorHome from './components/Professor/ProfessorHome';
+import AssignSubject from './components/Admin/AssignSubject';
 
 export const userContext = createContext()
 
@@ -87,6 +88,7 @@ function App() {
           <Route path="/admin/add-batch" element={<AddBatch />} />
           <Route path="/admin/add-professor" element={<AddProfessor />} />
           <Route path="/admin/add-subject" element={<AddSubject />} />
+          <Route path="/admin/assign-subject" element={<AssignSubject />} />
 
           <Route path="/admin/internship/:id" element={<InternshipAdmin />} />
           <Route path="/admin/internship/detail/:id" element={<AddInternship />} />

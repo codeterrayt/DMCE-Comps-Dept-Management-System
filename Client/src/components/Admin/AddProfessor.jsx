@@ -5,9 +5,13 @@ import { Modal } from 'react-responsive-modal';
 import axios from 'axios';
 import { getToken } from '../../helper/getToken';
 import { checkLogin } from '../../helper/checkLogin';
+import toast from 'react-hot-toast';
+import Loaders from '../Loaders';
 
 const AddProfessor = () => {
     const [professors, setProfessors] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [updateloading, setUpdateLoading] = useState(false);
     const [formData, setFormData] = useState({
         professor_name: '',
         professor_phone_no: '',
@@ -25,13 +29,14 @@ const AddProfessor = () => {
     useEffect(() => {
         if (!checkLogin()) {
             return navigate('/login');
-          }
-      
+        }
+
         fetchProfessors();
     }, []);
 
     // Fetch all professors
     const fetchProfessors = () => {
+        setLoading(true)
         const token = getToken();
         axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/professors`, {
             headers: {
@@ -42,9 +47,13 @@ const AddProfessor = () => {
             .then(response => {
                 console.log('Fetched professors:', response.data);
                 setProfessors(response.data); // Update professors state
+                setLoading(false)
+                return toast.success("professor data fetch successfully...")
             })
             .catch(error => {
+                setLoading(false)
                 console.error('Error fetching professors:', error);
+                return toast.error(error.response.data.message || "failed to fetch data")
             });
     };
 
@@ -59,8 +68,40 @@ const AddProfessor = () => {
 
     // Add a professor
     const handleAddProfessor = () => {
+    
         const token = getToken();
         const { professor_name, professor_phone_no, professor_gender, professor_email, password, professor_name_alias } = formData;
+        if (!professor_name) {
+            toast.error("Professor name is required");
+            return; // Exit or handle the error condition
+        }
+
+        if (!professor_phone_no) {
+            toast.error("Professor phone number is required");
+            return; // Exit or handle the error condition
+        }
+
+        if (!professor_gender) {
+            toast.error("Professor gender is required");
+            return; // Exit or handle the error condition
+        }
+
+        if (!professor_email) {
+            toast.error("Professor email is required");
+            return; // Exit or handle the error condition
+        }
+
+        if (!password) {
+            toast.error("Password is required");
+            return; // Exit or handle the error condition
+        }
+
+        if (!professor_name_alias) {
+            toast.error("Professor alias is required");
+            return; // Exit or handle the error condition
+        }
+        setUpdateLoading(true)
+   
         axios.post(`${import.meta.env.VITE_SERVER_DOMAIN}/admin/add/professor`, null, {
             params: {
                 professor_name,
@@ -68,7 +109,7 @@ const AddProfessor = () => {
                 professor_gender,
                 professor_email,
                 password,
-                professor_name_alias
+                professor_name_alias: professor_name_alias.toUpperCase()
             },
             headers: {
                 'Accept': 'application/json',
@@ -86,24 +127,57 @@ const AddProfessor = () => {
                     password: '',
                     professor_name_alias: ''
                 });
+                setUpdateLoading(false)
                 setOpenModal(false);
+                return toast.success("professor added successfully...")
             })
             .catch(error => {
+                setUpdateLoading(false)
+                setOpenModal(false);
                 console.error('Error adding professor:', error);
+                return toast.error(error.response.data.message || "failed to add professor")
             });
     };
 
     // Update a professor
     const handleUpdateProfessor = (professorId) => {
         const token = getToken();
+    
         const { professor_name, professor_phone_no, professor_gender, professor_email, password, professor_name_alias } = formData;
+        if (!professor_name) {
+            toast.error("Professor name is required");
+            return; // Exit or handle the error condition
+        }
+
+        if (!professor_phone_no) {
+            toast.error("Professor phone number is required");
+            return; // Exit or handle the error condition
+        }
+
+        if (!professor_gender) {
+            toast.error("Professor gender is required");
+            return; // Exit or handle the error condition
+        }
+
+        if (!professor_email) {
+            toast.error("Professor email is required");
+            return; // Exit or handle the error condition
+        }
+
+      
+
+        if (!professor_name_alias) {
+            toast.error("Professor alias is required");
+            return; // Exit or handle the error condition
+        }
+        setUpdateLoading(true)
         axios.post(`${import.meta.env.VITE_SERVER_DOMAIN}/admin/update/professor/${professorId}`, {
             professor_name,
             professor_phone_no,
             professor_gender,
             professor_email,
             password,
-            professor_name_alias
+            professor_name_alias: professor_name_alias.toUpperCase()
         }, {
             headers: {
                 'Accept': 'application/json',
@@ -111,13 +185,19 @@ const AddProfessor = () => {
             }
         })
             .then(response => {
+                setUpdateLoading(false)
                 console.log('Professor updated successfully:', response.data);
                 fetchProfessors(); // Fetch updated list after updating
                 setEditMode(false); // Exit edit mode
                 setEditProfessorId(null); // Clear edit professor ID
+                setOpenModal(false)
+                return toast.success("professor updated successfully...")
             })
             .catch(error => {
+                setUpdateLoading(false)
+                setOpenModal(false)
                 console.error('Error updating professor:', error);
+                return toast.error(error.response.data.message || "failed to update professor")
             });
     };
 
@@ -159,7 +239,7 @@ const AddProfessor = () => {
             professor_phone_no: professor.professor_phone_no,
             professor_gender: professor.professor_gender,
             professor_email: professor.user.email,
-            password: '', // Password should not be pre-filled for security reasons
+            password: professor.user.password,
             professor_name_alias: professor.professor_name_alias
         });
         setEditMode(true); // Set edit mode to true
@@ -189,7 +269,7 @@ const AddProfessor = () => {
                         <h2 className="text-2xl font-bold mb-4">Professor List</h2>
                         <button
                             type="button"
-                            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mb-2"
+                            className="bg-[#262847] text-white py-2 px-4 rounded  mb-2"
                             onClick={() => {
                                 setEditMode(false); // Ensure edit mode is false when adding new professor
                                 setOpenModal(true);
@@ -198,43 +278,46 @@ const AddProfessor = () => {
                             Add Professor
                         </button>
                     </div>
-                    <table className="min-w-full bg-white">
-                        <thead>
-                            <tr className="bg-gray-200">
-                                <th className="py-2 px-4">Name</th>
-                                <th className="py-2 px-4">Phone</th>
-                                <th className="py-2 px-4">Alias</th>
-                                <th className="py-2 px-4">Email</th>
-                                <th className="py-2 px-4">Gender</th>
-                                <th className="py-2 px-4">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {professors.map((professor, index) => (
-                                <tr key={index} className="text-center border-b">
-                                    <td className="py-2 px-4">{professor.user.name}</td>
-                                    <td className="py-2 px-4">{professor.professor_phone_no}</td>
-                                    <td className="py-2 px-4">{professor.professor_name_alias}</td>
-                                    <td className="py-2 px-4">{professor.user.email}</td>
-                                    <td className="py-2 px-4">{professor.professor_gender}</td>
-                                    <td className="py-2 px-4">
-                                        <button
-                                            className="text-blue-500 hover:text-blue-700 mr-2"
-                                            onClick={() => handleEditClick(professor)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className="text-red-500 hover:text-red-700"
-                                            onClick={() => handleDeleteProfessor(professor.id)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
+                    {
+                        loading ? <Loaders message={"wait..."} /> : <table className="min-w-full bg-white">
+                            <thead>
+                                <tr className="bg-gray-200">
+                                    <th className="py-2 px-4">Name</th>
+                                    <th className="py-2 px-4">Phone</th>
+                                    <th className="py-2 px-4">Alias</th>
+                                    <th className="py-2 px-4">Email</th>
+                                    <th className="py-2 px-4">Gender</th>
+                                    <th className="py-2 px-4">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {!professors.length ? <h1 className='text-xl mt-8 text-[#262847] font-bold w-fit mx-auto'>No data found</h1> : professors.map((professor, index) => (
+                                    <tr key={index} className="text-center border-b">
+                                        <td className="py-2 px-4">{professor.user.name}</td>
+                                        <td className="py-2 px-4">{professor.professor_phone_no}</td>
+                                        <td className="py-2 px-4">{professor.professor_name_alias}</td>
+                                        <td className="py-2 px-4">{professor.user.email}</td>
+                                        <td className="py-2 px-4">{professor.professor_gender}</td>
+                                        <td className="py-2 px-4">
+                                            <button
+                                                className="text-blue-500 hover:text-blue-700 mr-2"
+                                                onClick={() => handleEditClick(professor)}
+                                            >
+                                                <i className="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                            <button
+                                                className="text-red-500 hover:text-red-700 ml-3"
+                                                onClick={() => handleDeleteProfessor(professor.id)}
+                                            >
+                                                <i className="fa-solid fa-trash"></i>
+
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    }
                 </div>
             </div>
 
@@ -262,7 +345,7 @@ const AddProfessor = () => {
                             value={formData.professor_name}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
-                            required
+
                         />
                     </div>
                     <div className="mb-2">
@@ -274,7 +357,7 @@ const AddProfessor = () => {
                             value={formData.professor_phone_no}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
-                            required
+
                         />
                     </div>
                     <div className="mb-2">
@@ -286,7 +369,7 @@ const AddProfessor = () => {
                             value={formData.professor_name_alias}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
-                            required
+
                         />
                     </div>
                     <div className="mb-2">
@@ -298,10 +381,9 @@ const AddProfessor = () => {
                             value={formData.professor_email}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
-                            required
+
                         />
                     </div>
-                    {!editMode && ( // Render password field only in add mode
                         <div className="mb-2">
                             <label className="block text-gray-700 mb-2" htmlFor="password">Password</label>
                             <input
@@ -311,10 +393,10 @@ const AddProfessor = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2 border border-gray-300 rounded"
-                                required
+
                             />
                         </div>
-                    )}
+                    
                     <div className="mb-2">
                         <label className="block text-gray-700 mb-2" htmlFor="professor_gender">Gender</label>
                         <select
@@ -323,7 +405,7 @@ const AddProfessor = () => {
                             value={formData.professor_gender}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded"
-                            required
+
                         >
                             <option value="">Select Gender</option>
                             <option value="male">Male</option>
@@ -335,7 +417,7 @@ const AddProfessor = () => {
                         type="submit"
                         className="w-full mt-4 bg-[#262847] text-white py-2 rounded hover:bg-[#262847]"
                     >
-                        {editMode ? 'Update Professor' : 'Add Professor'}
+                        {updateloading ? "Loading..." : editMode ? 'Update Professor' : 'Add Professor'}
                     </button>
                 </form>
             </Modal>

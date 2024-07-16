@@ -23,18 +23,19 @@ const AddBatch = () => {
     const [updateSubId, setUpdateSubId] = useState(null); // State to track sub-batch ID for update
     const [track, setTrack] = useState(false); // State to track sub-batch ID for update
     const [loading, setLoading] = useState(false)
+    const [addloading, setAddLoading] = useState(false)
 
     const navigate = useNavigate();
 
     useEffect(() => {
         if (!checkLogin()) {
             return navigate('/login');
-          }
-      
+        }
+
         fetchBatches();
         fetchSubBatches()
     }, []);
- 
+
     // ${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/sub_batches
     // ${import.meta.env.VITE_SERVER_DOMAIN}/admin/fetch/sub_batches
 
@@ -108,6 +109,8 @@ const AddBatch = () => {
 
     //batch submit
     const handleSubmit = async (e) => {
+
+        setAddLoading(true)
         e.preventDefault();
 
         if (!formData.batch) {
@@ -141,10 +144,13 @@ const AddBatch = () => {
                 await axios.request(config);
                 fetchBatches(); // Refresh the batch list after adding
                 setFormData({ batch: '' });
-                setOpenModal(false); // Close the batch modal after submitting
+                setOpenModal(false); // Close the batch modal after submittings
+                setAddLoading(false)
+
                 toast.success('Batch added successfully');
             }
         } catch (error) {
+            setAddLoading(false)
             console.error(error);
             setError(error.response.data.message)
         } finally {
@@ -155,6 +161,15 @@ const AddBatch = () => {
     // bat handle
     const handleUpdate = async () => {
         try {
+
+            if (!formData.batch) {
+                return setError('Please enter the batch first');
+            }
+
+            if (formData.batch.length > 1) {
+                return setError('Batch can have only one character');
+            }
+            setAddLoading(true)
 
             const token = getToken();
             const config = {
@@ -172,9 +187,13 @@ const AddBatch = () => {
             setOpenModal(false); // Close the batch modal after updating
             fetchBatches(); // Refresh the batch list after updating
             setUpdateId(null); // Clear updateId after updating
+            setAddLoading(false)
+
             toast.success('Batch updated successfully');
         } catch (error) {
+            setAddLoading(false)
             console.error(error);
+            return toast.error(error.response.data.message)
             setError(error.response.data.message)
             // toast.error(error.request)
         }
@@ -228,7 +247,7 @@ const AddBatch = () => {
 
     const handleSubSubmit = async (e) => {
         e.preventDefault();
-
+        setAddLoading(true)
         const { subBatch } = subFormData;
         const { batchId } = subupdateFormData;
 
@@ -262,9 +281,11 @@ const AddBatch = () => {
                 setSubFormData({ batchId, subBatch: '' });
                 setOpenSubModal(false); // Close the sub-batch modal after submitting
                 toast.success('Sub-batch added successfully');
+                setAddLoading(false)
             }
         } catch (error) {
             console.error(error);
+            setAddLoading(false)
             setError(error.response.data.message)
         } finally {
             setIsLoading(false); // Stop loading indicator
@@ -276,13 +297,13 @@ const AddBatch = () => {
     // ${import.meta.env.VITE_SERVER_DOMAIN}/admin/add/sub_batch?batch_id=3&sub_batch=B1
 
     const handleSubUpdate = async () => {
+        setAddLoading(true)
+
         try {
             const { subBatch } = subFormData;
             const { batchId } = subupdateFormData;
 
-            console.log(subBatch);
-            console.log(batchId);
-            console.log(updateId);
+
             const token = getToken();
             const config = {
                 method: 'post', // Adjust method as per your API endpoint (could be PUT or PATCH depending on your backend API)
@@ -300,8 +321,12 @@ const AddBatch = () => {
             setSubFormData({ subBatch: "" }); // Set the batch ID for the sub-batch form
             setOpenSubModal(false); // Close the sub-batch modal after updating
             setUpdateSubId(null); // Clear updateSubId after updating
+
+            setAddLoading(false)
+
             toast.success('Sub-batch updated successfully');
         } catch (error) {
+            setAddLoading(false)
             console.error(error);
             setError(error?.response?.data?.message)
         }
@@ -338,72 +363,64 @@ const AddBatch = () => {
     return (
         <div className=' w-full bg-gray-200 min-h-screen h-auto'>
             <AdminNavBar />
-            {
-                loading ? <Loaders message={"Loading"} />
-                    : <div className="container mx-auto p-4 max-w-6xl bg-white rounded-md m-4">
+            <div className="container mx-auto p-4 max-w-6xl bg-white rounded-md m-4">
 
-                        <div className="flex justify-between items-center ">
-                            <h1 className="text-3xl font-semibold mb-4">Manage Batches</h1>
-                            <button
-                                onClick={() => setOpenModal(true)}
-                                className="bg-[#262847] text-white font-bold py-2 px-4 rounded"
-                            >
-                                Add Batch
-                            </button>
-                        </div>
+                <div className="flex justify-between items-center ">
+                    <h1 className="text-3xl font-semibold mb-4">Manage Batches</h1>
+                    <button
+                        onClick={() => setOpenModal(true)}
+                        className="bg-[#262847] text-white font-bold py-2 px-4 rounded"
+                    >
+                        Add Batch
+                    </button>
+                </div>
 
-                        <Modal open={openModal} onClose={() => {
-                            setUpdateId("")
-                            setFormData({ batch: "" })
-                            setOpenModal(false)
-                        }
-                        }
-                        >
-                            <div className="w-full max-w-lg mx-auto p-4">
-                                <h2 className="text-2xl font-semibold mb-4">Add Batch</h2>
-                                <form onSubmit={handleSubmit}>
-                                    <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-bold mb-2">Batch</label>
-                                        <input
-                                            type="text"
-                                            name="batch"
-                                            value={formData.batch}
-                                            onChange={handleChange}
-                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                            placeholder="Enter Batch"
-                                            maxLength="1"
+                <Modal open={openModal} onClose={() => {
+                    setUpdateId("")
+                    setFormData({ batch: "" })
+                    setOpenModal(false)
+                }
+                }
+                >
+                    <div className="w-full max-w-lg mx-auto p-4">
+                        <h2 className="text-2xl font-semibold mb-4">Add Batch</h2>
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Batch</label>
+                                <input
+                                    type="text"
+                                    name="batch"
+                                    value={formData.batch}
+                                    onChange={handleChange}
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Enter Batch"
+                                    maxLength="1"
 
-                                        />
-                                    </div>
-
-                                    {error && <p className="text-red-500 text-xs italic">{error}</p>}
-
-                                    <div className="flex items-center justify-between">
-                                        <button
-                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                                            type="submit"
-                                        >
-                                            {updateId ? 'Update' : 'Add'}
-                                        </button>
-                                        <button
-                                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                                            onClick={() => {
-                                                setUpdateId(null);
-                                                setFormData({ batch: '' });
-                                                setOpenModal(false);
-                                            }}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
+                                />
                             </div>
-                        </Modal>
 
-                        {isLoading && <Loaders />}
 
+
+                            <div className='flex items-center justify-center'>
+                                <button
+                                    className="bg-[#262847] mx-auto w-fit text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                    type="submit"
+                                >
+                                    {addloading ? "Loading..." : updateId ? 'Update' : 'Add'}
+                                </button>
+
+                            </div>
+
+
+                        </form>
+                    </div>
+                </Modal>
+
+                {
+                    loading ? <Loaders message={"Loading"} />
+                        :
                         <div className="overflow-x-auto">
-                            <table className="min-w-full border-collapse border border-gray-800">
+                            <table className="min-w-full border-collapse  ">
                                 <thead>
                                     <tr className="bg-gray-200">
                                         <th className="border  border-gray-800 px-4 py-2 text-center">Batch</th>
@@ -411,8 +428,8 @@ const AddBatch = () => {
                                         <th className="border border-gray-800 px-4 py-2 text-left">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {batches.map((batch) => (
+                                <tbody className=''>
+                                    {!subBatches.length && !batches.length ? <h1 className='text-xl mt-8 text-[#262847] font-bold w-fit mx-auto'>No data found</h1> : batches.map((batch) => (
                                         <tr key={batch.id}>
                                             <td className="border text-center border-gray-800 px-4 py-2">{batch.batch}</td>
                                             <td className="border text-center border-gray-800 px-4 py-2">
@@ -473,62 +490,54 @@ const AddBatch = () => {
                             </table>
                         </div>
 
+                }
 
-
-                        {/* Sub-batch Modal */}
-                        <Modal open={openSubModal} onClose={
-                            () => {
-                                setSubFormData({ subBatch: "" });
-                                setUpdateSubId("")
-                                setAddSubId("")
-                                setOpenSubModal(false)
-                            }
-                        }
-                        >
-                            <div className="w-full max-w-lg mx-auto p-4">
-                                <h2 className="text-2xl font-semibold mb-4">{updateSubId ? "Update " : "Add "}Sub-Batches</h2>
-                                <form onSubmit={handleSubSubmit}>
-                                    <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-bold mb-2">Sub-Batch</label>
-                                        <input
-                                            type="text"
-                                            name="subBatch"
-                                            value={subFormData.subBatch}
-                                            onChange={handleSubChange}
-                                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                            placeholder="Enter Sub-Batch"
-                                            required
-                                        />
-                                        <input type="hidden" name="batchId" value={subFormData.batchId} />
-                                    </div>
-
-                                    {error && <p className="text-red-500 text-xs italic">{error}</p>}
-
-                                    <div className="flex items-center justify-between">
-                                        <button
-                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                                            type="submit"
-                                        >
-                                            {updateSubId ? 'Update' : 'Add'}
-                                        </button>
-                                        <button
-                                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                                            onClick={() => {
-                                                setUpdateSubId(null);
-                                                setSubFormData({ batchId: '', subBatch: '' });
-                                                setOpenSubModal(false);
-                                            }}
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
+                {/* Sub-batch Modal */}
+                <Modal open={openSubModal} onClose={
+                    () => {
+                        setSubFormData({ subBatch: "" });
+                        setUpdateSubId("")
+                        setAddSubId("")
+                        setOpenSubModal(false)
+                    }
+                }
+                >
+                    <div className="w-full max-w-lg mx-auto p-4">
+                        <h2 className="text-2xl font-semibold mb-4">{updateSubId ? "Update " : "Add "}Sub-Batches</h2>
+                        <form onSubmit={handleSubSubmit}>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Sub-Batch</label>
+                                <input
+                                    type="text"
+                                    name="subBatch"
+                                    value={subFormData.subBatch}
+                                    onChange={handleSubChange}
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Enter Sub-Batch"
+                                    required
+                                />
+                                <input type="hidden" name="batchId" value={subFormData.batchId} />
                             </div>
-                        </Modal>
 
 
+                            <div className='flex items-center justify-center'>
+
+                                <button
+                                    className="bg-[#262847] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                    type="submit"
+                                >
+                                    {addloading ? "Loading..." : updateSubId ? 'Update' : 'Add'}
+                                </button>
+                            </div>
+
+
+                        </form>
                     </div>
-            }
+                </Modal>
+
+
+            </div>
+
         </div>
     );
 };

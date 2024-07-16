@@ -166,9 +166,10 @@ const AdminNavBar = () => {
             <div className='flex items-center gap-4'>
 
                 <p onClick={() => navigate('/admin/add-batch')} className='px-4 py-2 bg-white text-black font-bold cursor-pointer rounded-md'>Add Batch</p>
+                <p onClick={() => navigate('/admin/add-subject')} className='px-4 py-2 bg-white text-black font-bold cursor-pointer rounded-md'>Add Subject</p>
              
                 <p onClick={() => navigate('/admin/add-professor')} className='px-4 py-2 bg-white text-black font-bold cursor-pointer rounded-md'>Add Professor</p>
-                <p onClick={() => navigate('/admin/add-subject')} className='px-4 py-2 bg-white text-black font-bold cursor-pointer rounded-md'>Add Subject</p>
+                <p onClick={() => navigate('/admin/assign-subject')} className='px-4 py-2 bg-white text-black font-bold cursor-pointer rounded-md'>Assign Subject</p>
 
 
                 <button onClick={handleAdminChangePassword} className='px-4 py-2 bg-white text-black font-bold rounded-md'>Change Password</button>
