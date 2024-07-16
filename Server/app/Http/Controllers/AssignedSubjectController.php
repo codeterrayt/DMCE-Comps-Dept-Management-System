@@ -146,4 +146,21 @@ class AssignedSubjectController extends Controller
 
         return response()->json(['message' => 'Assigned subject deleted successfully']);
     }
+
+
+
+    // professor personal loggedin fetch assigned subjects
+    public function fetch_loggedin_professor_assigned_subject()
+    {
+        $id = auth()->user()->id;
+
+        $assignedSubject = AssignedSubject::where("user_id",$id)->first();
+
+        if (!$assignedSubject) {
+            return response()->json(['message' => 'Assigned subject not found'], 404);
+        }
+
+        return response()->json($assignedSubject);
+    }
+
 }

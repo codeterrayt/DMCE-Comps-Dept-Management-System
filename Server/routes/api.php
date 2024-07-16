@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\ProfessorController;
+use App\Http\Controllers\UniversalStudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -129,9 +130,21 @@ Route::middleware(['auth:sanctum', 'verified', 'ability:token-admin'])->group(fu
     Route::get('/admin/fetch/assigned-subject/{id}', [AssignedSubjectController::class, 'show']);
     Route::post('/admin/update/assigned-subject/{id}', [AssignedSubjectController::class, 'update']);
     Route::post('/admin/delete/assigned-subject/{id}', [AssignedSubjectController::class, 'destroy']);
+
+    Route::get('/admin/fetch/csv/students', [UniversalStudentController::class, 'index']);
+    Route::post('/admin/add/csv/student', [UniversalStudentController::class, 'store']);
+    Route::get('/admin/fetch/csv/student/{id}', [UniversalStudentController::class, 'show']);
+    Route::post('/admin/update/csv/student/{id}', [UniversalStudentController::class, 'update']);
+    Route::post('/admin/delete/csv/student/{id}', [UniversalStudentController::class, 'destroy']);
+    Route::post('/admin/upload/csv/students', [UniversalStudentController::class, 'upload']);
 });
 
-Route::middleware(['auth:sanctum', 'verified', 'ability:token-student,token-admin'])->group(function () {
+
+Route::middleware(['auth:sanctum', 'verified', 'ability:token-professor'])->group(function () {
+    Route::get('/professor/fetch/assigned-subjects', [AssignedSubjectController::class, 'fetch_loggedin_professor_assigned_subject']);
+});
+
+Route::middleware(['auth:sanctum', 'verified', 'ability:token-student,token-admin,token-professor'])->group(function () {
     Route::post('/update/profile', [ProfileController::class, 'update']);
     Route::get('/fetch/profile', function (Request $request) {
         return $request->user();
