@@ -51,6 +51,15 @@ const Home = () => {
 
   const isProfileCompleted = async () => {
     try {
+      const user = localStorage.getItem('dmceuser');
+      if (user) {
+
+        const userData = JSON.parse(user);
+        if (userData.role != 'admin' && userData.profile_completed) {
+          return true;
+        }
+      }
+
       const result = await isUserInfoCompleted();
       return result;
     } catch (error) {
@@ -69,9 +78,9 @@ const Home = () => {
             </div>
             <div className="container mx-auto px-4 py-8 text-center">
               <h1 className="text-3xl font-bold mb-4">Welcome to DMCE Data Management System</h1>
-          
+
               <h1 className="text-2xl font-bold mb-4">For Computer Department <i className="fa-solid fa-computer text-4xl m-4 text-[#00006A]"></i></h1>
-          
+
             </div>
 
           </AnimationWrapper>

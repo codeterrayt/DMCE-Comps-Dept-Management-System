@@ -32,6 +32,16 @@ export const isUserInfoCompleted = () => {
         .then((response) => {
           const result = checkFieldsNotNull(response?.data);
           if (result == true) {
+            const user = localStorage.getItem("dmceuser");
+            if (user) {
+              const userInsession = JSON.parse(user);
+              const data = {
+                ...userInsession,
+                profile_completed: true,
+              };
+              localStorage.setItem("dmceuser", JSON.stringify(data));
+            }
+
             return resolve(response.status);
           }
           resolve(result);
