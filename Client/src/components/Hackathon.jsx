@@ -13,13 +13,14 @@ import CertificatePopup from './Pop';
 import { formatDate } from '../helper/getDate';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import { useQuery } from 'react-query';
 
 const Hackathon = () => {
     const [certificateUrl, setCertificateUrl] = useState('');
     const [showCertificate, setShowCertificate] = useState(false);
     const [checkDelete, setCheckDelete] = useState(false);
     const navigate = useNavigate();
-    const [hackathon, setHackathon] = useState([]);
+    // const [hackathon, setHackathon] = useState([]);
     const [loader, setLoader] = useState(false);
 
     useEffect(() => {
@@ -43,31 +44,47 @@ const Hackathon = () => {
         return modifiedData;
     }
 
-    const getAllHackathons = () => {
+  
+
+
+    const getAllHackathons = async () => {
         setLoader(true);
         const token = getToken();
 
-        axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/hackathon`, {
+      const response = await  axios.get(`${import.meta.env.VITE_SERVER_DOMAIN}/student/fetch/hackathon`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
             }
         })
-            .then(response => {
-                const modifiedData = removeUnwantedFields(response.data.hackathon_participations);
-                setHackathon(modifiedData);
-                setLoader(false);
-            })
-            .catch(error => {
-                console.error(error);
-                setLoader(false);
-                if (error.response && error.response.status === 401) {
-                    localStorage.clear();
-                    return navigate('/login');
-                }
-                toast.error(getFirstErrorMessage(error.response.data));
-            });
+         return response.data.hackathon_participations;
+            // .then(response => {
+            //     // const modifiedData = removeUnwantedFields(response.data.hackathon_participations);
+            //     // setHackathon(modifiedData);
+            //     setLoader(false);
+            //     return response.data.hackathon_participations
+            // })
+            // .catch(error => {
+            //     console.error(error);
+            //     setLoader(false);
+            //     if (error.response && error.response.status === 401) {
+            //         localStorage.clear();
+            //         return navigate('/login');
+            //     }
+            //     toast.error(getFirstErrorMessage(error.response.data));
+            // });
     };
+    const { data: hackathon, isLoading, isError, error, refetch } = useQuery('hackthons', getAllHackathons, {
+        retry: 1, // Number of retries befor e triggering an error
+        onError: (error) => {
+            if (error.response && error.response.status === 401) {
+                localStorage.clear();
+                navigate('/login');
+            } else {
+                toast.error(getFirstErrorMessage(error.response?.data || error.message));
+            }
+        },
+    });
 
     const handleDelete = (id) => {
         try {
@@ -97,14 +114,16 @@ const Hackathon = () => {
                                             'Authorization': `Bearer ${token}`,
                                             ...data.getHeaders
                                         },
+                                      
                                         data: data
                                     };
 
                                     axios.request(config)
                                         .then(response => {
-                                            setHackathon(data => data.filter(value => value.id !== id));
+                                            // setHackathon(data => data.filter(value => value.id !== id));
                                             setCheckDelete(false);
                                             setLoader(false);
+                                            refetch()
                                         })
                                         .catch(error => {
                                             setCheckDelete(false);
@@ -151,7 +170,7 @@ const Hackathon = () => {
         <section className='w-full min-h-screen p-4 md:p-8'>
             {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
-            {loader ? (
+            {isLoading ? (
                 <Loaders className="capitalize" message={checkDelete ? "Deleting Your Hackathon" : "Fetching Your Hackathon"} />
             ) : (
                 <AnimationWrapper className='w-full'>

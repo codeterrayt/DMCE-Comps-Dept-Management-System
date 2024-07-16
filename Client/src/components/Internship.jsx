@@ -14,10 +14,11 @@ import CertificatePopup from './Pop';
 import { formatDate } from '../helper/getDate';
 import AnimationWrapper from './Page-Animation';
 import { getFirstErrorMessage } from '../helper/getErrorMessage';
+import { useQuery } from 'react-query';
 
 const Internship = () => {
     const navigate = useNavigate();
-    const [internships, setInternships] = useState([]);
+    // const [internships, setInternships] = useState([]);
     const [loader, setLoader] = useState(false);
     const [checkDelete, setCheckDelete] = useState(false);
 
@@ -62,7 +63,7 @@ const Internship = () => {
         getAllInternships();
     }, []);
 
-    const getAllInternships = () => {
+    const getAllInternships = async () => {
         setLoader(true);
         const token = getToken();
 
@@ -75,21 +76,25 @@ const Internship = () => {
             },
         };
 
-        axios.request(config)
-            .then((response) => {
-                const data = removeUnwantedFields(response.data.internships);
-                setInternships(data);
-                setLoader(false);
-            })
-            .catch((error) => {
-                if (error.response && error.response.status === 401) {
-                    localStorage.clear();
-                    return navigate('/login');
-                }
-                setLoader(false);
-                return toast.error(getFirstErrorMessage(error.response.data));
-            });
+        const res = await axios.request(config)
+        console.log(res.data.internships);
+        return res.data.internships
+
     };
+
+    const { data: internships, isLoading, isError, error, refetch } = useQuery('internships', getAllInternships, {
+        retry: 1, // Number of retries befor e triggering an error
+        onError: (error) => {
+            if (error.response && error.response.status === 401) {
+                localStorage.clear();
+                navigate('/login');
+            } else {
+                toast.error(getFirstErrorMessage(error.response?.data || error.message));
+            }
+        },
+    });
+
+    console.log(internships);
 
     const handleDelete = (id) => {
         try {
@@ -125,9 +130,10 @@ const Internship = () => {
                                     // Send delete request
                                     axios.request(config)
                                         .then((response) => {
-                                            setInternships(prevInternships => prevInternships.filter(internship => internship.id !== id));
+                                            // setInternships(prevInternships => prevInternships.filter(internship => internship.id !== id));
                                             setCheckDelete(false);
                                             setLoader(false);
+                                            refetch()
                                         })
                                         .catch((error) => {
                                             if (error.response && error.response.status === 401) {
@@ -163,7 +169,7 @@ const Internship = () => {
         <section className='w-full min-h-screen p-3 md:p-8'>
             {showCertificate && <CertificatePopup certificateUrl={certificateUrl} onClose={closeCertificate} />}
 
-            {loader ? <Loaders message={checkDelete ? "Wait, Deleting Your Internship" : "Fetching Your Internships"} /> :
+            {isLoading ? <Loaders message={checkDelete ? "Wait, Deleting Your Internship" : "Fetching Your Internships"} /> :
                 <AnimationWrapper className='w-full'>
                     <div className='w-full flex items-center justify-between px-4 mt-8'>
                         <h2 className='text-center text-xl md:text-3xl font-bold text-[#262847]'>Your Internships</h2>
@@ -182,7 +188,7 @@ const Internship = () => {
                     </div>
 
                     <div className="table-responsive w-full mt-8">
-                        {internships.length ? (
+                        {internships.length > 0 ? (
                             <table id="example" className="table table-striped text-black" style={{ width: '100%' }}>
                                 <thead>
                                     <tr className='capitalize'>
