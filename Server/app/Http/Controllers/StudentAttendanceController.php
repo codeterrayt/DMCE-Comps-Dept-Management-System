@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use App\Models\StudentAttendance;
+use App\Models\Subjects;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use PhpOption\None;
@@ -11,8 +12,32 @@ use Illuminate\Support\Facades\DB;
 
 class StudentAttendanceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+
+        $request->validate([
+            "subject_id" => 'required|integer|exists:subjects,id'
+        ]);
+
+        $subject_id = $request->subject_id;
+        $data = Student::with(['attendances' => function($query) use ($subject_id) {
+            $query->where('subject_id', $subject_id);
+        }])->get();
+
+
+
+        // if(count($data) == 0){
+            // $subject = Subjects::find($subject_id);
+            // dd($subject);
+            // $data = Student::with('attendances')->where("sem",$subject->subject_sem)->get();
+        // }
+
+        return response()->json($data);
+
+
+
+
+
     //     $data = DB::table('professors')
     //     ->join('assigned_subjects', 'professors.user_id', '=', 'assigned_subjects.user_id')
     //     ->join('students', function ($join) {
@@ -38,7 +63,10 @@ class StudentAttendanceController extends Controller
         $request->validate([
             'student_id' => 'required|exists:students,student_id',
             'sem' => 'required|integer',
-            // 'subject_id' => 'required|exists:subjects,id',
+            'academic_year' => 'required|string',
+            'course_year' => 'required|string',
+            'pr_th' => 'required|boolean',
+            'subject_id' => 'required|exists:subjects,id',
             'm1' => 'integer|nullable',
             'm2' => 'integer|nullable',
             'm3' => 'integer|nullable',
@@ -46,7 +74,13 @@ class StudentAttendanceController extends Controller
             'total' => 'integer|nullable',
         ]);
 
-        $d = StudentAttendance::where([["sem","=",$request->sem],["student_id","=",$request->student_id]])->first();
+        $d = StudentAttendance::where([
+            ["sem","=",$request->sem],
+            ["student_id","=",$request->student_id],
+            ["academic_year","=",$request->academic_year],
+            ["pr_th","=",$request->pr_th],
+            ["subject_id","=",$request->subject_id],
+        ])->first();
 
         if($d){
             return response()->json(['message' => 'Data Already Exits'], 404);
@@ -79,6 +113,9 @@ class StudentAttendanceController extends Controller
         $request->validate([
             'student_id' => 'required|exists:students,student_id',
             'sem' => 'required|integer',
+            'academic_year' => 'required|string',
+            'course_year' => 'required|string',
+            'pr_th' => 'required|boolean',
             'subject_id' => 'required|exists:subjects,id',
             'm1' => 'integer|nullable',
             'm2' => 'integer|nullable',
@@ -87,8 +124,13 @@ class StudentAttendanceController extends Controller
             'total' => 'integer|nullable',
         ]);
 
+
         // Find the attendance record by ID
-        $attendance = StudentAttendance::findOrFail($id);
+        $attendance = StudentAttendance::find($id);
+
+        if($attendance == null){
+            return response()->json(['message' => 'Data not found'], 404);
+        }
 
         // Update the attendance record with the request data
         $attendance->update($request->all());
