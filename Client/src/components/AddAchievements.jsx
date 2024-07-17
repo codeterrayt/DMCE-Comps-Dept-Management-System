@@ -202,6 +202,7 @@ const AddAchievements = () => {
     const getDataById = (id) => {
         setloader(true)
         try {
+            console.log("varad");
             const token = getToken()
 
             let config = {

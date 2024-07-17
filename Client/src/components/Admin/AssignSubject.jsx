@@ -342,7 +342,7 @@ const AssignSubject = () => {
                                 {!initialData.length ? <h1 className='text-xl mt-8 text-[#262847] font-bold w-fit mx-auto'>No data found</h1> : initialData.map((data, index) => (
                                     <tr key={index} className="text-center border-b">
                                         <td className="py-2 px-4">{data.user.name}</td>
-                                        <td className="py-2 px-4">{data.subject_id}</td>
+                                        <td className="py-2 px-4">{data.subject.subject_short}</td>
                                
                                         <td className="py-2 px-4">{data.batch}</td>
                                         <td className="py-2 px-4">{data.sub_batch || '-'}</td>

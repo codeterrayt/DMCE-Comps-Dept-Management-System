@@ -20,7 +20,7 @@ const LoginForm = () => {
         if (token) {
             navigate('/dmce/home');
         }
-    }, []);
+    }, [navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -29,14 +29,14 @@ const LoginForm = () => {
 
     const handleSubmit = () => {
         if (!formData.email) {
-            return toast.error('please provide the email address');
+            return toast.error('Please provide the email address.');
         }
 
         if (!formData.password) {
-            return toast.error('please provide the password');
+            return toast.error('Please provide the password.');
         }
 
-        const loading = toast.loading('wait! Login in progress');
+        const loading = toast.loading('Wait! Logging in...');
 
         let data = new FormData();
         data.append('email', formData.email);
@@ -65,11 +65,11 @@ const LoginForm = () => {
                 localStorage.setItem('dmceuser', JSON.stringify(user));
                 toast.dismiss(loading);
                 setUser(user);
-                toast.success("login successful");
+                toast.success("Login successful");
                 if (response.data.user.role === 'admin') {
                     return navigate('/admin');
-                }else if(response.data.user.role === 'professor'){
-                    return navigate('/professor')
+                } else if (response.data.user.role === 'professor') {
+                    return navigate('/professor');
                 }
                 return navigate('/dmce/home');
             })
@@ -85,33 +85,32 @@ const LoginForm = () => {
     }
 
     return (
-        <section className='relative w-full min-h-screen p-4 mt-8 md:p-8 overflow-hidden'>
-            <AnimationWrapper className='mx-auto w-full'>
-                <div className='w-full'>
-                    <img src={logo} className='w-40 mx-auto mb-4' alt="" />
+        <section className='relative w-full min-h-screen flex items-center justify-center p-4 bg-gray-50'>
+            <AnimationWrapper className='w-full max-w-md p-6 bg-white shadow-lg rounded-lg'>
+                <div className='text-center'>
+                    <img src={logo} className='w-24 mx-auto mb-4' alt="DMCE Logo" />
+                    <h1 className='text-3xl font-bold text-gray-800'>Login</h1>
                 </div>
-                <div className='w-full max-md:mt-8'>
-                    <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847] tracking-[3px]'>Login</h1>
-                </div>
-                <div className='w-full max-md:mt-4'>
-                    <form className='space-y-4  lg:w-[60%] md:w-[80%] mx-auto p-2 md:p-8  relative z-10'>
-                        <label className='label' htmlFor="email">Email</label>
-                        <input type="email" id='email' name="email" className='input' onChange={handleChange} />
-
-                        <label className='label' htmlFor="password">Password</label>
-                        <div className='w-full  flex items-center relative' >
-                            <input type={show ? "text" : "password"} id='password' name="password" className='input' onChange={handleChange} />
-                            <i onClick={handleEye} className={"fa-solid " + (show ? "fa-eye-slash" : "fa-eye") + " absolute right-2 top-1/3"}></i>
+                <form className='mt-6 space-y-6'>
+                    <div>
+                        <label className='block text-gray-700' htmlFor="email">Email</label>
+                        <input type="email" id='email' name="email" className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500' onChange={handleChange} />
+                    </div>
+                    <div>
+                        <label className='block text-gray-700' htmlFor="password">Password</label>
+                        <div className='relative'>
+                            <input type={show ? "text" : "password"} id='password' name="password" className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500' onChange={handleChange} />
+                            <i onClick={handleEye} className={"fa-solid " + (show ? "fa-eye-slash" : "fa-eye") + " absolute right-3 top-3 cursor-pointer text-gray-500"}></i>
                         </div>
-
-                        <div className='flex justify-center mt-4'>
-                            <button type='button' className='btn' onClick={handleSubmit}>Login</button>
-                        </div>
-                        <p className='font-bold text-center'>Don't have an account? <span onClick={() => navigate('/sign-up')} className=' text-[13px] cursor-pointer text-blue-700 underline inline'>Sign Up</span> </p>
-                    </form>
-                </div>
+                    </div>
+                    <div className='flex justify-center'>
+                        <button type='button' className='w-full py-2 px-4 bg-[#262847] text-white font-semibold rounded-md shadow-md  focus:outline-none focus:ring-2 focus:ring-indigo-500' onClick={handleSubmit}>Login</button>
+                    </div>
+                    <p className='text-center text-gray-700'>
+                        Don't have an account? <span onClick={() => navigate('/sign-up')} className='text-indigo-600 cursor-pointer underline'>Sign Up</span>
+                    </p>
+                </form>
             </AnimationWrapper>
-
         </section>
     );
 };

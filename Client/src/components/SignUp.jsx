@@ -8,14 +8,14 @@ import { getFirstErrorMessage } from '../helper/getErrorMessage';
 import logo from '../assets/dmce.png';
 
 const SignUpForm = () => {
-    const { user, setUser } = useContext(userContext)
+    const { user, setUser } = useContext(userContext);
 
     const [formData, setFormData] = useState({
         firstName: '',
         email: '',
         password: ''
     });
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,109 +23,93 @@ const SignUpForm = () => {
     };
 
     const handleSubmit = () => {
-
-
         if (!formData.firstName) {
-            return toast.error('pleased provide first name')
-
+            return toast.error('Please provide first name');
         }
-        if (!formData.firstName.split(' ').length > 1) {
-            toast.error('First name should only contain one word.');
-            return; // Exit the function if first name contains more than one word
+        if (formData.firstName.split(' ').length > 1) {
+            return toast.error('First name should only contain one word.');
         }
 
         if (!formData.email) {
-            return toast.error('please provide the email address')
+            return toast.error('Please provide the email address');
         }
 
         if (!formData.password) {
-            return toast.error('please provide the password')
+            return toast.error('Please provide the password');
         }
 
-        const loading = toast.loading('wait! Sign up in progress')
+        const loading = toast.loading('Wait! Sign up in progress');
 
         let data = new FormData();
         data.append('name', formData.firstName);
         data.append('email', formData.email);
         data.append('password', formData.password);
 
-        console.log("varad", data);
-
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-
             url: `${import.meta.env.VITE_SERVER_DOMAIN}/register`,
             headers: {
                 'Accept': 'application/json',
-
             },
             data: data
         };
 
-        console.log(config);
         axios.request(config)
             .then((response) => {
                 const user = {
                     name: response.data.user.name,
                     token: response.data.token,
-                    role: response.data.user.role,
+                    role: 'student',
                     id: response.data.user.id
-
-                }
-                setUser(user)
-
-                localStorage.setItem('dmceuser', JSON.stringify(user))
-                toast.dismiss(loading)
-                toast.success("signup successful")
-                return navigate('/dmce/home')
+                };
+                setUser(user);
+                localStorage.setItem('dmceuser', JSON.stringify(user));
+                toast.dismiss(loading);
+                toast.success("Signup successful");
+                return navigate('/dmce/home');
             })
             .catch((error) => {
-                console.log(error);
-                toast.dismiss(loading)
-                return toast.error(getFirstErrorMessage(error.response.data))
+                toast.dismiss(loading);
+                return toast.error(getFirstErrorMessage(error.response.data));
             });
     };
 
-    const [show, setShow] = useState(false)
+    const [show, setShow] = useState(false);
     const handleEye = () => {
-        setShow(pre => !pre)
+        setShow(prev => !prev);
+    };
 
-    }
     return (
-        <section className='w-full min-h-screen p-4 md:p-2 mt-4 '>
-            <AnimationWrapper className='mx-auto w-full'>
-            <div className='w-full'>
-                    <img src={logo} className='w-40 mx-auto mb-4' alt="" />
+        <section className='relative w-full min-h-screen flex items-center justify-center p-4 bg-gray-50'>
+            <AnimationWrapper className='w-full max-w-md p-6 bg-white shadow-lg rounded-lg'>
+                <div className='text-center'>
+                    <img src={logo} className='w-24 mx-auto mb-4' alt="DMCE Logo" />
+                    <h1 className='text-3xl font-bold text-gray-800'>Sign Up</h1>
                 </div>
-                <div className='w-full max-md:mt-8  '>
-                    <h1 className='text-center text-xl md:text-6xl font-bold text-[#262847] tracking-[3px]'>Sign Up</h1>
-                </div>
-                <div className='grid grid-cols-1 gap-4 w-full'>
-                    <div className=' w-full lg:w-[60%] mx-auto md:w-[80%] p-2 md:p-8 mt-4'>
-                        <label className='label' htmlFor="firstName">First Name</label>
-                        <input type="text" id='firstName' name="firstName" className='input' onChange={handleChange} />
-
-                        <label className='label' htmlFor="email">Email</label>
-                        <input type="email" id='email' name="email" className='input' onChange={handleChange} />
-
-                        <label className='label' htmlFor="password">Password</label>
-                        <div className='w-full  flex items-center relative' >
-                            <input type={show ? "text" : "password"} id='password' name="password" className='input' onChange={handleChange} />
-                            <i onClick={handleEye} className={"fa-solid " + (show ? "fa-eye-slash" : "fa-eye") + " absolute right-2 top-1/3"}></i>
-
-                        </div>
-
-                        <div className='flex justify-center mt-4'>
-                            <button className='btn' onClick={handleSubmit}>Sign Up</button>
-                        </div>
-                        <p className='font-bold text-center mt-8'>Already have account? <p onClick={() => navigate('/login')} className=' text-[13px] cursor-pointer text-blue-700 underline inline'>Login</p> </p>
-
-
+                <form className='mt-6 space-y-6'>
+                    <div>
+                        <label className='block text-gray-700' htmlFor="firstName">First Name</label>
+                        <input type="text" id='firstName' name="firstName" className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500' onChange={handleChange} />
                     </div>
-
-                </div>
-
+                    <div>
+                        <label className='block text-gray-700' htmlFor="email">Email</label>
+                        <input type="email" id='email' name="email" className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500' onChange={handleChange} />
+                    </div>
+                    <div>
+                        <label className='block text-gray-700' htmlFor="password">Password</label>
+                        <div className='relative'>
+                            <input type={show ? "text" : "password"} id='password' name="password" className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500' onChange={handleChange} />
+                            <i onClick={handleEye} className={"fa-solid " + (show ? "fa-eye-slash" : "fa-eye") + " absolute right-3 top-3 cursor-pointer text-gray-500"}></i>
+                        </div>
+                    </div>
+                    <div className='flex justify-center'>
+                        <button type='button' className='w-full py-2 px-4 bg-[#262847] text-white font-semibold rounded-md shadow-md  focus:outline-none focus:ring-2 ' onClick={handleSubmit}>Sign Up</button>
+                    </div>
+                    <p className='text-center text-gray-700'>
+                        Already have an account? <span onClick={() => navigate('/login')} className='text-indigo-600 cursor-pointer underline'>Login</span>
+                    </p>
+                </form>
             </AnimationWrapper>
         </section>
     );
