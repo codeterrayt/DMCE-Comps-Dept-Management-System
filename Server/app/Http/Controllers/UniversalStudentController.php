@@ -35,6 +35,9 @@ class UniversalStudentController extends Controller
         $student->roll_no = $request->roll_no;
         $student->name = $request->name;
         $student->batch = $request->batch;
+        $student->academic_year = $request->academic_year;
+        $student->sem = $request->sem;
+        $student->course_year = $request->course_year;
         $student->save();
 
 
@@ -81,6 +84,9 @@ class UniversalStudentController extends Controller
         $student->roll_no = $request->roll_no;
         $student->name = $request->name;
         $student->batch = $request->batch;
+        $student->academic_year = $request->academic_year;
+        $student->sem = $request->sem;
+        $student->course_year = $request->course_year;
         $student->save();
 
         // $user = User::where('student_id', $student->student_id)->first();

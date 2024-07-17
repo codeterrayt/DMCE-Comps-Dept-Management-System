@@ -9,10 +9,17 @@ class AssignedSubject extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'subject', 'pr_th', 'batch', 'sub_batch','sem'];
+    protected $fillable = ['user_id', 'subject_id', 'pr_th', 'batch', 'sub_batch',
+    // 'sem'
+];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function subject(){
+        return $this->belongsTo(Subjects::class,"subject_id","id");
+    }
+
 }

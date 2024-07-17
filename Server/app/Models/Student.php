@@ -25,4 +25,11 @@ class Student extends Model
         return $this->hasOne(User::class, 'student_id', 'student_id');
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(StudentAttendance::class, 'student_id', 'student_id');
+    }
+
+
+
 }
