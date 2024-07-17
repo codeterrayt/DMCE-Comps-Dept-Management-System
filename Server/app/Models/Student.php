@@ -30,6 +30,11 @@ class Student extends Model
         return $this->hasMany(StudentAttendance::class, 'student_id', 'student_id');
     }
 
+    public function sem(){
+        return $this->hasMany(Subjects::class,"subject_sem","sem");
+    }
 
-
+    public function subjects(){
+        return $this->hasMany(Subjects::class,"subject_sem","sem");
+    }
 }

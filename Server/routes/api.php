@@ -148,6 +148,9 @@ Route::middleware(['auth:sanctum', 'verified', 'ability:token-professor,token-ad
     Route::get('/ap/fetch/student-attendance/{id}', [StudentAttendanceController::class, 'show']);
     Route::post('/ap/update/student-attendance/{id}', [StudentAttendanceController::class, 'update']);
     // Route::post('/ap/delete/student-attendance/{id}', [StudentAttendanceController::class, 'destroy']);
+
+    Route::get('/ap/fetch/student/month-wise-attendance', [StudentAttendanceController::class, 'monthwise_attendance']);
+
 });
 
 

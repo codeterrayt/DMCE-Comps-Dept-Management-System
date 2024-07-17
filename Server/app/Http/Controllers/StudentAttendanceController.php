@@ -20,16 +20,16 @@ class StudentAttendanceController extends Controller
         ]);
 
         $subject_id = $request->subject_id;
-        $data = Student::with(['attendances' => function($query) use ($subject_id) {
+        $data = Student::with(['attendances' => function ($query) use ($subject_id) {
             $query->where('subject_id', $subject_id);
         }])->get();
 
 
 
         // if(count($data) == 0){
-            // $subject = Subjects::find($subject_id);
-            // dd($subject);
-            // $data = Student::with('attendances')->where("sem",$subject->subject_sem)->get();
+        // $subject = Subjects::find($subject_id);
+        // dd($subject);
+        // $data = Student::with('attendances')->where("sem",$subject->subject_sem)->get();
         // }
 
         return response()->json($data);
@@ -38,23 +38,23 @@ class StudentAttendanceController extends Controller
 
 
 
-    //     $data = DB::table('professors')
-    //     ->join('assigned_subjects', 'professors.user_id', '=', 'assigned_subjects.user_id')
-    //     ->join('students', function ($join) {
-    //         $join->on('assigned_subjects.sem', '=', 'students.sem');
-    //     })
-    //     ->join('student_attendances', function ($join) {//////
-    //         $join->on('assigned_subjects.sem', '=', 'student_attendances.sem');
-    //     })
-    //     ->select(
-    //         'professors.*',  // Select columns from professors table
-    //         'assigned_subjects.*',  // Select columns from assigned_subjects table
-    //         'students.*',  // Select columns from students table
-    //         'student_attendances.*'  // Select columns from student_attendances table
-    //     )
-    //     ->get();
+        //     $data = DB::table('professors')
+        //     ->join('assigned_subjects', 'professors.user_id', '=', 'assigned_subjects.user_id')
+        //     ->join('students', function ($join) {
+        //         $join->on('assigned_subjects.sem', '=', 'students.sem');
+        //     })
+        //     ->join('student_attendances', function ($join) {//////
+        //         $join->on('assigned_subjects.sem', '=', 'student_attendances.sem');
+        //     })
+        //     ->select(
+        //         'professors.*',  // Select columns from professors table
+        //         'assigned_subjects.*',  // Select columns from assigned_subjects table
+        //         'students.*',  // Select columns from students table
+        //         'student_attendances.*'  // Select columns from student_attendances table
+        //     )
+        //     ->get();
 
-    // return response()->json($data);
+        // return response()->json($data);
 
     }
 
@@ -75,14 +75,14 @@ class StudentAttendanceController extends Controller
         ]);
 
         $d = StudentAttendance::where([
-            ["sem","=",$request->sem],
-            ["student_id","=",$request->student_id],
-            ["academic_year","=",$request->academic_year],
-            ["pr_th","=",$request->pr_th],
-            ["subject_id","=",$request->subject_id],
+            ["sem", "=", $request->sem],
+            ["student_id", "=", $request->student_id],
+            ["academic_year", "=", $request->academic_year],
+            ["pr_th", "=", $request->pr_th],
+            ["subject_id", "=", $request->subject_id],
         ])->first();
 
-        if($d){
+        if ($d) {
             return response()->json(['message' => 'Data Already Exits'], 404);
         }
 
@@ -128,7 +128,7 @@ class StudentAttendanceController extends Controller
         // Find the attendance record by ID
         $attendance = StudentAttendance::find($id);
 
-        if($attendance == null){
+        if ($attendance == null) {
             return response()->json(['message' => 'Data not found'], 404);
         }
 
@@ -144,6 +144,42 @@ class StudentAttendanceController extends Controller
 
         return response()->json($attendance);
     }
+
+    public function monthwise_attendance(Request $request)
+    {
+        $request->validate([
+            'academic_year' => 'required|string',
+            'sem' => 'required|string|in:1,2,3,4,5,6,7,8'
+        ]);
+
+        $academic_year = $request->academic_year;
+        $subjectSem = $request->sem;
+
+        $data = Student::with(["sem", 'attendances' => function ($query) use ($academic_year, $subjectSem) {
+            $query->where([["academic_year",$academic_year],['sem',$subjectSem]])->get();
+        }])->where([
+            ['sem', $subjectSem],
+            ['academic_year', $academic_year]
+        ])->get();
+
+
+        // \DB::enableQueryLog();
+
+        // $data = Student::with(['subjects', 'subjects.attendances2' => function ($query) use ($academic_year, $subjectSem) {
+        //     $query->where('academic_year', $academic_year)
+        //         ->where('sem', $subjectSem);
+        // }])
+        //     ->where([
+        //         ['sem', $subjectSem],
+        //         ['academic_year', $academic_year]
+        //     ])
+        //     ->get();
+
+
+        return response()->json($data);
+    }
+
+
 
     // public function destroy($id)
     // {
