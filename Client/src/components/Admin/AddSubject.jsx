@@ -37,6 +37,14 @@ const AddSubject = () => {
             setLoading(false)
             return toast.success("subject fetch successfully...")
         } catch (error) {
+            if (error.response.status == 401) {
+                setLoading(false);
+                localStorage.clear()    
+                  navigate('/login'
+
+                  )
+                   return toast.error("unauthenticated");
+              }
             setLoading(false)
             console.error('Error fetching subjects:', error);
             return toast.error(error.response.data.message)
@@ -274,6 +282,7 @@ const AddSubject = () => {
                             className="w-full px-3 py-2 border border-gray-300 rounded"
                         >
                             <option value="">Select Semester</option>
+                            <option value={1}>Semester 1</option>
                             <option value={2}>Semester 2</option>
                             <option value={3}>Semester 3</option>
                             <option value={4}>Semester 4</option>

@@ -51,6 +51,11 @@ const AddProfessor = () => {
                 return toast.success("professor data fetch successfully...")
             })
             .catch(error => {
+                if (error.response.status == 401) {
+                    setLoading(false);
+                    localStorage.clear()
+                    navigate('/login')
+                  }
                 setLoading(false)
                 console.error('Error fetching professors:', error);
                 return toast.error(error.response.data.message || "failed to fetch data")

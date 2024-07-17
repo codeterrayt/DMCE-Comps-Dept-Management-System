@@ -58,6 +58,12 @@ const AddBatch = () => {
             setLoading(false)
             toast.success('Batches fetched successfully');
         } catch (error) {
+            if (error.response.status == 401) {
+                setLoading(false);
+                localStorage.clear()   
+                   navigate('/login')
+                    return toast.error("unauthenticated");
+              }
             setLoading(false)
             console.error(error);
             toast.error('Failed to fetch batches');
@@ -83,6 +89,12 @@ const AddBatch = () => {
             setLoading(false)
             toast.success('Sub-batches fetched successfully');
         } catch (error) {
+            if (error.response.status == 401) {
+                setLoading(false);
+                localStorage.clear()    
+                  navigate('/login')
+                   return toast.error("unauthenticated");
+              }
             setLoading(false)
             console.error(error);
             toast.error('Failed to fetch sub-batches');

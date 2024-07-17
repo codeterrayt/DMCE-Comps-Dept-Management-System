@@ -63,6 +63,12 @@ const AssignSubject = () => {
             setLoading(false);
             toast.success("All data fetched successfully");
         } catch (error) {
+            if (error.response.status == 401) {
+                setLoading(false);
+                localStorage.clear()     
+                 navigate('/login') 
+                 return toast.error("unauthenticated");
+              }
             setLoading(false);
             toast.error("Failed to fetch data");
         }
@@ -423,7 +429,7 @@ const AssignSubject = () => {
                                     Select Batch
                                 </option>
                                 {batches.map((batch) => (
-                                    <option key={batch.id} value={batch.id}>
+                                    <option key={batch.id} value={batch.batch}>
                                         {batch.batch}
                                     </option>
                                 ))}
