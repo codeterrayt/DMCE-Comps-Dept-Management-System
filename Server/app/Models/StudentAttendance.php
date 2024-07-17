@@ -13,7 +13,10 @@ class StudentAttendance extends Model
     protected $fillable = [
         'student_id',
         'sem',
-        // 'subject_id',
+        'subject_id',
+        'pr_th',
+        'academic_year',
+        'course_year',
         'm1',
         'm2',
         'm3',

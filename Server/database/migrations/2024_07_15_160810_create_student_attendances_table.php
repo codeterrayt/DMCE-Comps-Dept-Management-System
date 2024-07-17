@@ -16,7 +16,10 @@ return new class extends Migration
             $table->string('student_id');
             $table->foreign('student_id')->references('student_id')->on('students')->onDelete('cascade');
             $table->integer('sem');
-            // $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade');
+            $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade');
+            $table->string('academic_year')->nullable();
+            $table->string('course_year')->nullable();
+            $table->boolean('pr_th')->default(0);
             $table->integer('m1')->default(0);
             $table->integer('m2')->default(0);
             $table->integer('m3')->default(0);
