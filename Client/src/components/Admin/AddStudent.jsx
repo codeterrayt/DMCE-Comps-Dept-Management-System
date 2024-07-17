@@ -37,7 +37,7 @@ const AddStudent = () => {
 
     useEffect(() => {
         if (!checkLogin()) {
-            return navigate('/dmce/login');
+            return navigate('/login');
         }
         fetchData();
     }, []);

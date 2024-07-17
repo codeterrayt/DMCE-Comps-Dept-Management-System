@@ -57,7 +57,7 @@ const AddSubject = () => {
     useEffect(() => {
 
         if (!checkLogin) {
-            return navigate('/dmce/login')
+            return navigate('/login')
         }
 
         fetchSubjects();
