@@ -13,23 +13,23 @@ class StudentAttendanceController extends Controller
 {
     public function index()
     {
-        $data = DB::table('professors')
-        ->join('assigned_subjects', 'professors.user_id', '=', 'assigned_subjects.user_id')
-        ->join('students', function ($join) {
-            $join->on('assigned_subjects.sem', '=', 'students.sem');
-        })
-        ->join('student_attendances', function ($join) {//////
-            $join->on('assigned_subjects.sem', '=', 'student_attendances.sem');
-        })
-        ->select(
-            'professors.*',  // Select columns from professors table
-            'assigned_subjects.*',  // Select columns from assigned_subjects table
-            'students.*',  // Select columns from students table
-            'student_attendances.*'  // Select columns from student_attendances table
-        )
-        ->get();
+    //     $data = DB::table('professors')
+    //     ->join('assigned_subjects', 'professors.user_id', '=', 'assigned_subjects.user_id')
+    //     ->join('students', function ($join) {
+    //         $join->on('assigned_subjects.sem', '=', 'students.sem');
+    //     })
+    //     ->join('student_attendances', function ($join) {//////
+    //         $join->on('assigned_subjects.sem', '=', 'student_attendances.sem');
+    //     })
+    //     ->select(
+    //         'professors.*',  // Select columns from professors table
+    //         'assigned_subjects.*',  // Select columns from assigned_subjects table
+    //         'students.*',  // Select columns from students table
+    //         'student_attendances.*'  // Select columns from student_attendances table
+    //     )
+    //     ->get();
 
-    return response()->json($data);
+    // return response()->json($data);
 
     }
 

@@ -154,7 +154,7 @@ class AssignedSubjectController extends Controller
     {
         $id = auth()->user()->id;
 
-        $assignedSubject = AssignedSubject::where("user_id",$id)->first();
+        $assignedSubject = AssignedSubject::with('subject')->where("user_id",$id)->get();
 
         if (!$assignedSubject) {
             return response()->json(['message' => 'Assigned subject not found'], 404);
