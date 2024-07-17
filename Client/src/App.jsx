@@ -39,6 +39,7 @@ import AddBatch from './components/Admin/AddBatch';
 import ProfessorHome from './components/Professor/ProfessorHome';
 import AssignSubject from './components/Admin/AssignSubject';
 import AddStudent from './components/Admin/AddStudent';
+import PageNotFound from './components/PageNotFound';
 
 export const userContext = createContext()
 
@@ -109,6 +110,7 @@ function App() {
           {/* //professor  */}
 
           <Route path="/professor" element={<ProfessorHome />} />
+          <Route path="*" element={<PageNotFound/>} />
 
 
 
