@@ -15,4 +15,9 @@ class Subjects extends Model
         "subject_sem"
     ];
 
+    public function attendances()
+    {
+        return $this->hasMany(StudentAttendance::class, 'sem', 'sem');
+    }
+
 }

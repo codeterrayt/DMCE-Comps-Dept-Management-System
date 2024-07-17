@@ -1,0 +1,117 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Student;
+use App\Models\StudentAttendance;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use PhpOption\None;
+use Illuminate\Support\Facades\DB;
+
+class StudentAttendanceController extends Controller
+{
+    public function index()
+    {
+        $data = DB::table('professors')
+        ->join('assigned_subjects', 'professors.user_id', '=', 'assigned_subjects.user_id')
+        ->join('students', function ($join) {
+            $join->on('assigned_subjects.sem', '=', 'students.sem');
+        })
+        ->join('student_attendances', function ($join) {//////
+            $join->on('assigned_subjects.sem', '=', 'student_attendances.sem');
+        })
+        ->select(
+            'professors.*',  // Select columns from professors table
+            'assigned_subjects.*',  // Select columns from assigned_subjects table
+            'students.*',  // Select columns from students table
+            'student_attendances.*'  // Select columns from student_attendances table
+        )
+        ->get();
+
+    return response()->json($data);
+
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,student_id',
+            'sem' => 'required|integer',
+            // 'subject_id' => 'required|exists:subjects,id',
+            'm1' => 'integer|nullable',
+            'm2' => 'integer|nullable',
+            'm3' => 'integer|nullable',
+            'm4' => 'integer|nullable',
+            'total' => 'integer|nullable',
+        ]);
+
+        $d = StudentAttendance::where([["sem","=",$request->sem],["student_id","=",$request->student_id]])->first();
+
+        if($d){
+            return response()->json(['message' => 'Data Already Exits'], 404);
+        }
+
+        // Calculate the total
+        $total = ($request->m1 ?? 0) + ($request->m2 ?? 0) + ($request->m3 ?? 0) + ($request->m4 ?? 0);
+
+        // Merge the total into the request data
+        $data = $request->all();
+        $data['total'] = $total;
+
+        // Create the attendance record
+        $attendance = StudentAttendance::create($data);
+        return response()->json($attendance, 201);
+    }
+
+
+    public function show($id)
+    {
+        $attendance = StudentAttendance::with('student', 'subject')->find($id);
+        if (!$attendance) {
+            return response()->json(['message' => 'Student not found'], 404);
+        }
+        return response()->json($attendance);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,student_id',
+            'sem' => 'required|integer',
+            'subject_id' => 'required|exists:subjects,id',
+            'm1' => 'integer|nullable',
+            'm2' => 'integer|nullable',
+            'm3' => 'integer|nullable',
+            'm4' => 'integer|nullable',
+            'total' => 'integer|nullable',
+        ]);
+
+        // Find the attendance record by ID
+        $attendance = StudentAttendance::findOrFail($id);
+
+        // Update the attendance record with the request data
+        $attendance->update($request->all());
+
+        // Calculate the total
+        $total = ($request->m1 ?? 0) + ($request->m2 ?? 0) + ($request->m3 ?? 0) + ($request->m4 ?? 0);
+
+        // Update the total in the attendance record
+        $attendance->total = $total;
+        $attendance->save();
+
+        return response()->json($attendance);
+    }
+
+    // public function destroy($id)
+    // {
+    //     $attendance = StudentAttendance::find($id);
+
+    //     if(!$attendance){
+    //         return response()->json(['message' => 'Student not found'], 404);
+    //     }
+
+    //     $attendance->delete();
+    //     return response()->json(['message' => 'Student not found'], 204);
+    // }
+}

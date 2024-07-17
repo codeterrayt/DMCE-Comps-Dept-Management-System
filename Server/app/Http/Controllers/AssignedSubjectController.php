@@ -12,7 +12,7 @@ class AssignedSubjectController extends Controller
 {
     public function index()
     {
-        $assignedSubjects = AssignedSubject::with('user')->get();
+        $assignedSubjects = AssignedSubject::with('user','subject')->get();
         return response()->json($assignedSubjects);
     }
 
@@ -40,10 +40,10 @@ class AssignedSubjectController extends Controller
                     }
                 },
             ],
-            'subject' => 'required|string|max:255',
+            'subject_id' => 'required|integer|exists:subjects,id',
             'pr_th' => 'required|boolean',
             'batch' => 'required|string|max:255',
-            'sem' => 'required|integer|between:1,8',
+            // 'sem' => 'required|integer|between:1,8',
             'sub_batch' => [
                 'nullable',
                 'string',
@@ -75,7 +75,7 @@ class AssignedSubjectController extends Controller
 
     public function show($id)
     {
-        $assignedSubject = AssignedSubject::with('user')->find($id);
+        $assignedSubject = AssignedSubject::with('user','subject')->find($id);
 
         if (!$assignedSubject) {
             return response()->json(['message' => 'Assigned subject not found'], 404);
@@ -104,10 +104,10 @@ class AssignedSubjectController extends Controller
                     }
                 },
             ],
-            'subject' => 'required|string|max:255',
+            'subject_id' => 'required|integer|exists:subjects,id',
             'pr_th' => 'required|boolean',
             'batch' => 'required|string|max:255',
-            'sem' => 'required|integer|between:1,8',
+            // 'sem' => 'required|integer|between:1,8',
             'sub_batch' => [
                 'nullable',
                 'string',

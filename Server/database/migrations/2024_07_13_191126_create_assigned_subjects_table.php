@@ -14,13 +14,16 @@ return new class extends Migration
         Schema::create('assigned_subjects', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('subject');
-            $table->integer('sem');
-            $table->boolean('pr_th')->default(1); // 1 for PR (practical), 0 for TH (theory)
+
+            $table->unsignedBigInteger('subject_id');
+            $table->foreign('subject_id')->references('id')->on('subjects')->onDelete('cascade');
+
+            $table->boolean('pr_th')->default(0);
             $table->string('batch');
             $table->string('sub_batch')->nullable();
             $table->timestamps();
         });
+
     }
 
     /**

@@ -16,6 +16,7 @@ use App\Http\Controllers\BatchController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\UniversalStudentController;
+use App\Http\Controllers\StudentAttendanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -137,7 +138,18 @@ Route::middleware(['auth:sanctum', 'verified', 'ability:token-admin'])->group(fu
     Route::post('/admin/update/csv/student/{id}', [UniversalStudentController::class, 'update']);
     Route::post('/admin/delete/csv/student/{id}', [UniversalStudentController::class, 'destroy']);
     Route::post('/admin/upload/csv/students', [UniversalStudentController::class, 'upload']);
+
 });
+
+
+Route::middleware(['auth:sanctum', 'verified', 'ability:token-professor,token-admin'])->group(function () {
+    Route::get('/ap/fetch/student-attendances', [StudentAttendanceController::class, 'index']);
+    Route::post('/ap/add/student-attendance', [StudentAttendanceController::class, 'store']);
+    Route::get('/ap/fetch/student-attendance/{id}', [StudentAttendanceController::class, 'show']);
+    Route::post('/ap/update/student-attendance/{id}', [StudentAttendanceController::class, 'update']);
+    // Route::post('/ap/delete/student-attendance/{id}', [StudentAttendanceController::class, 'destroy']);
+});
+
 
 
 Route::middleware(['auth:sanctum', 'verified', 'ability:token-professor'])->group(function () {
