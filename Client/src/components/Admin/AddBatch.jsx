@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { getToken } from '../../helper/getToken';
 import Loaders from '../Loaders';
 import { checkLogin } from '../../helper/checkLogin';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 
 const AddBatch = () => {
     const [batches, setBatches] = useState([]);
@@ -164,7 +165,7 @@ const AddBatch = () => {
         } catch (error) {
             setAddLoading(false)
             console.error(error);
-            setError(error.response.data.message)
+            toast.error(getFirstErrorMessage(error.response?.data || error.message));
         } finally {
             setIsLoading(false); // Stop loading indicator
         }
@@ -205,7 +206,7 @@ const AddBatch = () => {
         } catch (error) {
             setAddLoading(false)
             console.error(error);
-            return toast.error(error.response.data.message)
+            toast.error(getFirstErrorMessage(error.response?.data || error.message));
             setError(error.response.data.message)
             // toast.error(error.request)
         }
@@ -298,7 +299,7 @@ const AddBatch = () => {
         } catch (error) {
             console.error(error);
             setAddLoading(false)
-            setError(error.response.data.message)
+            toast.error(getFirstErrorMessage(error.response?.data || error.message));
         } finally {
             setIsLoading(false); // Stop loading indicator
         }
@@ -340,7 +341,7 @@ const AddBatch = () => {
         } catch (error) {
             setAddLoading(false)
             console.error(error);
-            setError(error?.response?.data?.message)
+            toast.error(getFirstErrorMessage(error.response?.data || error.message));
         }
     };
 

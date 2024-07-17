@@ -188,7 +188,7 @@ const Internship = () => {
                     </div>
 
                     <div className="table-responsive w-full mt-8">
-                        {internships.length > 0 ? (
+                        {internships && internships.length > 0 ? (
                             <table id="example" className="table table-striped text-black" style={{ width: '100%' }}>
                                 <thead>
                                     <tr className='capitalize'>

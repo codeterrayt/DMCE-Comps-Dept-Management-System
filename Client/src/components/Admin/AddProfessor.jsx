@@ -7,6 +7,7 @@ import { getToken } from '../../helper/getToken';
 import { checkLogin } from '../../helper/checkLogin';
 import toast from 'react-hot-toast';
 import Loaders from '../Loaders';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 
 const AddProfessor = () => {
     const [professors, setProfessors] = useState([]);
@@ -55,10 +56,10 @@ const AddProfessor = () => {
                     setLoading(false);
                     localStorage.clear()
                     navigate('/login')
-                  }
+                }
                 setLoading(false)
                 console.error('Error fetching professors:', error);
-                return toast.error(error.response.data.message || "failed to fetch data")
+                return toast.error(getFirstErrorMessage(error.response?.data || error.message) || "failed to fetch the data");
             });
     };
 
@@ -73,7 +74,7 @@ const AddProfessor = () => {
 
     // Add a professor
     const handleAddProfessor = () => {
-    
+
         const token = getToken();
         const { professor_name, professor_phone_no, professor_gender, professor_email, password, professor_name_alias } = formData;
         if (!professor_name) {
@@ -106,7 +107,7 @@ const AddProfessor = () => {
             return; // Exit or handle the error condition
         }
         setUpdateLoading(true)
-   
+
         axios.post(`${import.meta.env.VITE_SERVER_DOMAIN}/admin/add/professor`, null, {
             params: {
                 professor_name,
@@ -140,14 +141,14 @@ const AddProfessor = () => {
                 setUpdateLoading(false)
                 setOpenModal(false);
                 console.error('Error adding professor:', error);
-                return toast.error(error.response.data.message || "failed to add professor")
+                return toast.error(getFirstErrorMessage(error.response?.data || error.message)||"Failed to add professor");
             });
     };
 
     // Update a professor
     const handleUpdateProfessor = (professorId) => {
         const token = getToken();
-    
+
         const { professor_name, professor_phone_no, professor_gender, professor_email, password, professor_name_alias } = formData;
         if (!professor_name) {
             toast.error("Professor name is required");
@@ -169,7 +170,7 @@ const AddProfessor = () => {
             return; // Exit or handle the error condition
         }
 
-      
+
 
         if (!professor_name_alias) {
             toast.error("Professor alias is required");
@@ -202,7 +203,8 @@ const AddProfessor = () => {
                 setUpdateLoading(false)
                 setOpenModal(false)
                 console.error('Error updating professor:', error);
-                return toast.error(error.response.data.message || "failed to update professor")
+                return toast.error(getFirstErrorMessage(error.response?.data || error.message)|| "Failed to update the professor");
+
             });
     };
 
@@ -389,19 +391,19 @@ const AddProfessor = () => {
 
                         />
                     </div>
-                        <div className="mb-2">
-                            <label className="block text-gray-700 mb-2" htmlFor="password">Password</label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded"
+                    <div className="mb-2">
+                        <label className="block text-gray-700 mb-2" htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded"
 
-                            />
-                        </div>
-                    
+                        />
+                    </div>
+
                     <div className="mb-2">
                         <label className="block text-gray-700 mb-2" htmlFor="professor_gender">Gender</label>
                         <select

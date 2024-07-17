@@ -191,7 +191,7 @@ const Hackathon = () => {
                     </div>
 
                     <div className="table-responsive w-full mt-8">
-                        {hackathon.length ? (
+                        {hackathon && hackathon.length ? (
                             <table id="example" className="table table-striped text-black" style={{ width: '100%' }}>
                                 <thead>
                                     <tr>

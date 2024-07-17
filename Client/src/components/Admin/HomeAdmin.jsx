@@ -115,6 +115,7 @@ const HomeAdmin = () => {
             localStorage.clear()
             navigate('/login')
           }
+          toast.error(error.response.data.message)
         });
     }, 500);
   };

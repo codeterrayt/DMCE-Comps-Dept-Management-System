@@ -67,11 +67,13 @@ const ExtraCurr = () => {
     const { data: activity, isLoading, isError, error, refetch } = useQuery('ecc', getAllActivities, {
         retry: 1, // Number of retries befor e triggering an error
         onError: (error) => {
+            console.log(error);
             if (error.response && error.response.status === 401) {
                 localStorage.clear();
                 navigate('/login');
             } else {
                 toast.error(getFirstErrorMessage(error.response?.data || error.message));
+                // toast.error(error.message);
             }
         },
     });
@@ -178,7 +180,7 @@ const ExtraCurr = () => {
                     </div>
 
                     <div className="table-responsive w-full mt-8 ">
-                        {activity.length ? (
+                        {activity && activity.length ? (
                             <table id="example" className="table table-striped" style={{ width: '100%' }}>
                                 <thead>
                                     <tr>

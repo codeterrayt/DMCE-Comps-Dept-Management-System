@@ -7,6 +7,7 @@ import { getToken } from '../../helper/getToken';
 import toast from 'react-hot-toast';
 import { checkLogin } from '../../helper/checkLogin';
 import Loaders from '../Loaders';
+import { getFirstErrorMessage } from '../../helper/getErrorMessage';
 
 const AddSubject = () => {
     const [subjects, setSubjects] = useState([]);
@@ -39,15 +40,15 @@ const AddSubject = () => {
         } catch (error) {
             if (error.response.status == 401) {
                 setLoading(false);
-                localStorage.clear()    
-                  navigate('/login'
+                localStorage.clear()
+                navigate('/login'
 
-                  )
-                   return toast.error("unauthenticated");
-              }
+                )
+                return toast.error("unauthenticated");
+            }
             setLoading(false)
             console.error('Error fetching subjects:', error);
-            return toast.error(error.response.data.message)
+            return toast.error("failed to fetch the subjects")
         }
     };
 
@@ -113,7 +114,8 @@ const AddSubject = () => {
             } catch (error) {
                 setSubmitLoading(false)
                 console.error('Error updating subject:', error);
-                toast.error(error.response.data.message || "Failed to update subject");
+                return toast.error(getFirstErrorMessage(error.response?.data || error.message) || "failed to update subject");
+
             }
         } else {
             // Otherwise, add a new subject
@@ -146,7 +148,8 @@ const AddSubject = () => {
             } catch (error) {
                 setSubmitLoading(false)
                 console.error('Error adding subject:', error);
-                toast.error(error.response.data.message || "Failed to add subject");
+                return toast.error(getFirstErrorMessage(error.response?.data || error.message) || "Failed to add subject");
+
             }
         }
     };

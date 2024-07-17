@@ -147,7 +147,7 @@ const AddStudent = () => {
                   return toast.error("unauthenticated");
               }
             setLoading(false);
-            toast.error(error.response.data.message);
+            toast.error(error.response.data.message || "Failed to fetch data");
             console.error(error.message);
         }
     };
@@ -276,7 +276,8 @@ const AddStudent = () => {
                 <div className="bg-white p-6 rounded-lg shadow-md w-full ">
                     <div className='flex items-center justify-between'>
                         <h2 className="text-2xl font-bold mb-4">Manage Students</h2>
-                        <div className='flex items-center gap-4 justify-center'>
+                       <div>
+                       <div className='flex items-center gap-4 justify-center'>
                             <button
                                 type="button"
                                 className="bg-[#262847] text-white py-2 px-4 rounded "
@@ -312,6 +313,8 @@ const AddStudent = () => {
                             )}
 
                         </div>
+                        <p className='mt-1 text-[12px] text-red-500 mx-auto font-bold w-fit'>If you edit multiple row, kindly click above <span className='text-[15px] underline '>(save all)</span> button, or press <span className='text-[15px] underline'> CTRL + S</span></p>
+                       </div>
                     </div>
 
                     {loading ? (

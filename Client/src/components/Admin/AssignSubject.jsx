@@ -21,10 +21,10 @@ const AssignSubject = () => {
     const [editmode, setEditMode] = useState([]);
     const [formData, setFormData] = useState({
         user_id: '',
-        subject: '',
+        subject_id: '',
         batch: '',
         pr_th: null,
-        sem: '',
+    
         sub_batch: "",
     });
     const [openModal, setOpenModal] = useState(false);
@@ -189,12 +189,12 @@ const AssignSubject = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { user_id, subject, batch, pr_th, sem, sub_batch } = formData;
+        const { user_id, subject_id, batch, pr_th,  sub_batch } = formData;
         if (!user_id) {
             toast.error("Please select a professor");
             return;
         }
-        if (!subject) {
+        if (!subject_id) {
             toast.error("Please select a subject");
             return;
         }
@@ -206,20 +206,17 @@ const AssignSubject = () => {
             toast.error("Please select Theory or Practical");
             return;
         }
-        if (!sem) {
-            toast.error("Please select a semester");
-            return;
-        }
+     
         if (pr_th === 0 && !sub_batch) {
             toast.error("Please select a sub batch for practical subjects");
             return;
         }
         const queryParams = new URLSearchParams({
             user_id,
-            subject,
+            subject_id,
             batch,
             pr_th,
-            sem,
+  
             sub_batch
         }).toString();
         setAddLoading(true)
@@ -240,10 +237,10 @@ const AssignSubject = () => {
                 });
                 setFormData({
                     user_id: '',
-                    subject: '',
+                    subject_id: '',
                     batch: '',
                     pr_th: null,
-                    sem: '',
+                
                     sub_batch: "",
                 });
                 setOpenModal(false);
@@ -254,7 +251,7 @@ const AssignSubject = () => {
             } catch (error) {
                 setAddLoading(false)
                 console.error('Error adding subject:', error);
-                toast.error(getFirstErrorMessage(error.response?.data));
+                return toast.error(getFirstErrorMessage(error.response?.data || error.message));
             } finally {
                 setLoading(false);
             }
@@ -273,10 +270,10 @@ const AssignSubject = () => {
                 });
                 setFormData({
                     user_id: '',
-                    subject: '',
+                    subject_id: '',
                     batch: '',
                     pr_th: null,
-                    sem: '',
+            
                     sub_batch: "",
                 });
                 setOpenModal(false);
@@ -287,7 +284,7 @@ const AssignSubject = () => {
             } catch (error) {
                 setAddLoading(false)
                 console.error('Error adding subject:', error);
-                toast.error(getFirstErrorMessage(error.response?.data));
+                return toast.error(getFirstErrorMessage(error.response?.data || error.message));
             } finally {
                 setLoading(false);
             }
@@ -316,13 +313,13 @@ const AssignSubject = () => {
             <div className="bg-gray-100 flex justify-center min-h-screen h-auto p-4">
                 <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
                     <div className='flex items-center justify-between mb-4'>
-                        <h2 className="text-2xl font-bold">Subject List</h2>
+                        <h2 className="text-2xl font-bold">Assigned Subject List</h2>
                         <button
                             type="button"
                             className="bg-[#262847] text-white py-2 px-4 rounded "
                             onClick={() => setOpenModal(true)}
                         >
-                            Add Subject
+                            Assign Subject
                         </button>
                     </div>
                     {loading ? (
@@ -334,7 +331,7 @@ const AssignSubject = () => {
                                     <th className="py-2 px-4">Professor</th>
 
                                     <th className="py-2 px-4">Subject Name</th>
-                                    <th className="py-2 px-4">Semester</th>
+                            
                                     <th className="py-2 px-4">Batch</th>
                                     <th className="py-2 px-4">Sub Batch</th>
                                     <th className="py-2 px-4">PR/TH</th>
@@ -345,8 +342,8 @@ const AssignSubject = () => {
                                 {!initialData.length ? <h1 className='text-xl mt-8 text-[#262847] font-bold w-fit mx-auto'>No data found</h1> : initialData.map((data, index) => (
                                     <tr key={index} className="text-center border-b">
                                         <td className="py-2 px-4">{data.user.name}</td>
-                                        <td className="py-2 px-4">{data.subject}</td>
-                                        <td className="py-2 px-4">{data.sem}</td>
+                                        <td className="py-2 px-4">{data.subject_id}</td>
+                               
                                         <td className="py-2 px-4">{data.batch}</td>
                                         <td className="py-2 px-4">{data.sub_batch || '-'}</td>
                                         <td className="py-2 px-4">{data.pr_th === 1 ? 'Theory' : 'Practical'}</td>
@@ -385,6 +382,7 @@ const AssignSubject = () => {
                             <option disabled value="">
                                 Select Professor
                             </option>
+                  
                             {professors.map((professor) => (
                                 <option key={professor.user.id} value={professor.user.id}>
                                     {professor.user.name}
@@ -393,13 +391,13 @@ const AssignSubject = () => {
                         </select>
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 mb-2" htmlFor="subject">
+                        <label className="block text-gray-700 mb-2" htmlFor="subject_id">
                             Subject
                         </label>
                         <select
-                            id="subject"
-                            name="subject"
-                            value={formData.subject}
+                            id="subject_id"
+                            name="subject_id"
+                            value={formData.subject_id}
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                         >
@@ -407,14 +405,14 @@ const AssignSubject = () => {
                                 Select Subject
                             </option>
                             {subjects.map((sub) => (
-                                <option key={sub.id} value={sub.subject_name}>
+                                <option key={sub.id} value={sub.id}>
                                     {sub.subject_name}
                                 </option>
                             ))}
                         </select>
                     </div>
-                    <div className="flex mb-4 justify-between">
-                        <div className="w-1/2 pr-2">
+                
+                        <div className=" mb-4">
                             <label className="block text-gray-700 mb-2" htmlFor="batch">
                                 Batch
                             </label>
@@ -434,56 +432,11 @@ const AssignSubject = () => {
                                     </option>
                                 ))}
                             </select>
-                        </div>
-                        <div className="w-1/2 pl-2">
-                            <label className="block text-gray-700 mb-2" htmlFor="sem">
-                                Semester
-                            </label>
-                            <select
-                                id="sem"
-                                name="sem"
-                                value={formData.sem}
-                                onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                            >
-                                <option disabled value="">
-                                    Select Semester
-                                </option>
-                                {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
-                                    <option key={sem} value={sem}>
-                                        SEM {sem}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+               
+                       
+                      
                     </div>
-                    {/* <div className="mb-4">
-                        <label className="block text-gray-700 mb-2">Theory / Practical</label>
-                        <div className="flex">
-                            <label className="flex items-center mr-4">
-                                <input
-                                    type="radio"
-                                    name="pr_th"
-                                    value={1}
-                                    checked={formData.pr_th === 1}
-                                    onChange={handleChange}
-                                    className="mr-2"
-                                />
-                                Theory
-                            </label>
-                            <label className="flex items-center">
-                                <input
-                                    type="radio"
-                                    name="pr_th"
-                                    value={0}
-                                    checked={formData.pr_th === 0}
-                                    onChange={handleChange}
-                                    className="mr-2"
-                                />
-                                Practical
-                            </label>
-                        </div>
-                    </div> */}
+                   
                     <div className="mb-4">
                         <label className="block text-gray-700 mb-2">Theory / Practical</label>
                         <div className="flex">
