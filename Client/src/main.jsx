@@ -10,7 +10,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <>
      <QueryClientProvider client={queryClient}>
     <Toaster
-      position="top-right"
+      // position="top-right"
       reverseOrder={true}
     />
     <App />
