@@ -40,6 +40,7 @@ import ProfessorHome from './components/Professor/ProfessorHome';
 import AssignSubject from './components/Admin/AssignSubject';
 import AddStudent from './components/Admin/AddStudent';
 import PageNotFound from './components/PageNotFound';
+import AddAttendance from './components/Professor/AddAttendance';
 
 export const userContext = createContext()
 
@@ -110,6 +111,7 @@ function App() {
           {/* //professor  */}
 
           <Route path="/professor" element={<ProfessorHome />} />
+          <Route path="/professor/add-attendance/:subjectId" element={<AddAttendance />} />
           <Route path="*" element={<PageNotFound/>} />
 
 

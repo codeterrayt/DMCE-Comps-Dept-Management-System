@@ -22,6 +22,9 @@ const Home = () => {
     if (role == 'admin') {
       return navigate('/admin')
     }
+    if(role == 'professor'){
+      return navigate('/professor')
+    }
 
     // const isProfileComplete = JSON.parse(userInsession).profile_completed
 
