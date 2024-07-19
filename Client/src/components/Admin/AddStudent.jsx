@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminNavBar from './AdminNavBar';
 import { Modal } from 'react-responsive-modal';
@@ -41,6 +41,7 @@ const AddStudent = () => {
         }
         fetchData();
     }, []);
+    
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -269,6 +270,46 @@ const AddStudent = () => {
         }
     };
 
+
+    const handleKeyDown = useCallback((event, rowIndex, cellName) => {
+        if (!editMode) return;
+
+        const cellOrder = ["student_id", "roll_no", "name", "batch", "academic_year", "course_year", "sem"];
+        const currentCellIndex = cellOrder.indexOf(cellName);
+        let nextCellIndex = currentCellIndex;
+        let nextRowIndex = rowIndex;
+
+        switch (event.key) {
+            case "ArrowUp":
+                nextRowIndex = rowIndex > 0 ? rowIndex - 1 : rowIndex;
+                break;
+            case "ArrowDown":
+                nextRowIndex = rowIndex < studentData.length - 1 ? rowIndex + 1 : rowIndex;
+                break;
+            case "ArrowLeft":
+                nextCellIndex = currentCellIndex > 0 ? currentCellIndex - 1 : currentCellIndex;
+                break;
+            case "ArrowRight":
+                nextCellIndex = currentCellIndex < cellOrder.length - 1 ? currentCellIndex + 1 : currentCellIndex;
+                break;
+            default:
+                break;
+        }
+
+        const nextCellName = cellOrder[nextCellIndex];
+        const nextCell = document.querySelector(`input[name="${nextCellName}"][data-row-index="${nextRowIndex}"]`);
+        if (nextCell) {
+            nextCell.focus();
+        }
+    }, [editMode, studentData.length]);
+
+    const handleFocus = (event, rowIndex, cellName) => {
+        event.target.addEventListener("keydown", (e) => handleKeyDown(e, rowIndex, cellName));
+    };
+
+    const handleBlur = (event) => {
+        event.target.removeEventListener("keydown", handleKeyDown);
+    };
     return (
         <>
             <AdminNavBar />
@@ -321,7 +362,7 @@ const AddStudent = () => {
                         <Loaders />
                     ) : (
                         <>
-                            <table className="w-full mt-4 border-collapse border">
+                            <table  id="example" className="w-full table table-striped mt-4 border-collapse border">
                                 <thead>
                                     <tr>
                                         <th className="border px-4 py-2">ID</th>
@@ -347,6 +388,8 @@ const AddStudent = () => {
                                                             value={editedData[index]?.student_id || ''}
                                                             onChange={(e) => handleEditChange(e, index)}
                                                             className="w-full px-2 py-1 border"
+                                                            onFocus={(e) => handleFocus(e, index, "student_id")}
+                                                            onBlur={handleBlur}
                                                         />
                                                     </td>
                                                     <td className="border px-4 py-2">
@@ -356,6 +399,8 @@ const AddStudent = () => {
                                                             value={editedData[index]?.roll_no || ''}
                                                             onChange={(e) => handleEditChange(e, index)}
                                                             className="w-full px-2 py-1 border"
+                                                            onFocus={(e) => handleFocus(e, index, "student_id")}
+                                                            onBlur={handleBlur}
                                                         />
                                                     </td>
                                                     <td className="border px-4 py-2">
@@ -365,6 +410,8 @@ const AddStudent = () => {
                                                             value={editedData[index]?.name || ''}
                                                             onChange={(e) => handleEditChange(e, index)}
                                                             className="w-full px-2 py-1 border"
+                                                            onFocus={(e) => handleFocus(e, index, "student_id")}
+                                                            onBlur={handleBlur}
                                                         />
                                                     </td>
                                                     <td className="border px-4 py-2">
@@ -374,6 +421,8 @@ const AddStudent = () => {
                                                             value={editedData[index]?.batch || ''}
                                                             onChange={(e) => handleEditChange(e, index)}
                                                             className="w-full px-2 py-1 border"
+                                                            onFocus={(e) => handleFocus(e, index, "student_id")}
+                                                            onBlur={handleBlur}
                                                         />
                                                     </td>
                                                     <td className="border px-4 py-2">
@@ -383,6 +432,8 @@ const AddStudent = () => {
                                                             value={editedData[index]?.academic_year || ''}
                                                             onChange={(e) => handleEditChange(e, index)}
                                                             className="w-full px-2 py-1 border"
+                                                            onFocus={(e) => handleFocus(e, index, "student_id")}
+                                                            onBlur={handleBlur}
                                                         />
                                                     </td>
                                                     <td className="border px-4 py-2">
@@ -392,6 +443,8 @@ const AddStudent = () => {
                                                             value={editedData[index]?.course_year || ''}
                                                             onChange={(e) => handleEditChange(e, index)}
                                                             className="w-full px-2 py-1 border"
+                                                            onFocus={(e) => handleFocus(e, index, "student_id")}
+                                                            onBlur={handleBlur}
                                                         />
                                                     </td>
                                                     <td className="border px-4 py-2">
@@ -401,6 +454,8 @@ const AddStudent = () => {
                                                             value={editedData[index]?.sem || ''}
                                                             onChange={(e) => handleEditChange(e, index)}
                                                             className="w-full px-2 py-1 border"
+                                                            onFocus={(e) => handleFocus(e, index, "student_id")}
+                                                            onBlur={handleBlur}
                                                         />
                                                     </td>
                                                     <td className="border px-4 py-2">
