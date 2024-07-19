@@ -20,4 +20,19 @@ class Subjects extends Model
         return $this->hasMany(StudentAttendance::class, 'sem', 'sem');
     }
 
+    public function attendances2()
+    {
+        return $this->hasMany(StudentAttendance::class, 'sem', 'subject_sem');
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'student_subjects', 'subject_id', 'student_id');
+    }
+
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
+
 }
