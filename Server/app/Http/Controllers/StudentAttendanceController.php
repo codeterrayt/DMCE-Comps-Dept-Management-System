@@ -20,10 +20,18 @@ class StudentAttendanceController extends Controller
         ]);
 
         $subject_id = $request->subject_id;
+
+        $curret_subject = Subjects::where("id",$subject_id)->first();
+
+        // dd($subject_sem->subject_sem);
+
         $data = Student::with(['attendances' => function ($query) use ($subject_id) {
             $query->where('subject_id', $subject_id);
-        }])->get();
+        }])->where("sem",$curret_subject->subject_sem)->get();
 
+
+        // dd($subject_sem);
+        // $data = Student::where("sem",$curret_subject->subject_sem)->get();
 
 
         // if(count($data) == 0){
