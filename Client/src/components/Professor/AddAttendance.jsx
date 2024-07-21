@@ -75,7 +75,7 @@ const AddAttendance = () => {
                 const pr_th = 0;
     
                 // Construct the URL with only defined values
-                let url = `${import.meta.env.VITE_SERVER_DOMAIN}/api/ap/add/student-attendance/?student_id=${student_id}&subject_id=${subjectId}&sem=${sem}&academic_year=2021-2022&course_year=${course_year}&pr_th=${pr_th}`;
+                let url = `${import.meta.env.VITE_SERVER_DOMAIN}/api/ap/add/student-attendance/?student_id=${student_id}&subject_id=${subjectId}&sem=${sem}&academic_year=2021 - 2022&course_year=${course_year}&pr_th=${pr_th}`;
                 if (m1 !== undefined && m1 !== null) url += `&m1=${m1}`;
                 if (m2 !== undefined && m2 !== null) url += `&m2=${m2}`;
                 if (m3 !== undefined && m3 !== null) url += `&m3=${m3}`;
