@@ -76,7 +76,7 @@ const ProfessorHome = () => {
                     <td className="px-4 py-2 border">{sub.pr_th == 1 ? "Theory" : "Practical"}</td>
                     <td className="px-4 py-2 border">{sub.batch}</td>
 
-                    <td onClick={() => navigate(`/professor/add-attendance/${sub.subject_id}`)} className="px-4 py-2 border text-center cursor-pointer hover:bg-[#262847] hover:text-white duration-200"><i className="fa-solid fa-square-plus text-2xl mx-auto "></i></td>
+                    <td onClick={() => navigate(`/professor/add-attendance/${sub.subject_id}/${sub.pr_th}`)} className="px-4 py-2 border text-center cursor-pointer hover:bg-[#262847] hover:text-white duration-200"><i className="fa-solid fa-square-plus text-2xl mx-auto "></i></td>
                   </tr>
                 ))}
               </tbody>
