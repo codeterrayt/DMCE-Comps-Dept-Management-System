@@ -8,7 +8,8 @@ import { checkLogin } from '../../helper/checkLogin';
 import axios from 'axios';
 
 const AddAttendance = () => {
-    const { subjectId  , pr_th} = useParams();
+    const { subjectId  , pr_th , sub_batch , academic_year} = useParams();
+    console.log(sub_batch , academic_year);
     const [students, setStudents] = useState([]);
     const [modifiedRows, setModifiedRows] = useState(new Map());
     const [loading, setLoading] = useState(false);
@@ -43,7 +44,7 @@ const AddAttendance = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url: `${import.meta.env.VITE_SERVER_DOMAIN}/ap/fetch/student-attendances?subject_id=${subjectId}`,
+                url:  sub_batch ? `${import.meta.env.VITE_SERVER_DOMAIN}/ap/fetch/pr/student-attendances?subject_id=${subjectId}&sub_batch=${sub_batch}&academic_year=${academic_year}`:`${import.meta.env.VITE_SERVER_DOMAIN}/ap/fetch/student-attendances?subject_id=${subjectId}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -199,7 +200,7 @@ const AddAttendance = () => {
                                                 onInput={(e) => handleInputChange(rowIndex, 'm1', e.target.textContent)}
                                                 onKeyDown={(e) => handleKeyDown(e, rowIndex, 0)}
                                             >
-                                                {attendance ? attendance.m1 : ' '}
+                                                {attendance ? attendance.m1 : '0'}
                                             </td>
                                             <td
                                                 id={`cell-${rowIndex}-1`}
@@ -209,7 +210,7 @@ const AddAttendance = () => {
                                                 onInput={(e) => handleInputChange(rowIndex, 'm2', e.target.textContent)}
                                                 onKeyDown={(e) => handleKeyDown(e, rowIndex, 1)}
                                             >
-                                                {attendance ? attendance.m2 : ' '}
+                                                {attendance ? attendance.m2 : '0'}
                                             </td>
                                             <td
                                                 id={`cell-${rowIndex}-2`}
@@ -219,7 +220,7 @@ const AddAttendance = () => {
                                                 onInput={(e) => handleInputChange(rowIndex, 'm3', e.target.textContent)}
                                                 onKeyDown={(e) => handleKeyDown(e, rowIndex, 2)}
                                             >
-                                                {attendance ? attendance.m3 : ' '}
+                                                {attendance ? attendance.m3 : '0'}
                                             </td>
                                             <td
                                                 id={`cell-${rowIndex}-3`}
@@ -229,9 +230,9 @@ const AddAttendance = () => {
                                                 onInput={(e) => handleInputChange(rowIndex, 'm4', e.target.textContent)}
                                                 onKeyDown={(e) => handleKeyDown(e, rowIndex, 3)}
                                             >
-                                                {attendance ? attendance.m4 : ' '}
+                                                {attendance ? attendance.m4 : '0'}
                                             </td>
-                                            <td className="px-4 py-2 border font-bold">{attendance ? attendance.total : ' '}</td>
+                                            <td className="px-4 py-2 border font-bold">{attendance ? attendance.total : '0'}</td>
                                         </tr>
                                     );
                                 })}

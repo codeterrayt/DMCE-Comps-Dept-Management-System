@@ -111,7 +111,7 @@ function App() {
           {/* //professor  */}
 
           <Route path="/professor" element={<ProfessorHome />} />
-          <Route path="/professor/add-attendance/:subjectId/:pr_th" element={<AddAttendance />} />
+          <Route path="/professor/add-attendance/:subjectId/:pr_th/:sub_batch/:academic_year" element={<AddAttendance />} />
           <Route path="*" element={<PageNotFound/>} />
 
 

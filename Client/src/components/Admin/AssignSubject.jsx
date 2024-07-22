@@ -180,6 +180,12 @@ const AssignSubject = () => {
             });
             setInitialData(response.data);
         } catch (error) {
+            if (error.response.status == 401) {
+                setLoading(false);
+                localStorage.clear()     
+                 navigate('/login') 
+                 return toast.error("unauthenticated");
+              }
             console.error('Error fetching initial data:', error);
             toast.error(error.response?.data?.message || "Failed to fetch data");
         } finally {
