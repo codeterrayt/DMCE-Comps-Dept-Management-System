@@ -144,6 +144,7 @@ Route::middleware(['auth:sanctum', 'verified', 'ability:token-admin'])->group(fu
 
 Route::middleware(['auth:sanctum', 'verified', 'ability:token-professor,token-admin'])->group(function () {
     Route::get('/ap/fetch/student-attendances', [StudentAttendanceController::class, 'index']);
+    Route::get('/ap/fetch/pr/student-attendances', [StudentAttendanceController::class, 'index_pr']);
     Route::post('/ap/add/student-attendance', [StudentAttendanceController::class, 'store']);
     Route::get('/ap/fetch/student-attendance/{id}', [StudentAttendanceController::class, 'show']);
     Route::post('/ap/update/student-attendance/{id}', [StudentAttendanceController::class, 'update']);
