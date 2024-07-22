@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AssignedSubject;
 use App\Models\Student;
 use App\Models\StudentAttendance;
 use App\Models\Subjects;
@@ -21,17 +22,17 @@ class StudentAttendanceController extends Controller
 
         $subject_id = $request->subject_id;
 
-        $curret_subject = Subjects::where("id",$subject_id)->first();
+        $current_subject = Subjects::where("id",$subject_id)->first();
 
         // dd($subject_sem->subject_sem);
 
         $data = Student::with(['attendances' => function ($query) use ($subject_id) {
             $query->where('subject_id', $subject_id);
-        }])->where("sem",$curret_subject->subject_sem)->get();
+        }])->where("sem",$current_subject->subject_sem)->get();
 
 
         // dd($subject_sem);
-        // $data = Student::where("sem",$curret_subject->subject_sem)->get();
+        // $data = Student::where("sem",$current_subject->subject_sem)->get();
 
 
         // if(count($data) == 0){
@@ -63,6 +64,35 @@ class StudentAttendanceController extends Controller
         //     ->get();
 
         // return response()->json($data);
+
+    }
+
+
+    public function index_pr(Request $request)
+    {
+
+        $request->validate([
+            "subject_id" => 'required|integer|exists:subjects,id',
+            "sub_batch" => "required|string|exists:sub_batches,sub_batch",
+            "academic_year" => "required|string"
+        ]);
+
+        $subject_id = $request->subject_id;
+        $sub_batch = $request->sub_batch;
+        $academic_year = $request->academic_year;
+
+        $current_subject = Subjects::where("id",$subject_id)->first();
+
+        // dd($subject_sem->subject_sem);
+
+        $data = Student::with(['attendances' => function ($query) use ($subject_id) {
+            $query->where('subject_id', $subject_id)
+            // ->where("pr_th",0)
+            ;
+        }])->where("sem",$current_subject->subject_sem)->where("batch",$sub_batch)->where("academic_year",$academic_year)->get();
+
+        return response()->json($data);
+
 
     }
 
