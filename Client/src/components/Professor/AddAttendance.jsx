@@ -6,10 +6,11 @@ import NavBar from './ProfessorNav';
 import Loaders2 from '../Loader2';
 import { checkLogin } from '../../helper/checkLogin';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const AddAttendance = () => {
-    const { subjectId  , pr_th , sub_batch , academic_year} = useParams();
-    console.log(sub_batch , academic_year);
+    const { subjectId, pr_th, sub_batch, academic_year } = useParams();
     const [students, setStudents] = useState([]);
     const [modifiedRows, setModifiedRows] = useState(new Map());
     const [loading, setLoading] = useState(false);
@@ -44,7 +45,7 @@ const AddAttendance = () => {
             let config = {
                 method: 'get',
                 maxBodyLength: Infinity,
-                url:  sub_batch ? `${import.meta.env.VITE_SERVER_DOMAIN}/ap/fetch/pr/student-attendances?subject_id=${subjectId}&sub_batch=${sub_batch}&academic_year=${academic_year}`:`${import.meta.env.VITE_SERVER_DOMAIN}/ap/fetch/student-attendances?subject_id=${subjectId}`,
+                url: sub_batch ? `${import.meta.env.VITE_SERVER_DOMAIN}/ap/fetch/pr/student-attendances?subject_id=${subjectId}&sub_batch=${sub_batch}&academic_year=${academic_year}` : `${import.meta.env.VITE_SERVER_DOMAIN}/ap/fetch/student-attendances?subject_id=${subjectId}`,
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -159,11 +160,79 @@ const AddAttendance = () => {
         }
     };
 
+    const exportToCSV = () => {
+        // Define the CSV headers
+        const headers = ['Student ID', 'Roll No', 'Name', 'Batch', 'Course Year', 'Sem', 'M1', 'M2', 'M3', 'M4', 'Total'];
+
+        // Prepare the rows
+        const rows = students.map(student => {
+            const attendance = student.attendances.find(att => att.subject_id == subjectId) || {};
+            return [
+                student.student_id,
+                student.roll_no,
+                student.name,
+                student.batch,
+                student.course_year,
+                student.sem,
+                attendance.m1 || '0',
+                attendance.m2 || '0',
+                attendance.m3 || '0',
+                attendance.m4 || '0',
+                attendance.total || '0'
+            ];
+        });
+
+        // Create the CSV content
+        const csvContent = [headers, ...rows].map(e => e.join(',')).join('\n');
+
+        // Create a downloadable blob
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'attendance.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const exportToPDF = () => {
+        const doc = new jsPDF();
+        const table = tableRef.current;
+        doc.autoTable({ html: table });
+        doc.save('attendance.pdf');
+    };
+
     return (
         <>
             <NavBar />
             {loading ? <Loaders2 message={"Fetching Attendance..."} /> : (
-                <div className="container mx-auto mt-5">
+                <div className="container mx-auto mt-3">
+                    <div className="mb-4 flex items-center justify-between  px-8">
+                        <p className='text-2xl font-bold'>Fill Attendance</p>
+                        <div className='flex flex-col gap-2 items-center'>
+                            <div className=''>
+                                <button
+                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                    onClick={saveAttendance}
+                                >
+                                    Save Attendance <i class="fa-solid fa-floppy-disk"></i>
+                                </button>
+                                <button
+                                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2"
+                                    onClick={exportToCSV}
+                                >
+                                     <i class="fa-solid fa-file-excel"></i>
+                                </button>
+                                <button
+                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2"
+                                    onClick={exportToPDF}
+                                >
+                                     <i class="fa-solid fa-file-pdf"></i>
+                                </button>
+                            </div>
+                            <p className='mt-1 text-[12px] text-red-500 mx-auto font-bold w-fit'>click save Attendance button or Press CTRL + S to save</p>
+                        </div>
+                    </div>
                     <div className="overflow-x-auto mb-4">
                         <table ref={tableRef} className="table-auto w-full text-left whitespace-no-wrap table table-striped">
                             <thead>
@@ -239,14 +308,7 @@ const AddAttendance = () => {
                             </tbody>
                         </table>
                     </div>
-                    <div className="mb-4">
-                        <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                            onClick={saveAttendance}
-                        >
-                            Save Attendance
-                        </button>
-                    </div>
+
                 </div>
             )}
         </>

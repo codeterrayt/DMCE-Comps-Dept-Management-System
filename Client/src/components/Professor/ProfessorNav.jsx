@@ -42,9 +42,9 @@ const NavBar = () => {
     const user = JSON.parse(localStorage.getItem('dmceuser'));
 
     return (
-        <nav className="bg-[#262847] text-white p-3 flex justify-between items-center">
+        <nav className="bg-[#262847] text-white p-3 flex justify-between items-center px-8 ">
             <div>
-                <img src={logo} alt="Logo" className="h-16" />
+                <img src={logo} alt="Logo" onClick={()=>navigate('/')} className="h-16 cursor-pointer" />
             </div>
             <div className="flex items-center">
                 <div className="mr-4">

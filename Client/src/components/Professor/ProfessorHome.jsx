@@ -52,7 +52,7 @@ const ProfessorHome = () => {
   };
 
   const handleNavigate = (sub) => {
-    if (!academicYear[sub.subject_id]) {
+    if ( sub.pr_th == 0 && !academicYear[sub.subject_id]) {
       toast.error("Please select an academic year.");
       return;
     }
@@ -86,7 +86,7 @@ const ProfessorHome = () => {
                   <th className="px-4 py-2 border">Semester</th>
                   <th className="px-4 py-2 border">PR/TH</th>
                   <th className="px-4 py-2 border">Batch</th>
-                  <th className="px-4 py-2 border">Select Academic Year</th>
+                  {/* <th className="px-4 py-2 border">Select Academic Year</th> */}
                   <th className="px-4 py-2 border">Sub Batch</th>
                   <th className="px-4 py-2 border">Add Attendance</th>
                 </tr>
@@ -98,20 +98,25 @@ const ProfessorHome = () => {
                     <td className="px-4 py-2 border">{sub.subject.subject_short}</td>
                     <td className="px-4 py-2 border">{sub.subject.subject_sem}</td>
                     <td className="px-4 py-2 border">{sub.pr_th === 1 ? "Theory" : "Practical"}</td>
-                    <td className="px-4 py-2 border">{sub.batch}</td>
-                    <td className="px-4 py-2 border">
-                      <select 
+                    <td className="px-4 py-2 border">{sub.batch}
+                      
+                    </td>
+                     
+                    
+                    <td className="px-4 py-2 border">{sub.sub_batch ? <div className='flex gap-1 flex-col justify-center'>
+                    {sub.sub_batch}
+                    <select 
                         className="w-full px-3 py-2 border rounded-md shadow-sm"
                         value={academicYear[sub.subject_id] || ''}
                         onChange={(e) => handleAcademicYearChange(e, sub.subject_id)}
                       >
                         <option value="">Select academic year</option>
-                        <option value="2020-2021">2020-2021</option>
-                        <option value="2021-2022">2021-2022</option>
-                        <option value="2022-2023">2022-2023</option>
+                        <option value="2020 - 2021">2020-2021</option>
+                        <option value="2021 - 2022">2021-2022</option>
+                        <option value="2022 - 2023">2022-2023</option>
                       </select>
+                    </div> : "All class"}
                     </td>
-                    <td className="px-4 py-2 border">{sub.sub_batch}</td>
                     <td 
                       onClick={() => handleNavigate(sub)} 
                       className="px-4 py-2 border text-center cursor-pointer hover:bg-[#262847] hover:text-white duration-200"
