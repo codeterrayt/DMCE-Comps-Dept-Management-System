@@ -187,22 +187,25 @@ class StudentAttendanceController extends Controller
     {
         $request->validate([
             'academic_year' => 'required|string',
-            'sem' => 'required|string|in:1,2,3,4,5,6,7,8'
+            'sem' => 'required|string|in:1,2,3,4,5,6,7,8',
+            'batch' => 'required'
         ]);
 
         $academic_year = $request->academic_year;
         $subjectSem = $request->sem;
+        $batch = $request->batch;
 
         // $data = Student::with(['attendances' => function ($query) use ($subjectSem, $academic_year) {
         //     $query->where('sem', $subjectSem)->where("academic_year",$academic_year);
         // }])->where("sem",$subjectSem)->get();
 
 
-        $data = Student::with(['attendances' => function ($query) use ($subjectSem, $academic_year) {
+        $data = Student::with(['attendances' => function ($query) use ($subjectSem, $academic_year,$batch) {
             $query->where('sem', $subjectSem)->where("academic_year",$academic_year);
             // ->where("pr_th",0)
             ;
-        }])->where("sem",$subjectSem)->where("academic_year",$academic_year)->get();
+        }])->where("sem",$subjectSem)->where("academic_year",$academic_year)->where("batch","like","{$batch}%")->get();
+
 
 
         return response()->json($data);
