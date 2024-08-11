@@ -162,25 +162,45 @@ class StudentAttendanceController extends Controller
             'total' => 'integer|nullable',
         ]);
 
-
-        // Find the attendance record by ID
         $attendance = StudentAttendance::find($id);
 
         if ($attendance == null) {
             return response()->json(['message' => 'Data not found'], 404);
         }
-
+        
         // Update the attendance record with the request data
         $attendance->update($request->all());
-
+        
         // Calculate the total
-        $total = ($request->m1 ?? 0) + ($request->m2 ?? 0) + ($request->m3 ?? 0) + ($request->m4 ?? 0);
-
+        $total = ($request->m1 ?? $attendance->m1) 
+               + ($request->m2 ?? $attendance->m2) 
+               + ($request->m3 ?? $attendance->m3) 
+               + ($request->m4 ?? $attendance->m4);
+        
         // Update the total in the attendance record
         $attendance->total = $total;
         $attendance->save();
-
+        
         return response()->json($attendance);
+
+        // Find the attendance record by ID
+        // $attendance = StudentAttendance::find($id);
+
+        // if ($attendance == null) {
+        //     return response()->json(['message' => 'Data not found'], 404);
+        // }
+
+        // // Update the attendance record with the request data
+        // $attendance->update($request->all());
+
+        // // Calculate the total
+        // $total = ($request->m1 ?? 0) + ($request->m2 ?? 0) + ($request->m3 ?? 0) + ($request->m4 ?? 0);
+
+        // // Update the total in the attendance record
+        // $attendance->total = $total;
+        // $attendance->save();
+
+        // return response()->json($attendance);
     }
 
     public function monthwise_attendance(Request $request)
