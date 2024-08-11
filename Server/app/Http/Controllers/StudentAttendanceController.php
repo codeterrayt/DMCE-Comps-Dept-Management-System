@@ -193,25 +193,16 @@ class StudentAttendanceController extends Controller
         $academic_year = $request->academic_year;
         $subjectSem = $request->sem;
 
-        $data = Student::with(["sem", 'attendances' => function ($query) use ($academic_year, $subjectSem) {
-            $query->where([["academic_year",$academic_year],['sem',$subjectSem]])->get();
-        }])->where([
-            ['sem', $subjectSem],
-            ['academic_year', $academic_year]
-        ])->get();
+        // $data = Student::with(['attendances' => function ($query) use ($subjectSem, $academic_year) {
+        //     $query->where('sem', $subjectSem)->where("academic_year",$academic_year);
+        // }])->where("sem",$subjectSem)->get();
 
 
-        // \DB::enableQueryLog();
-
-        // $data = Student::with(['subjects', 'subjects.attendances2' => function ($query) use ($academic_year, $subjectSem) {
-        //     $query->where('academic_year', $academic_year)
-        //         ->where('sem', $subjectSem);
-        // }])
-        //     ->where([
-        //         ['sem', $subjectSem],
-        //         ['academic_year', $academic_year]
-        //     ])
-        //     ->get();
+        $data = Student::with(['attendances' => function ($query) use ($subjectSem, $academic_year) {
+            $query->where('sem', $subjectSem)->where("academic_year",$academic_year);
+            // ->where("pr_th",0)
+            ;
+        }])->where("sem",$subjectSem)->where("academic_year",$academic_year)->get();
 
 
         return response()->json($data);
